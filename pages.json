@@ -1,0 +1,207 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": ""
+				// "navigationStyle": "custom"
+				// "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path" : "pages/message/task_join",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/user/user",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/user/login",
+			"style" : 
+			{
+				"navigationBarTitleText" : "登录",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/task/task_add",
+			"style" : 
+			{
+				"navigationBarTitleText" : "发布",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/task/task_search",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/task/task_info",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/task/task_member",
+			"style" : 
+			{
+				"navigationBarTitleText" : "已报名",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/message/task_chat_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/message/chat_user_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/user/other_user/other_user",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/task/task_share",
+			"style" : 
+			{
+				"navigationBarTitleText" : "发送到",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/task/task_share_user",
+			"style" : 
+			{
+				"navigationBarTitleText" : "发送到",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/report/report_task_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "举报任务",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/report/select_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "选择",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/report/report_user_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "举报用户",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/setting/setting_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "设置",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/setting/black_list_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "黑名单",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/edit/edit_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "编辑资料",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/edit/icon_crop",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/edit/edit_name_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "设置昵称",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/edit/edit_sex_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "选择性别",
+				"enablePullDownRefresh" : false
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			// "background": "#efeff4"
+			"background": "#939396"
+		}
+	},
+	"tabBar": {
+		"selectedColor": "#000000",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "任务"
+			},
+			{
+				"pagePath": "pages/message/task_join",
+				"text": "消息"
+			},
+			{
+				"pagePath": "pages/user/user",
+				"text": "我的"
+			}
+		]
+	}
+}
