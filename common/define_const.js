@@ -1,9 +1,9 @@
 // var HostBase = "http://192.168.0.39:18999"
 // var WsHost = "ws://192.168.0.39:10002/"
-var HostBase = "http://47.99.56.195:18999"
-var WsHost = "ws://47.99.56.195:10002/"
-// var HostBase = "http://192.168.0.77:8999"
-// var WsHost = "ws://192.168.0.77:10002/"
+// var HostBase = "http://47.99.56.195:18999"
+// var WsHost = "ws://47.99.56.195:10002/"
+var HostBase = "http://192.168.0.77:8999"
+var WsHost = "ws://192.168.0.77:10002/"
 
 var ErrCode = {
 	SUCCESS:0,
@@ -13,6 +13,7 @@ var ErrCode = {
 var EnumSex = {
 	WOMAN:0,
 	MAN:1,
+	NONE:2,
 }
 
 var TaskMoneyType = {
@@ -69,6 +70,8 @@ var PageType = {
 	User:1,
 	ChatUser:2,
 	ChatTask:3,
+	TaskListJoin:4,
+	TaskListMy:5,
 }
 
 var ReportTaskType = {
@@ -103,6 +106,22 @@ var ReportUserName = [
 	"其他",
 ]
 
+var TaskShowState = {
+	Open:0,			//进行中
+	InCheck:1,			//审核中
+	CheckFail:2,		//审核未通过
+	TaskTimeEnd:3,		//任务时间以结束
+	TaskDelete:4,		//任务以解散
+	Kicked:5,			//被踢出任务
+	Illegal:6,			//已下架
+}
+
+var CreditType = {
+	Bad:-1,
+	None:0,
+	Good:1,
+}
+
 export {
 	ErrCode,
 	EnumSex,
@@ -120,4 +139,6 @@ export {
 	ReportUserType,
 	ReportTaskName,
 	ReportUserName,
+	TaskShowState,
+	CreditType,
 }

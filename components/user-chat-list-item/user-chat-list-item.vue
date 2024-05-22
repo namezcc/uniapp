@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<uni-list-chat v-if="user" :avatar-circle="true" :title="user.name" :avatar="icon" 
-		:note="chatString" :time="timeString" @click="toChatPage" clickable>
+		:note="chatString" :time="timeString" @click="toChatPage" clickable :badgeText="unReadNum">
 		</uni-list-chat>
 	</view>
 </template>
@@ -23,7 +23,7 @@ import store from '../../store';
 			}
 		},
 		data() {
-			console.log("chat list data")
+			// console.log("chat list data")
 			return {
 				user:null,
 			};
@@ -32,22 +32,28 @@ import store from '../../store';
 			store.dispatch("getOtherUser",this.cid).then((res)=>{
 				if (res) {
 					this.user = res
+					// console.log("load icon ",res.icon)
 				}
 			})
 		},
 		computed:{
 			chat() {
 				let c = store.getters.getUserChatByCid(this.cid)
-				return c.data[0]
+				return c.data[0] || {}
 			},
 			icon() {
-				return util_common.getIconUrl(this.user.icon)
+				// console.log("icon ",this.user?.icon)
+				return util_common.getIconUrl(this.user?.icon)
 			},
 			timeString() {
 				return util_time.diffString(this.chat.send_time)
 			},
 			chatString() {
 				return util_chat.getShortContent(this.chat.content_type,this.chat.content)
+			},
+			unReadNum() {
+				let n = store.getters.getUserChatUnReadNum(this.cid)
+				return n == 0 ? "" : n
 			}
 		},
 		methods:{

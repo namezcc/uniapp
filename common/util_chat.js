@@ -26,9 +26,9 @@ function getShortContent(ctype,content) {
 			return content
 			break;
 		case ChatContentType.Image:
-			return "图片"
+			return "[图片]"
 		case ChatContentType.Task:
-			return "任务"
+			return "[任务]"
 		default:
 			break;
 	}

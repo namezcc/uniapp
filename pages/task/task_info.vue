@@ -1,83 +1,124 @@
 <template>
-	<view v-if="task" class="col-class">
+	<view v-if="task" class="col-class text-normal" style="height: 100%;">
 		<uv-popup ref="popup" mode="bottom" round="10px" :bgColor="theme.content_grey_deep">
 			<view style="height: 200px;padding: 10px;">
 				<uv-grid :col="4" :border="false">
-					<uv-grid-item>
+					<uv-grid-item v-if="selfTask && !isDelete" @click="deleteTask">
 						<chat-icon name="取消">
 							<uni-icons type="trash-filled" size="30"></uni-icons>
 						</chat-icon>
 					</uv-grid-item>
-					<uv-grid-item @click="toReportPage">
-						<chat-icon name="举报">
-							<uv-icon name="warning-fill"></uv-icon>
+					<uv-grid-item @click="toReportPage" >
+						<chat-icon name="举报" v-if="!selfTask">
+							<uv-icon name="warning-fill" size="24px"></uv-icon>
 						</chat-icon>
 					</uv-grid-item>
 				</uv-grid>
 			</view>
 		</uv-popup>
-		<myrow :customStyle="{backgroundColor: '#fff',padding:'5px'}">
-			<avatar :src="task.creator_icon"/>
+		<scroll-view scroll-y="true" :refresherEnabled="true" @refresherrefresh="onPullDownRefresh" :refresher-triggered="refreshFinish"
+		 style="height: 0;flex: 1;">
+		<myrow :customStyle="{backgroundColor: '#fff',padding:'10px'}">
+			<avatar :src="task.creator_icon" :tocid="task.cid"/>
 			<text>{{task.creator_name}}</text>
 			<expanded></expanded>
-			<uni-icons style="margin: 5px;" :type="starType" size="24" @click="onStarClick" :color="starColor"></uni-icons>
+			<view v-if="!selfTask" style="margin: 5px;">
+				<uni-icons :type="starType" size="24" @click="onStarClick" :color="starColor"></uni-icons>
+			</view>
 			<text :style="{margin: '5px',color:theme.primary}" v-if="selfTask" @click="toEditPage">编辑</text>
-			<uni-icons style="margin: 5px;" type="more-filled" @click="openPopup"></uni-icons>
+			<view style="margin: 5px;">
+				<uni-icons size="24" type="more-filled" @click="openPopup"></uni-icons>
+			</view>
+			<view style="width: 5px;"></view>
 		</myrow>
-		<scroll-view scroll-y="true" :refresherEnabled="true" @refresherrefresh="onPullDownRefresh" :refresher-triggered="refreshFinish"
-		 class="expanded">
 		<!-- style="height: 100%;" -->
 			<swiper :indicator-dots="true" :autoplay="false" v-if="images.length" style="height: 300px;background-color: #fff;">
 				<template v-for="(u,index) in images" :key="index">
 					<swiper-item style="height: 300px;">
-						<image :src="u" mode="aspectFit" style="height: 300px;width: 100%;"></image>
+						<image :src="u" mode="aspectFit" style="height: 300px;width: 100%;" @click="previewImage(index)"></image>
 					</swiper-item>
 				</template>
 			</swiper>
 			<view class="box-radius">
-				<uni-title :title="task.title" type="h2"></uni-title>
-				<!-- <text class="task-title">{{task.title}}</text> -->
-				<view style="font-size: 15px;">
-					<text>{{task.content}}</text>
-				</view>
+				<!-- <uni-title :title="task.title" type="h2"></uni-title> -->
+				<uni-section :title="task.title" type="line" titleFontSize="18px">					
+					<!-- <text class="task-title">{{}}</text> -->
+					<view style="font-size: 14px;margin: 5px;">
+						<text>{{task.content}}</text>
+					</view>
+				</uni-section>
 			</view>
 			<!-- <uv-line></uv-line> -->
 			<view class="box-radius">
-				<uv-cell-group>
-					<uv-cell :title="moneyTitle" >
-						<template v-slot:value>
-							<text class="text-primary">{{moneyString}}</text>
-						</template>
-					</uv-cell>
-					<uv-cell title="已报名" @click="toMemberPage">
-						<template v-slot:value>
-							<text class="text-normal">{{numString}}</text>
-							<uni-icons type="right"></uni-icons>
-						</template>
-					</uv-cell>
-					<uv-cell title="报名截止时间" >
-						<template v-slot:value>
-							<text class="text-primary">{{timeString}}</text>
-						</template>
-					</uv-cell>
-					<uv-cell title="发布时间" >
-						<template v-slot:value>
-							<text class="text-normal">{{task.createAt}}</text>
-						</template>
-					</uv-cell>
-					<uv-cell title="任务地点" @click="toMapLocation">
-						<template v-slot:value>
-							<text class="text-normal">{{location}}</text>
-							<uni-icons type="right"></uni-icons>
-						</template>
-					</uv-cell>
-				</uv-cell-group>
+				<view class="cell-info">
+					<myrow>
+						<text class="text-subtitle">{{moneyTitle}}</text>
+						<expanded></expanded>
+						<text class="text-primary">{{moneyString}}</text>
+					</myrow>
+				</view>
+				<view class="cell-info" @click="toMemberPage">
+					<myrow>
+						<text class="text-subtitle">报名信息</text>
+						<expanded></expanded>
+						<text>{{numString}}</text>
+						<uni-icons type="right"></uni-icons>
+					</myrow>
+				</view>
+				<view v-if="task.address != null" class="cell-info" @click="toMapLocation">
+					<myrow>
+						<text class="text-subtitle">任务地点</text>
+						<expanded></expanded>
+						<text>{{location}}</text>
+						<uni-icons v-if="this.task.address != null" type="right"></uni-icons>
+					</myrow>
+				</view>
+				<view class="cell-info">
+					<myrow>
+						<text class="text-subtitle">报名截止时间</text>
+						<expanded></expanded>
+						<text>{{timeString}}</text>
+					</myrow>
+				</view>
+				<view class="cell-info" v-if="(task.task_start_time ?? 0) > 0">
+					<uni-section title="开始结束时间" type="circle">						
+						<myrow mainAlign="center">
+							<view class="timeContent">
+								{{taskStartTime}}
+							</view>
+							<text style="margin: 10px;">至</text>
+							<view class="timeContent">
+								{{taskEndTime}}
+							</view>
+						</myrow>
+					</uni-section>
+				</view>
 			</view>
+			<view class="box-radius">
+				<view class="cell-info">
+					<myrow>
+						<text class="text-subtitle">信用分限制</text>
+						<expanded></expanded>
+						<text :style="{color:theme.primary_low}">{{taskCreditScore}}</text>
+					</myrow>
+				</view>
+				<view class="cell-info">	
+				<myrow>
+					<text class="text-subtitle">发布时间</text>
+					<expanded></expanded>
+					<text>{{task.createAt}}</text>
+				</myrow>
+				</view>
+			</view>
+			<view style="height: 50px;"></view>
 		</scroll-view>
 		<myrow :customStyle="{backgroundColor: '#fff',padding:'5px'}" :wrap="false">
 			<!-- <uni-icons type=""></uni-icons> -->
-			<uv-icon name="share" size="26" :customStyle="{marginLeft: '10px',marginRight: '10px'}" @click="showShare"></uv-icon>
-			<button @click="optAction" class="fill-btn-primary" >{{optName}}</button>
+			<mycol>
+				<uv-icon name="share" size="26" :customStyle="{marginLeft: '10px',marginRight: '10px'}" @click="showShare"></uv-icon>
+				<text class="text-share">分享</text>
+			</mycol>
+			<button @click="optAction" :class="canAction?'fill-btn-primary':'fill-btn-primary-disabled'">{{optName}}</button>
 		</myrow>
 		<view class="bg-color-white">
 			<uv-safe-bottom></uv-safe-bottom>
@@ -89,17 +130,22 @@
 <script>
 	import store from "@/store/index.js"
 	import util_task from "@/common/util_task"
-	import { ErrCode, TaskMoneyType, UpdateEventType, UserFinishState } from "../../common/define_const"
+	import { EnumSex, ErrCode, TaskMoneyType, UpdateEventType, UserFinishState } from "../../common/define_const"
 	import apihandle from "@/common/api_handle"
 	import { mapState,mapGetters } from "vuex"
 	import {color as theme} from "@/common/theme.js"
 	import user_data from "../../store/modules/user_data"
+import util_time from "../../common/util_time"
+import util_page from "../../common/util_page"
+import util_common from "../../common/util_common"
 	
 	var optState = {
 		join:0,
 		quit:1,
 		finish:2,
 		full:3,
+		sexMan:4,
+		sexWoman:5,
 	}
 	
 	export default {
@@ -108,12 +154,25 @@
 				taskid:null,
 				refreshFinish: false,
 				theme:theme,
+				task:null,
 			}
 		},
 		onLoad(e) {
 			// this.task = store.getters.getTaskById(e.taskid)
 			this.taskid = e.taskid
 			
+			uni.showLoading({
+			})
+			store.dispatch("getTaskInfo",this.taskid).then((res)=>{
+				if (res && res.state != util_task.TaskServerState.Illegal) {
+					this.task = res
+				}else{
+					apihandle.toast("任务已下架")
+					uni.navigateBack()
+				}
+			}).finally(()=>{
+				uni.hideLoading()
+			})
 			// uni.$on(UpdateEventType.Task,(tid)=>{
 			// 	if (tid == this.taskid) {
 			// 		this.taskid = tid
@@ -128,11 +187,14 @@
 			...mapState({
 				user: state => state.user_data.user,
 			}),
-			task() {
-				return store.getters.getTaskById(this.taskid)
-			},
+			// task() {
+			// 	return store.getters.getTaskById(this.taskid)
+			// },
 			selfTask() {
 				return this.task.cid == this.user.cid
+			},
+			isDelete() {
+				return this.task.delete == 1
 			},
 			starType() {
 				return this.inInterestTask(this.taskid) ? "star-filled" : "star"
@@ -144,10 +206,10 @@
 				return util_task.getImageUrls(this.task)
 			},
 			moneyTitle() {
-				return this.task.money_type == TaskMoneyType.Reward ? "可获得报酬" : "需要支付给发布者"
+				return this.task.money_type == TaskMoneyType.Reward ? "可获得奖励" : "需支付费用"
 			},
 			moneyString() {
-				return util_task.getMoneyString(this.task)
+				return util_task.getMoneyString(this.task,true)
 			},
 			numString() {
 				return util_task.getNumString(this.task)
@@ -170,12 +232,20 @@
 						return optState.quit
 					}
 				}else{
+					let limitsex = util_task.getLimitSex(task)
+					if (limitsex != EnumSex.NONE && limitsex != user.sex) {
+						return limitsex == EnumSex.WOMAN ? optState.sexWoman : optState.sexMan
+					}
 					if (util_task.canJoin(task,user.sex)) {
 						return optState.join
 					}else{
 						return optState.full
 					}
 				}
+			},
+			canAction() {
+				var state = this.getOptState
+				return state == optState.join || state == optState.quit
 			},
 			optName() {
 				var state = this.getOptState
@@ -187,7 +257,21 @@
 					return "已完成"
 				}else if(state == optState.full){
 					return "已满"
+				}else if(state == optState.sexWoman){
+					return "限女生"
+				}else if(state == optState.sexMan){
+					return "限男生"
 				}
+			},
+			taskStartTime() {
+				return util_time.formatTaskWeekTime(this.task.task_start_time)
+			},
+			taskEndTime() {
+				return util_time.formatTaskWeekTime(this.task.task_end_time)
+			},
+			taskCreditScore() {
+				let score = this.task.credit_score || 0
+				return `≥ ${score} 分`
 			}
 		},
 		methods: {
@@ -249,14 +333,43 @@
 					url:"/pages/task/task_add?taskid="+this.taskid,
 				})
 			},
+			checkJoin() {
+				if (this.user.age <= 0) {
+					apihandle.toast("请先进行实名验证")
+					util_page.toIdCardPage()
+					return false
+				}
+				let needscore = this.task.credit_score||0
+				let uscore = util_common.getCreditShowScore(this.user.credit_score)
+				if (uscore < needscore) {
+					apihandle.toast("信用分不足")
+					return false
+				}
+				let now = util_time.getSecond()
+				if (now > this.task.end_time) {
+					apihandle.toast("报名时间已结束")
+					return false
+				}
+				if (this.task.state != 1) {
+					apihandle.toast("任务未开始")
+					return false
+				}
+				return true
+			},
 			optAction() {
 				var state = this.getOptState
 				if (state == optState.join) {
+					if (!this.checkJoin()) {
+						return
+					}
 					apihandle.apiJoinTask(this.task.id).then((res)=>{
 						if (res) {
 							this.task.join = res.join
 							store.commit("updateTaskOne",this.task)
 							apihandle.toast("报名成功")
+							uni.navigateTo({
+								url:"/pages/message/task_chat_page?taskid="+this.task.id,
+							})
 						}
 					})
 				}else if (state == optState.quit) {
@@ -274,9 +387,11 @@
 			},
 			showShare() {
 				uni.showActionSheet({
+					// title:"分享到",
+					// alertText:"分享到",
 					itemList:["已报名","我的发布","私聊"],
 					success: (i) => {
-						console.log("share ",i.tapIndex)
+						// console.log("share ",i.tapIndex)
 						let url = ""
 						switch (i.tapIndex){
 							case 0:
@@ -297,9 +412,44 @@
 					}
 				})
 			},
+			// 解散任务
+			deleteTask() {
+				uni.showModal({
+					title:"解散任务",
+					content:"确定解散任务吗?",
+					success: (res) => {
+						if (res.confirm) {
+							store.commit("deleteMyTask",this.taskid)
+							apihandle.toast("已解散")
+							// uni.navigateBack()
+							uni.switchTab({
+								url: '/pages/message/task_join'
+							});
+						}
+					}
+				})
+			},
 			toReportPage() {
 				uni.navigateTo({
 					url:`/pages/report/report_task_page?cid=${this.user.cid}&taskid=${this.taskid}`
+				})
+			},
+			onImgTouchStart(e) {
+				console.log("touch start")
+				this.viewImage = true
+			},
+			onImgTouchMove(e) {
+				console.log("touch move")
+				this.viewImage = false
+			},
+			previewImage(index) {
+				// console.log("previewImage")
+				// if (!this.viewImage) {
+				// 	return
+				// }
+				uni.previewImage({
+					urls:this.images,
+					current:index,
 				})
 			}
 		}
@@ -317,25 +467,36 @@
 	}
 	
 	.box-radius {
-		// border-radius: 10px;
-		// margin: 5px;
-		padding: 10px;
+		border-radius: 20rpx;
+		margin: 20rpx;
+		padding: 20rpx;
 		background-color: #fff;
-	}
-	
-	.task-title{
-		font-size: 20px;
-		font-weight:  500;
+		color: $uni-main-color;
+		font-size: 14px;
 	}
 	
 	.text-primary {
 		color: $my-color-primary;
-		font-size: 12px;
+		// font-size: 12px;
+	}
+	
+	.text-subtitle {
+		font-size: 14px;
+		color: $uni-secondary-color;
+	}
+	
+	.cell-info {
+		margin: 10px 0px;
 	}
 	
 	.text-normal {
-		// color: $my-color-primary;
-		font-size: 12px;
+		color: $uni-main-color;
+		// font-size: 12px;
+	}
+	
+	.text-share {
+		color: $uni-base-color;
+		font-size: 14px;
 	}
 	
 	

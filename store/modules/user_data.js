@@ -12,6 +12,7 @@ export default {
 		interestTask: [],	//兴趣列表
 		blackList:[],		//黑名单
 		user_map: new Map(),
+		user_credit_type: new Map(),		//评价类型
 	},
 	getters: {
 		inInterestTask: state => (id) => {
@@ -28,6 +29,13 @@ export default {
 		setUser(state,user) {
 			state.user = user
 			global_data.setUser(user)
+			state.user_map.set(user.cid,user)
+		},
+		logout(state) {
+			console.log("logout user")
+			state.user = {cid:0}
+			global_data.setUser(null)
+			this.commit("setLogoutToken")
 		},
 		setLocation(state,loc) {
 			state.location = loc
@@ -61,17 +69,27 @@ export default {
 		},
 		setUserSex(state,sex) {
 			state.user.sex = sex
+		},
+		setOtherUserCredit(state,{cid,ctype}) {
+			let u = state.user_map.get(cid)
+			if (u) {
+				let oldtype = state.user_credit_type.get(cid) || 0
+				state.user_credit_type.set(cid,ctype)
+				let score = ctype - oldtype
+				u.credit_score += score
+				api.apiSetCreditToUserType(cid,ctype)
+			}
 		}
 	},
 	actions: { 
 		getUserData(context) {
-			// console.log("getUserData")
+			console.log("getUserData")
 			api.apiGetUserInfo().then((res)=>{
 				if (res) {
 					// console.log(res)
 					context.commit("setUser",res)
 				}else{
-					context.commit("login","")
+					// context.commit("login","")
 				}
 			})
 			// 初始化都在这做
@@ -117,8 +135,57 @@ export default {
 			}
 			return res
 		},
+		async getOtherUserListOrCash(context,cidvec) {
+			if (cidvec.length == 0) {
+				return []
+			}
+			let vec = []
+			let umap = context.state.user_map
+			for (let cid of cidvec) {
+				let u = umap.get(cid)
+				if (u == null) {
+					vec.push(cid)
+				}
+			}
+			let resvec = []
+			if (vec.length > 0) {
+				let res = await api.apiGetUserList(vec)
+				if (res) {
+					for (let v of res) {
+						umap.set(v.cid,v)
+					}
+				}
+			}
+			for (let cid of cidvec) {
+				let u = umap.get(cid)
+				resvec.push(u)
+			}
+			return resvec
+		},
 		async getBlackListUser(context) {
 			return await this.dispatch("getOtherUserList",context.state.blackList)
+		},
+		async getUserCreditType(context,cid) {
+			let ctype = context.state.user_credit_type.get(cid)
+			if (ctype != null) {
+				return ctype
+			}
+			
+			let res = await api.apiGetCreditToUserType(cid)
+			if (res) {
+				ctype = res.ctype
+				context.state.user_credit_type.set(cid,ctype)
+			}else{
+				ctype = 0
+			}
+			return ctype
+		},
+		async checkIdcard(context,{idcard,name}) {
+			let res = await api.apiCheckIdCard(idcard,name)
+			if (res) {
+				context.state.user.age = util_common.getAgeFromID(idcard)
+			}
+			return res
 		}
 	}
 }

@@ -2,14 +2,18 @@
 	<view>
 		<scroll-view scroll-y="true" style="height: 100%;">
 			<uni-list v-if="task && task.join">
-				<uni-list-item v-for="(mem,index) in task.join.data" @click="toUserInfoPage(mem)" :clickable="true" :key="index">
+				<uni-list-item v-for="(mem,index) in member" @click="toUserInfoPage(mem)" :clickable="true" :key="index">
 					<template v-slot:header>
 						<myrow>							
 							<avatar :src="mem.icon" :sex="mem.sex"></avatar>
-							<text>{{mem.name}}</text>
+							<view style="width: 5px;"></view>
+							<mycol itemAlign="flex-start">								
+								<text style="margin-bottom: 8px;">{{mem.name}}</text>
+								<text-tag :text="creditScore(mem)"></text-tag>
+							</mycol>
 							<expanded></expanded>
-							<button @click.stop="kickPeople(mem)" type="warn" v-if="optKick(mem)" size="mini" >踢出</button>
-							<button disabled="true" v-if="optFinish(mem)" size="mini">已完成</button>
+							<button @click.stop="kickPeople(mem)" type="warn" v-if="optKick(index)" size="mini" >踢出</button>
+							<button disabled="true" v-if="optFinish(index)" size="mini">已完成</button>
 						</myrow>
 					</template>
 				</uni-list-item>
@@ -30,6 +34,8 @@
 	import { UserFinishState } from "@/common/define_const"
 	import store from "@/store/index.js"
 import apihandle from "../../common/api_handle"
+import util_common from "../../common/util_common"
+import util_task from "../../common/util_task"
 	
 	var MemOpt = {
 		Finish:0,
@@ -42,10 +48,15 @@ import apihandle from "../../common/api_handle"
 			return {
 				task:null,
 				kickmsg:"",
+				member:[],
 			}
 		},
 		onLoad(e) {
 			this.task = store.getters.getTaskById(e.taskid)
+			let cidvec = util_task.getTaskJoinCidvec(this.task)
+			store.dispatch("getOtherUserListOrCash",cidvec).then((res)=>{
+				this.member = res
+			})
 		},
 		computed:{
 			...mapState({
@@ -63,10 +74,12 @@ import apihandle from "../../common/api_handle"
 					return MemOpt.Kick
 				}
 			},
-			optKick(mem) {
+			optKick(index) {
+				let mem = this.task.join.data[index]
 				return this.optState(mem) == MemOpt.Kick
 			},
-			optFinish(mem) {
+			optFinish(index) {
+				let mem = this.task.join.data[index]
 				return this.optState(mem) == MemOpt.Finish
 			},
 			kickPeople(mem) {
@@ -91,10 +104,16 @@ import apihandle from "../../common/api_handle"
 			},
 			toUserInfoPage(mem) {
 				// console.log("toUserInfoPage")
+				if (this.cid == mem.cid) {
+					return
+				}
 				uni.navigateTo({
 					url:`/pages/user/other_user/other_user?cid=${mem.cid}`
 				})
-			}
+			},
+			creditScore(mem) {
+				return '信用分 '+ util_common.getCreditShowScore(mem.credit_score)
+			},
 		},
 		
 	}

@@ -73,7 +73,7 @@
     /* 快应用特有相关 */
     "mp-weixin" : {
         /* 小程序特有相关 */
-        "appid" : "wxc2ebd6f664aa788a",
+        "appid" : "wxf37907f7775402c1",
         "setting" : {
             "urlCheck" : false
         },

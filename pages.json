@@ -3,7 +3,8 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "",
+				"disableScroll": true
 				// "navigationStyle": "custom"
 				// "enablePullDownRefresh": true
 			}
@@ -13,7 +14,8 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "",
-				"enablePullDownRefresh" : false
+				"enablePullDownRefresh" : false,
+				"disableScroll": true
 			}
 		},
 		{
@@ -21,7 +23,8 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "",
-				"enablePullDownRefresh" : false
+				"enablePullDownRefresh" : true
+				// "disableScroll": true
 			}
 		},
 		{
@@ -52,8 +55,9 @@
 			"path" : "pages/task/task_info",
 			"style" : 
 			{
-				"navigationBarTitleText" : "",
-				"enablePullDownRefresh" : false
+				"navigationBarTitleText" : "任务信息",
+				"enablePullDownRefresh" : false,
+				"disableScroll": true
 			}
 		},
 		{
@@ -69,7 +73,8 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "",
-				"enablePullDownRefresh" : false
+				"enablePullDownRefresh" : false,
+				"disableScroll": true
 			}
 		},
 		{
@@ -77,7 +82,10 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "",
-				"enablePullDownRefresh" : false
+				"enablePullDownRefresh" : false,
+				"disableScroll": true
+				// "navigationStyle": "custom",
+				// "navigationBarTextStyle": "white"
 			}
 		},
 		{
@@ -85,7 +93,8 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "",
-				"enablePullDownRefresh" : false
+				"enablePullDownRefresh" : false,
+				"onReachBottomDistance": 50
 			}
 		},
 		{
@@ -169,16 +178,34 @@
 			}
 		},
 		{
-			"path" : "pages/edit/edit_sex_page",
+			"path" : "pages/message/test_chat_page",
 			"style" : 
 			{
-				"navigationBarTitleText" : "选择性别",
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false,
+				"disableScroll": true
+			}
+		},
+		{
+			"path" : "pages/edit/edit_idcard_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "实名认证",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/setting/suggest_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "建议/反馈",
 				"enablePullDownRefresh" : false
 			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
+		// "backgroundColorTop": "#fff",
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8",
@@ -189,10 +216,12 @@
 	},
 	"tabBar": {
 		"selectedColor": "#000000",
+		"fontSize": "16px",
+		"color": "#999",
 		"list": [
 			{
 				"pagePath": "pages/index/index",
-				"text": "任务"
+				"text": "帮帮"
 			},
 			{
 				"pagePath": "pages/message/task_join",

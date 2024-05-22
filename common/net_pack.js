@@ -1,5 +1,13 @@
 export var HEAD_SIZE = 8;
 
+function encodeText(str) {
+	return unescape(encodeURIComponent(str)).split("").map(val => val.charCodeAt());
+}
+
+function decodeText(arrbuff) {
+	return decodeURIComponent(escape(String.fromCharCode(...new Uint8Array(arrbuff))));
+}
+
 class NetPack {
   offset = 0;
 
@@ -39,6 +47,15 @@ class NetPack {
     this.offset += 4;
     return v;
   }
+  
+  readInt64() {
+    if (this.offset + 8 > this._buff.byteLength) {
+      return 0
+    }
+    let v = this._buff.getBigInt64(this.offset, true);
+    this.offset += 8;
+    return v;
+  }
 
   /**
    * 
@@ -52,7 +69,8 @@ class NetPack {
     if (this.offset + len > this._buff.buffer.byteLength) {
       return "";
     }
-    let s = new TextDecoder("utf-8").decode(this._buff.buffer.slice(this.offset, this.offset + len));
+    // let s = new TextDecoder("utf-8").decode(this._buff.buffer.slice(this.offset, this.offset + len));
+	let s = decodeText(this._buff.buffer.slice(this.offset, this.offset + len));
     this.offset += len;
     return s;
   }
@@ -62,7 +80,10 @@ class NetPack {
    * @returns {String}
    */
   readBuffString() {
-    return new TextDecoder("utf-8").decode(this._buff.buffer.slice(this.offset));
+	// let buff = this._buff.buffer.slice(this.offset);
+	let s = decodeText(this._buff.buffer.slice(this.offset));
+    // return new TextDecoder("utf-8").decode(this._buff.buffer.slice(this.offset));
+	return s;
   }
   
   /**
@@ -100,14 +121,21 @@ class NetPack {
     this._buff.setInt32(this.offset, v, true);
     this.offset += 4;
   }
+  
+  writeInt64(v) {
+    this._checkExpand(8);
+    this._buff.setBigInt64(this.offset, BigInt(v), true);
+    this.offset += 8;
+  }
 
   /**
    * 
    * @param {String} s 
    */
   writeString(s) {
-    let encoder = new TextEncoder();
-    let encodedString = encoder.encode(s);
+    // let encoder = new TextEncoder();
+    // let encodedString = encoder.encode(s);
+	let encodedString = encodeText(s);
     this._checkExpand(4 + encodedString.byteLength)
     this.writeInt32(encodedString.length);
     new Uint8Array(this._buff.buffer).set(encodedString, this.offset);
@@ -119,8 +147,9 @@ class NetPack {
    * @param {String} s 
    */
   writeBufferString(s) {
-    let encoder = new TextEncoder();
-    let encodedString = encoder.encode(s);
+    // let encoder = new TextEncoder();
+    // let encodedString = encoder.encode(s);
+	let encodedString = encodeText(s);
     this._checkExpand(encodedString.length)
     new Uint8Array(this._buff.buffer).set(encodedString, this.offset);
     this.offset += encodedString.length;

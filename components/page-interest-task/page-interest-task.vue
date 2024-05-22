@@ -1,9 +1,16 @@
 <template>
 	<view class="content">
 		<z-paging v-if="firstLoaded || isCurrentPage" ref="paging" v-model="dataList" @query="queryList"
-		:paging-style="{top:'0px',bottom:'0px'}" :default-page-size="pageSize">
+		 :default-page-size="pageSize" :fixed="customClick" :hide-empty-view="true">
 			<view v-for="(task,index) in dataList" :key="index" @click="toTaskInfo(task)">
 				<task-item :task="task"></task-item>
+			</view>
+			<view v-if="this.firstLoaded && dataList.length == 0" style="width: 100%;">
+				<myrow mainAlign="center">					
+					<view style="width: 200px;">
+						<uv-divider text="" :dot="true"></uv-divider>
+					</view>
+				</myrow>
 			</view>
 		</z-paging>
 	</view>
@@ -33,6 +40,9 @@
 			// 当前swiper切换到第几个index
 			currentIndex: {
 				default: 0,
+			},
+			customClick:{
+				default:false
 			}
 		},
 		watch: {
@@ -61,6 +71,7 @@
 					}else{
 						this.$refs.paging.complete([])
 					}
+					this.firstLoaded = true
 				})
 			},
 			toTaskInfo(task) {

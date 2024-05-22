@@ -6,10 +6,13 @@
 				<uni-icons type="camera" class="camera-icon" :size="30"></uni-icons>
 			</view>
 		</view>
-		<uv-cell-group>
-			<uv-cell title="昵称" :isLink="true" @click="toEditName" :value="user.name"></uv-cell>
-			<uv-cell title="性别" :isLink="true" @click="toEditSex" :value="sex"></uv-cell>
-		</uv-cell-group>
+		<view class="card">			
+			<uv-cell-group :border="false">
+				<uv-cell title="昵称" :isLink="true" @click="toEditName" :value="user.name"></uv-cell>
+				<!-- <uv-cell title="性别" :isLink="true" @click="toEditSex" :value="sex"></uv-cell> -->
+				<uv-cell title="实名验证" :isLink="true" @click="toEditIdCard" :value="idcard" :border="false"></uv-cell>
+			</uv-cell-group>
+		</view>
 	</view>
 </template>
 
@@ -29,6 +32,9 @@ import { EnumSex } from "../../common/define_const"
 			}),
 			sex() {
 				return this.user.sex == EnumSex.MAN ? "男" :"女"
+			},
+			idcard() {
+				return this.user.age > 0 ? "(已完成)" : "(未完成)"
 			}
 		},
 		methods: {
@@ -51,9 +57,17 @@ import { EnumSex } from "../../common/define_const"
 					url:"/pages/edit/edit_name_page?name="+this.user.name
 				})
 			},
-			toEditSex() {
+			// toEditSex() {
+			// 	uni.navigateTo({
+			// 		url:"/pages/edit/edit_sex_page"
+			// 	})
+			// },
+			toEditIdCard() {
+				if (this.user.age > 0) {
+					return
+				}
 				uni.navigateTo({
-					url:"/pages/edit/edit_sex_page"
+					url:"/pages/edit/edit_idcard_page"
 				})
 			}
 		}
@@ -73,6 +87,12 @@ import { EnumSex } from "../../common/define_const"
 		position: absolute;
 		right: 0;
 		bottom: 0;
+	}
+	
+	.card {
+		border-radius: 10px;
+		background-color: #fff;
+		margin: 0px 10px;
 	}
 	
 </style>

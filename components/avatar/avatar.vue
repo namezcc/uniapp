@@ -1,6 +1,6 @@
 <template>
 	<view :style="[avatorBox]">
-		<uv-avatar :src="urls" :size="radius" @click="toUserPage"></uv-avatar>
+		<uv-avatar :src="userurl" :size="radius" @click="toUserPage"></uv-avatar>
 		<view class="sex-icon">
 			<uv-icon v-if="sex!=null" :name="iconname" :color="sexcolor" :bold="true"></uv-icon>
 		</view>
@@ -10,6 +10,8 @@
 <script>
 import { EnumSex, PageType } from '../../common/define_const';
 	import util_common from "@/common/util_common.js"
+	import store from '@/store';
+import global_data from '../../common/global_data';
 
 	export default {
 		name:"avatar",
@@ -18,7 +20,7 @@ import { EnumSex, PageType } from '../../common/define_const';
 				default:40,
 			},
 			src:{
-				require:true,
+				default:"",
 			},
 			sex:{
 				default:null,
@@ -28,19 +30,34 @@ import { EnumSex, PageType } from '../../common/define_const';
 			},
 			tocid:{
 				default:0,
+			},
+			usercid:{
+				default:0,
 			}
+		},
+		mounted() {
+			if (this.usercid > 0) {
+				// 加载玩家数据
+				store.dispatch("getOtherUser",this.usercid).then((res)=>{
+					if (res) {
+						this.userurl = res.icon
+						// console.log("user icon ",res.icon)
+					}
+				})
+			}
+			// console.log("user icon data",this.src)
 		},
 		data() {
 			return {
-				aurl:"/static/icon/head_0_h.png",
 				iconname: this.sex == EnumSex.WOMAN ? "woman" : "man",
 				sexcolor: this.sex == EnumSex.WOMAN ? "pink" : "royalblue",
+				userurl:this.src,
 			};
 		},
 		computed:{
-			urls() {
-				return util_common.getIconUrl(this.src)
-			},
+			// urls() {
+			// 	return this.userurl || this.src
+			// },
 			avatorBox() {
 				return this.sex !== null ? {
 					position: 'relative',
@@ -51,7 +68,7 @@ import { EnumSex, PageType } from '../../common/define_const';
 		},
 		methods:{
 			toUserPage() {
-				if (this.tocid == 0) {
+				if (this.tocid == 0 || this.tocid == global_data.cid) {
 					return
 				}
 				if (this.inpage == PageType.User) {

@@ -1,18 +1,20 @@
 <template>
-	<view>
-		<view class="input-content">
+	<view class="input-content">
+		<view>
 			<myrow>
-				<uv-textarea ref="chatinput" autoHeight :cursor="cursor" :focus="focus" @blur="onInputBlue"
+				<!-- <uv-textarea ref="chatinput" autoHeight :cursor="cursor" :focus="focus" @blur="onInputBlue" @confirm="onSendMsg"
 					v-model="inputContent" :customStyle="{margin:'10px',backgroundColor: '#fff'}"
-					:adjustPosition="false" @keyboardheightchange="onKeyBoardHeight" />
-				<toggle-button @state="toggleEmojiKeyboard" :state1="!emojiKeyboardVisible" :customStyle="{margin:'5px'}">
+					:adjustPosition="false" border="none" confirmType="send" /> -->
+				<uv-input :cursor="cursor" :focus="focus" @blur="onInputBlue" @confirm="onSendMsg" :confirmHold="true"
+				v-model="inputContent" :customStyle="{margin:'10px',backgroundColor: '#fff'}" :adjustPosition="false" confirmType="send"></uv-input>
+				<!-- <toggle-button @state="toggleEmojiKeyboard" :state1="!emojiKeyboardVisible" :customStyle="{margin:'5px'}">
 					<template v-slot>
 						<myicon name="biaoqing" :customStyle="{fontSize:'24px'}"></myicon>
 					</template>
 					<template v-slot:state2>
 						<myicon name="jianpan1" :customStyle="{fontSize:'24px'}"></myicon>
 					</template>
-				</toggle-button>
+				</toggle-button> -->
 				
 				<toggle-button @state="onCustomKeyBoard" :state1="!customBoardShow" :customStyle="{margin:'5px'}">
 					<template v-slot>
@@ -24,7 +26,7 @@
 				</toggle-button>
 			</myrow>
 		</view>
-		<view class="emoji-keyboard" v-show="emojiKeyboardVisible">
+		<!-- <view class="emoji-keyboard" v-show="emojiKeyboardVisible">
 			<scroll-view scroll-y="true" class="emoji-content" enable-flex="true">
 				<uv-grid :col="7" @click="onClickEmoji">
 					<uv-grid-item v-for="(emoji,index) in emojis" :key="index">
@@ -43,13 +45,12 @@
 					</button>
 				</myrow>
 			</view>
-		</view>
+		</view> -->
 		<view class="custom-board" v-show="customBoardShow">
 			<view style="height: 10px;"></view>
 			<slot name="customBoard"></slot>
 		</view>
-		<view :style="{height:keyBoardHeight+'px',width:'100%'}"></view>
-		<uv-safe-bottom></uv-safe-bottom>
+		<!-- <view :style="{height:keyBoardHeight+'px',width:'100%'}"></view> -->
 	</view>
 </template>
 
@@ -82,7 +83,10 @@
 			onInputBlue(event) {
 				this.cursor = event.detail.cursor
 			},
-			
+			onInputFocus() {
+				this.emojiKeyboardVisible = false
+				this.customBoardShow = false
+			},
 			onClickEmoji(n) {
 				this.addEmoji(this.emojis[n])
 			},
@@ -141,14 +145,22 @@
 					return
 				}
 				this.$emit("sendmsg",this.inputContent)
+				this.inputContent = ""
 			}
+		},
+		options: {
+			// multpleSlots: true,
+			// styleIsolation: "shared",
+			// addGlobalClass: true,
+			virtualHost: true,
 		}
 	}
 </script>
 
 <style lang="scss">
 	.input-content {
-		background-color: #9a9a9a;
+		// background-color: #9a9a9a;
+		background-color: #f8f8f8;
 	}
 	
 	.emoji-keyboard {

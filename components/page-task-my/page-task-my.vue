@@ -1,18 +1,26 @@
 <template>
-	<view class="content">
+	<!-- <view class="content">
+	</view> -->
 		<z-paging v-if="firstLoaded || isCurrentPage" ref="paging" v-model="dataList" @query="queryList" 
-		 :default-page-size="pageSize" :fixed="customClick">
+		 :default-page-size="pageSize" :fixed="customClick" :hide-empty-view="true">
 			<view v-for="(task,index) in dataList" @click="toChatPage(task)" :key="index">
 				<task-chat-item :task="task"></task-chat-item>
 			</view>
+			<view v-if="this.firstLoaded && dataList.length == 0" style="width: 100%;">
+				<myrow mainAlign="center">					
+					<view style="width: 200px;">
+						<uv-divider text="" :dot="true"></uv-divider>
+					</view>
+				</myrow>
+			</view>
 		</z-paging>
-	</view>
 </template>
 
 <script>
 	import { ServerConfig } from '@/common/define_const';
 	import apihandle from '@/common/api_handle';
 	import store from '../../store';
+import util_task from '../../common/util_task';
 	
 	export default {
 		name:"page-task-my",
@@ -58,17 +66,29 @@
 				immediate: true
 			},
 		},
+		created() {
+			uni.$on("onDeleteTaskMy",this.onDeleteTaskMy)
+		},
+		beforeDestroy() {
+			uni.$off("onDeleteTaskMy")
+		},
 		methods:{
 			queryList(pageNo,pageSize) {
-				store.dispatch("loadTaskMy",{skip:(pageNo-1)*pageSize,ref:false}).then((res)=>{
+				store.dispatch("loadTaskMy",{skip:(pageNo-1)*pageSize,ref:pageNo==1,usecash:this.usecash}).then((res)=>{
 					if (res) {
 						this.$refs.paging.complete(res)
 					}else{
 						this.$refs.paging.complete([])
 					}
+					this.firstLoaded = true
 				})
+				this.usecash = false
 			},
 			toChatPage(task) {
+				if (task.state == util_task.TaskServerState.Illegal) {
+					apihandle.toast("任务已下架")
+					return
+				}
 				if (this.customClick) {
 					this.$emit("clickTask",task)
 					return
@@ -77,6 +97,10 @@
 					url:"/pages/message/task_chat_page?taskid="+task.id,
 				})
 				// console.log("toChatPage")
+			},
+			onDeleteTaskMy() {
+				this.usecash = true
+				this.$refs.paging.reload()
 			}
 		}
 	}

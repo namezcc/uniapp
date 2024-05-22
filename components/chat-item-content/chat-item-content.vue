@@ -2,20 +2,21 @@
 	<view>
 		<template v-if="isText">
 			<view class="msg-content" :style="{backgroundColor:textColor}">
-				<rich-text :nodes="emojiText">
-				</rich-text>				
+				<!-- <rich-text :nodes="emojiText">
+				</rich-text>	 -->			
+				<text>{{chat.content}}</text>
 			</view>
 		</template>
 		<template v-if="isImage">
 			<view class="">
-				<image :src="imageUrl" mode="aspectFit" class="msg-image" ></image>
+				<image :src="imageUrl" mode="aspectFit" class="msg-image" @click="previewImage(imageUrl)"></image>
 			</view>
 		</template>
 		<template v-if="isTask">
 			<view class="msg-task">
 				<uni-card :title="`任务:${taskInfo.title}`" @click="toTaskInfoPage(taskInfo.id)">
 					<myrow mainAlign="center">
-						<text style="font-size: 12px;">点击查看详情</text>
+						<text>点击查看详情</text>
 					</myrow>
 				</uni-card>
 			</view>
@@ -57,7 +58,7 @@ import store from '../../store';
 				return this.chat.content_type == ChatContentType.Task
 			},
 			textColor() {
-				return this.self ? '#00cf60':"#fff"
+				return this.self ? '#00d861':"#fff"
 			},
 			emojiText() {
 				var vec = util_string.splitByMarkers(this.chat.content,'[',']',true)
@@ -79,6 +80,8 @@ import store from '../../store';
 							name:'img',
 							attrs:{
 								class:"emoji",
+								height:"20px",
+								width:"20px",
 								src:util_task.getImageUrlName(`emoji/${s}.png`)
 							}
 						})
@@ -115,20 +118,25 @@ import store from '../../store';
 		methods:{
 			toTaskInfoPage(id) {
 				// console.log("to task ",id)
-				var task = store.getters.getTaskById(id)
-				if (task) {
-					uni.navigateTo({
-						url:"/pages/task/task_info?taskid="+id
-					})
-				}else{
-					store.dispatch("loadTaskOne",id).then((res)=>{
-						if (res) {
-							uni.navigateTo({
-								url:"/pages/task/task_info?taskid="+id
-							})
-						}
-					})
-				}
+				uni.navigateTo({
+					url:"/pages/task/task_info?taskid="+id
+				})
+				// var task = store.getters.getTaskById(id)
+				// if (task) {
+				// }else{
+				// 	store.dispatch("loadTaskOne",id).then((res)=>{
+				// 		if (res) {
+				// 			uni.navigateTo({
+				// 				url:"/pages/task/task_info?taskid="+id
+				// 			})
+				// 		}
+				// 	})
+				// }
+			},
+			previewImage(url) {
+				uni.previewImage({
+					urls:[url]
+				})
 			}
 		}
 	}

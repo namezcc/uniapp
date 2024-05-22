@@ -1,10 +1,11 @@
 <template>
-	<view style="height: 100%;">
-		<uv-search placeholder="搜索任务" :showAction="true" action-text="取消" @custom="back" v-model="searchText" @search="onSearchTask"
-		:customStyle="{backgroundColor:'#fff'}"></uv-search>
+	<view style="height: 100%;" class="col-class">
+		<view :style="{padding: '5px 5px',backgroundColor:theme.topNavBar}">
+			<uv-search :focus="true" placeholder="搜索任务" :showAction="true" action-text="取消" @custom="back" v-model="searchText" @search="onSearchTask"></uv-search>
+		</view>
 		<scroll-view scroll-y="true" style="height: 100%;">
 			<uv-list :customStyle="{backgroundColor: 'transparent'}">
-				<template v-for="task in genTaskList">
+				<template v-for="(task,index) in genTaskList" :key="index">
 					<uv-list-item @click="toTaskInfo(task)" :clickable="true" :customStyle="{backgroundColor: 'transparent'}">
 						<task-item :task="task"></task-item>
 					</uv-list-item>
@@ -13,7 +14,9 @@
 					<uni-load-more :status="loadState"></uni-load-more>
 				</uv-list-item>
 			</uv-list>
-			<text v-if="searchNone">没有搜索到相关内容</text>
+			<view class="class-ceter text-search">
+				<text v-if="searchNone">没有搜索到相关内容</text>
+			</view>
 		</scroll-view>
 	</view>
 </template>
@@ -23,6 +26,7 @@
 	import api from "@/common/api_handle.js"
 	import util_task from '../../common/util_task'
 	import store from "@/store/index.js"
+	import {color as mycolor} from "@/common/theme.js"
 	
 	var config = util_task.newTaskConfig()
 	
@@ -30,6 +34,7 @@
 		data() {
 			return {
 				loadState: EnumLoadState.More,
+				theme:mycolor,
 				searchText: "",
 				taskList:[],
 				searchNone: false,
@@ -91,8 +96,15 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
+	@import "@/static/my.scss";
+	
 	page {
 		height: 100%;
+	}
+	
+	.text-search {
+		color: $uni-base-color;
+		margin-top: 30px;
 	}
 </style>

@@ -2,6 +2,7 @@ import store from "../store/index.js"
 import {
 	WsHost
 } from "./define_const.js"
+import global_data from "./global_data.js"
 import NetPack from "./net_pack.js"
 
 export var CmId = {
@@ -9,41 +10,64 @@ export var CmId = {
 	PING:1,
 	TASK_CHAT:2,
 	LOAD_TASK_CHAT:3,
+	N_CM_TASK_CHAT_READ:4,
 	CHAT_USER:5,
+	CHAT_USER_READ:7,
 }
 
 var SmId = {
 	PONG:1,
 	TASK_CHAT_UPDATE:3,
 	TASK_CHAT_INDEX:4,
+	SM_CHAT_READ:5,
 	CHAT_USER_LIST:8,
+	CHAT_USER_READ:9,
+	SM_TASK_BE_KICK:10,	//被踢出任务
 }
 
 var wsconn = {
 	isopen: false,
+	_reconnect:false,
 	_readDataLenth: 0,
 	_readData: new Uint8Array(1024),
 	_handle:new Map(),
 	_token:"",
 	init() {
-		uni.onSocketError(function(res) {
+		uni.onSocketError((res)=> {
 			console.log('WebSocket连接打开失败 ', res);
+			// 重连
+			if (this._reconnect == true) {
+				return
+			}
+			this._reconnect = true
+			this.isopen = false
+			setTimeout(() => {
+				this.connectServer(this._token)
+			}, 10000)
 		});
 		
-		uni.onSocketOpen(() => {
+		uni.onSocketOpen((res) => {
+			console.log("ws socket open",res)
+			if (this.isopen) {
+				return
+			}
 			this.isopen = true
 			this.sendLoginData()
 		})
 		
 		uni.onSocketClose(() => {
+			console.error("socket closed");
 			if (this.isopen) {
 				this.clearData()
 			}
 			this.isopen = false
-			// 重连
-			setTimeout(() => {
-				// this.connectServer(this._token)
-			}, 10000)
+			if (global_data.isLogin() && this._reconnect == false) {				
+				// 重连
+				this._reconnect = true
+				setTimeout(() => {
+					this.connectServer(this._token)
+				}, 5000)
+			}
 		})
 		
 		uni.onSocketMessage(this.onReadData.bind(this));
@@ -54,38 +78,41 @@ var wsconn = {
 		this._handle.set(SmId.PONG,this.onNetPong.bind(this))
 		this._handle.set(SmId.TASK_CHAT_UPDATE,this.onGetTaskChat.bind(this))
 		this._handle.set(SmId.TASK_CHAT_INDEX,this.onGetTaskChatIndex.bind(this))
+		this._handle.set(SmId.SM_CHAT_READ,this.onLoadTaskChatRead.bind(this))
 		this._handle.set(SmId.CHAT_USER_LIST,this.onGetChatUser.bind(this))
+		this._handle.set(SmId.CHAT_USER_READ,this.onLoadChatUserRead.bind(this))
+		this._handle.set(SmId.SM_TASK_BE_KICK,this.onKickOutTask.bind(this))
 		
 		
 	},
 	connectServer(token) {
-		setTimeout(()=>{
-			if (this.isopen) {
-				this.close()
-			}
-			
-			this._token = token
+		if (this.isopen) {
+			return
+		}
+		
+		this._reconnect = false
+		this.isopen = false
+		this._token = token
 
-			try{
-				var stask = uni.connectSocket({
-					url: WsHost,
-					complete:()=> {
-						// console.log("ws complete ")
-					},
-					fail: (r) => {
-						console.log("ws fail ",r)
-					},
-					success: (r) => {
-						// console.log("ws success ",r)
-					}
-				})
-				stask.onError((r)=>{
-					console.log("ws err ",r.toString())
-				})							
-			}catch(e){
-				console.log(e)
-			}
-		},10)
+		try{
+			var stask = uni.connectSocket({
+				url: WsHost,
+				complete:()=> {
+					// console.log("ws complete ")
+				},
+				fail: (r) => {
+					console.log("ws fail ",r)
+				},
+				success: (r) => {
+					// console.log("ws success ",r)
+				}
+			})
+			stask.onError((r)=>{
+				console.log("ws err ",r.toString())
+			})							
+		}catch(e){
+			console.log(e)
+		}
 	},
 	close() {
 		this.isopen = false
@@ -139,20 +166,32 @@ var wsconn = {
 			this._readDataLenth -= offset
 		}
 	},
-	sendNetPack(pid, p) {
+	sendNetPack(pid, p,resfunc = null) {
 	    if (!this.isopen) {
-	      console.error("socket closed");
+			if (resfunc) {
+				resfunc(false)
+			}
 	      return;
 	    }
 		pid += 3000
 		uni.sendSocketMessage({
-			data:p.decode(pid)
+			data:p.decode(pid),
+			fail: () => {
+				if (resfunc) {
+					resfunc(false)
+				}
+			},
+			success: () => {
+				if (resfunc) {
+					resfunc(true)
+				}
+			}
 		})
 	},
-	sendJsonData(pid,d) {
+	sendJsonData(pid,d,resfunc=null) {
 		let p = NetPack.newPack()
 		p.writeJsonObject(d)
-		this.sendNetPack(pid,p)
+		this.sendNetPack(pid,p,resfunc)
 	},
 	sendLoginData() {
 		console.log("web socket connected")
@@ -160,6 +199,9 @@ var wsconn = {
 		p.writeBufferString(this._token)
 		this.sendNetPack(CmId.LOGIN,p)
 		this.sendPing()
+		
+		// 清除聊天数据
+		store.commit("reloadUserChatData")
 	},
 	sendPing() {
 		setTimeout(()=>{
@@ -205,6 +247,39 @@ var wsconn = {
 	onGetChatUser(p) {
 		var obj = p.readJsonObject()
 		store.commit("onGetUserChat",obj)
+	},
+	onLoadChatUserRead(p) {
+		var obj = p.readJsonObject()
+		store.commit("onLoadUserChatRead",obj)
+		// console.log("onLoadChatUserRead ",obj)
+	},
+	saveUserChatIndex(readmap) {
+		var amap = new Map()
+		var p = NetPack.newPack();
+		p.writeInt32(readmap.size)
+		for (const [key,value] of readmap) {
+			p.writeInt64(key)
+			p.writeInt32(value)
+		}
+		this.sendNetPack(CmId.CHAT_USER_READ,p)
+	},
+	saveTaskChatIndex(readmap) {
+		var amap = new Map()
+		var p = NetPack.newPack();
+		p.writeInt32(readmap.size)
+		for (const [key,value] of readmap) {
+			p.writeString(key)
+			p.writeInt32(value)
+		}
+		this.sendNetPack(CmId.N_CM_TASK_CHAT_READ,p)
+	},
+	onLoadTaskChatRead(p) {
+		var obj = p.readJsonObject()
+		store.commit("onLoadTaskChatRead",obj)
+	},
+	onKickOutTask(p) {
+		var obj = p.readJsonObject()
+		store.commit("onKickOutTask",obj)
 	}
 
 

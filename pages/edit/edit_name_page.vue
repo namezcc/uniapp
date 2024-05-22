@@ -1,15 +1,16 @@
 <template>
 	<view class="col-class">
-		<view style="margin: 10px;">
-			<uv-input type="text" v-model="txtName"></uv-input>
+		<view style="margin: 10px;padding: 5px;background-color: #fff;border-radius: 10px;">
+			<uv-input type="text" v-model="txtName" border="none"></uv-input>
 		</view>
-		<view style="margin: 0px 10px;">
-			<text>2-15个字符</text>
+		<view style="margin: 0px 15px;">
+			<text class="tip">2-15个字符</text>
 		</view>
 		<view style="height: 100%;"></view>
 		<view style="margin: 10px;">
 			<button class="fill-btn-primary" @click="onSave">保存</button>
 		</view>
+		<view style="height: 50px;"></view>
 	</view>
 </template>
 
@@ -59,4 +60,10 @@ import apihandle from "../../common/api_handle"
 
 <style lang="scss">
 	@import "@/static/my.scss";
+	
+	.tip {
+		color: $uni-base-color;
+		font-size: 14px;
+	}
+	
 </style>

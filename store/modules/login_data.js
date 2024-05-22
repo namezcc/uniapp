@@ -12,6 +12,12 @@ export default {
 		}
 	},
 	mutations: {
+		setLogoutToken(state) {
+			console.log("logout token")
+			state.token = ""
+			uni.setStorageSync("token","")
+			wsconn.close()
+		},
 		loadToken(state) {
 			state.token = uni.getStorageSync("token")
 			var tokentime = uni.getStorageSync("tokentime") || 0
@@ -33,7 +39,7 @@ export default {
 			state.token = token;
 			console.log("save token ",token)
 			uni.setStorageSync("token",token)
-			if (token == "") {
+			if (token == "" || !token) {
 				return
 			}
 			var outime = util_time.getSecond() + 3600*24 	//每天刷新

@@ -13,6 +13,7 @@
 <script>
 	export default {
 		name:"chat-icon",
+		emits:["iconClick"],
 		props:{
 			name:{
 				default:""
@@ -25,7 +26,7 @@
 		},
 		methods:{
 			onClick() {
-				this.$emit("click")
+				this.$emit("iconClick")
 			}
 		},
 		options: {

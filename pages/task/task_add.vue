@@ -2,31 +2,39 @@
 	<view  class="mainCol">
 		<mycol>			
 			<view class="titleStyle colItem">
-				<!-- border="none" -->
-				<uv-input v-model="txtTitle" placeholder="任务标题" maxlength="15" inputAlign="center" shape="circle" />
+				<uv-input v-model="txtTitle" placeholder="任务标题" maxlength="30" inputAlign="center" shape="circle" />
 			</view>
 			<view class="contentStyle colItem">
 				<uv-textarea v-model="txtContent" placeholder="任务内容..." count maxlength="500" height="100" ></uv-textarea>
 			</view>
 			<view class="colItem itemContent">
-				<view style="margin: 5px;">
+				<view class="contentPadding">
 					<uni-file-picker v-model="imageValue" title="选择图片" limit="9" :imageStyles="imageStyle" file-mediatype="image"
 					@delete="onDeleteImage" @select="onSelectImage">
 						<uni-icons type="plusempty" style="color: black;"></uni-icons>
 					</uni-file-picker>
 				</view>
 			</view>
-			<view class="colItem itemContent" style="font-size: 14px;">
-				<view style="margin: 5px;">
+			<view class="colItem itemContent">
+				<view class="contentPadding">
+					<uni-data-checkbox v-model="currentNum" :localdata="sexNum" mode="tag" selectedColor="#87d694"></uni-data-checkbox>
+					<view class="lineMargin"></view>
 					<myrow>
-						<view style="width: 120px;">
-							<uv-subsection mode="subsection" :activeColor="theme.primary" :inactiveColor="theme.primary" fontSize="12" :current="currentNum" :list="['任务人数','男女人数']" @change="onClickNumItem"></uv-subsection>
+						<view>
+							<!-- <uv-subsection mode="subsection" :activeColor="theme.primary" :inactiveColor="theme.primary" fontSize="12" :current="currentNum" :list="['任务人数','男女人数']" @change="onClickNumItem"></uv-subsection> -->
+							<!-- <picker :value="currentNum" :range="numtype" @change="onClickNumItem">
+								<view>
+									<text>{{numtype[currentNum]}}</text>
+									<uni-icons type="right"></uni-icons>
+								</view>
+							</picker> -->
+							人数
 						</view>
 						<expanded></expanded>
-						<view style="font-size: 12px;">
-							<view v-show="currentNum === 0">
+						<view style="font-size: 14px;">
+							<view v-show="currentNum !== 1">
 								<myrow>
-									<view style="width: 50px;">
+									<view :style="{width: inputWidth+'px'}">
 										<uv-input v-model="txtManNum" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
 									</view>
 									<text>人</text>
@@ -35,13 +43,13 @@
 							<view v-show="currentNum === 1">
 								<myrow>
 									男
-									<view style="width: 50px;">
+									<view :style="{width: inputWidth+'px'}">
 										<uv-input v-model="txtManNum" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
 									</view>
 									<text>人</text>
 									<view style="width: 20px;"></view>
 									女
-									<view style="width: 50px;">
+									<view :style="{width: inputWidth+'px'}">
 										<uv-input v-model="txtWomanNum" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
 									</view>
 									<text>人</text>
@@ -49,17 +57,25 @@
 							</view>
 						</view>
 					</myrow>					
-					<uv-line margin="5px 0px"></uv-line>
+					<!-- <uv-line margin="5px 0px"></uv-line> -->
+					<view class="lineMargin"></view>
 					<myrow>
 						<view style="width: 120px;">
-							<uv-subsection mode="subsection" :activeColor="theme.primary" :inactiveColor="theme.primary" fontSize="12" :current="currentMoney" :list="['任务奖励','男女收费']" @change="onClickMoneyItem"></uv-subsection>
+							<!-- <uv-subsection mode="subsection" :activeColor="theme.primary" :inactiveColor="theme.primary" fontSize="12" :current="currentMoney" :list="['任务奖励','男女收费']" @change="onClickMoneyItem"></uv-subsection> -->
+							<picker :value="currentMoney" :range="moneyType" @change="onClickMoneyItem">
+								<myrow>
+									<text style="margin-right: 3px;">{{moneyType[currentMoney]}}</text>
+									<!-- <uni-icons type="down"></uni-icons> -->
+									<uv-icon name="arrow-down"></uv-icon>
+								</myrow>
+							</picker>
 						</view>
 						<expanded></expanded>
-						<view style="font-size: 12px;">
+						<view style="font-size: 14px;">
 							<view v-show="currentMoney === 0">
 								<myrow>
-									<view style="width: 50px;">
-										<uv-input v-model="txtManMoney" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
+									<view :style="{width: inputWidth+'px'}">
+										<uv-input v-model="txtManMoney" type="number" maxlength="10" inputAlign="center" shape="circle"></uv-input>
 									</view>
 									<text>元</text>
 								</myrow>
@@ -67,21 +83,21 @@
 							<view v-show="currentMoney === 1">
 								<myrow>
 									男
-									<view style="width: 50px;">
-										<uv-input v-model="txtManMoney" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
+									<view :style="{width: inputWidth+'px'}">
+										<uv-input v-model="txtManMoney" type="number" maxlength="10" inputAlign="center" shape="circle"></uv-input>
 									</view>
 									<text>元</text>
 									<view style="width: 20px;"></view>
 									女
-									<view style="width: 50px;">
-										<uv-input v-model="txtWomanMoney" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
+									<view :style="{width: inputWidth+'px'}">
+										<uv-input v-model="txtWomanMoney" type="number" maxlength="10" inputAlign="center" shape="circle"></uv-input>
 									</view>
 									<text>元</text>
 								</myrow>
 							</view>
 						</view>
 					</myrow>
-					<view :style="{fontSize: '10px',color: theme.secondary}">
+					<view :style="{fontSize: '12px',color: theme.secondary}">
 						<text v-show="currentMoney === 0">
 							*你支付给别人的报酬
 						</text>
@@ -89,25 +105,64 @@
 							*别人支付给你的费用
 						</text>
 					</view>
-					<uv-line margin="5px 0px"></uv-line>
+				</view>
+			</view>
+			<view class="colItem itemContent">
+				<view class="contentPadding">
 					<myrow>
 						<text>报名截止时间</text>
 						<expanded></expanded>
-						<text @click="openPicker">{{dateString}}</text>
+						<text @click="openPicker(1)">{{taskJoinEndTime}}</text>
 						<uv-picker ref="picker" :columns="pickerColums" @confirm="onPicker" ></uv-picker>
 					</myrow>
-					<uv-line margin="5px 0px"></uv-line>
+					<view class="lineMargin"></view>
+					<myrow>
+						<!-- <checkbox-group @change="onSetTaskTime">
+							<label>
+								<text>开始结束时间</text>
+								<checkbox value="1" :color="theme.primary" :border-color="theme.primary" />
+							</label>
+						</checkbox-group> -->
+						<text>开始结束时间</text>
+						<expanded></expanded>
+						<switch :checked="haveTaskTime" :color="theme.primary_low" @change="onSetTaskTime"></switch>
+					</myrow>
+					<view class="lineMargin"></view>
+					<myrow v-if="haveTaskTime" mainAlign="center" >
+						<view class="timeContent" @click="openPicker(2)">
+							{{taskStartTime}}
+						</view>
+						<text style="margin: 10px;">至</text>
+						<view class="timeContent" @click="openPicker(3)">
+							{{taskEndTime}}
+						</view>
+					</myrow>
+					<view class="lineMargin"></view>
 					<myrow>
 						<text>任务地点</text>
 						<expanded></expanded>
 						<text @click="openMap" style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;max-width: 200px;">{{locationString}}</text>
 						<uni-icons type="location-filled"></uni-icons>
 					</myrow>
+					<view class="lineMargin"></view>
+					<myrow>
+						<text>信用分</text>
+						<expanded></expanded>
+						<text class="text-score">{{creditScore}}</text>
+					</myrow>
+					<uv-slider v-model="credit_score" min="50" max="150" :activeColor="theme.primary_low" :block-color="theme.primary_low"></uv-slider>
+					<view class="lineMargin"></view>
+					<myrow>
+						<text>是否公开</text>
+						<expanded></expanded>
+						<switch :checked="taskOpen" :color="theme.primary_low" @change="onTaskOpen"></switch>
+					</myrow>
 				</view>
 			</view>
 			<view class="colItem" style="margin-top: 20px;">
 				<button @click="submitTask" class="fill-btn-primary" >{{optName}}</button>
 			</view>
+			<uv-safe-bottom></uv-safe-bottom>
 		</mycol>
 	</view>
 </template>
@@ -120,6 +175,9 @@
 	import { mapState,mapMutations } from "vuex"
 	import store from "@/store/index.js"
 	import util_time from "../../common/util_time"
+import util_page from "../../common/util_page"
+	
+	let useDateArray = [];
 	
 	function getDateArray() {
 		const datesArray = [];
@@ -131,9 +189,11 @@
 			const year = futureDate.getFullYear();
 			const month = (futureDate.getMonth() + 1).toString().padStart(2, '0');
 			const day = futureDate.getDate().toString().padStart(2, '0');
+			const week = util_time.weekString[futureDate.getDay()]
 			
-			const formattedDate = `${year}-${month}-${day}`;
+			const formattedDate = `周${week} ${month}月${day}日`;
 			datesArray.push(formattedDate);
+			useDateArray.push(`${year}-${month}-${day}`)
 		}
 		return datesArray;
 	}
@@ -154,6 +214,14 @@
 		return arr
 	}
 	
+	let pickType = {
+		joinEndTime:1,
+		taskStart:2,
+		taskEnd:3,
+	}
+	
+	let nowPickType = pickType.joinEndTime
+	
 	export default {
 		data() {
 			return {
@@ -164,6 +232,7 @@
 				txtWomanNum:"0",
 				txtManMoney:"0",
 				txtWomanMoney:"0",
+				inputWidth:60,
 				imageValue:[],
 				imageStyle: {
 					borderRadius: '10px',
@@ -179,12 +248,31 @@
 					getDateArray(),getHourArray(),getMinArray()
 				],
 				dateSelect:[],
-				dateString: "请选择日期",
+				// dateString: "请选择日期",
 				locationString: "线下任务请选择",
 				location: null,
+				joinEndTime:0,
+				numtype:["男女不限","自定义","限女生","限男生"],
+				sexNum:[
+					{text:"男女不限",value:0},
+					{text:"自定义",value:1},
+					{text:"限女生",value:2},
+					{text:"限男生",value:3},
+				],
+				moneyType:["任务奖励","任务收费"],
+				haveTaskTime:false,
+				startTime:0,
+				endTime:0,
+				taskOpen:true,
+				credit_score:80,
 			}
 		},
 		onLoad(e) {
+			// uni.setNavigationBarColor({
+			// 	backgroundColor:theme.primary,
+			// 	frontColor:"#ffffff",
+			// })
+			
 			if (e?.taskid) {				
 				var t = store.getters.getTaskById(e.taskid)
 				this.editTask = t
@@ -205,9 +293,13 @@
 				
 				this.currentMoney = t.money_type
 				
-				if (t.end_time > 0) {
-					this.dateString = util_time.formatTime(t.end_time)
-				}
+				this.joinEndTime = t.end_time
+				this.startTime = t.task_start_time || 0
+				this.endTime = t.task_end_time || 0
+				this.haveTaskTime = this.startTime > 0 && this.endTime > 0
+				this.taskOpen = !(t.nonpublic == true)
+				this.credit_score = t.credit_score || 0
+				
 				if (t.address) {
 					this.locationString = t.address.name || t.address.address
 					this.location = t.address
@@ -228,15 +320,39 @@
 			}
 		},
 		computed:{
-			optName() {
-				return this.editTask == null ? "发布任务" : "确认修改"
-			}
-		},
-		methods: {
 			...mapState({
 				user: state => state.user_data.user,
 				userlocation: state => state.user_data.location,
 			}),
+			optName() {
+				return this.editTask == null ? "发布任务" : "确认修改"
+			},
+			taskJoinEndTime() {
+				if (this.joinEndTime == 0) {
+					return "请选择日期"
+				}else{
+					return util_time.formatTaskWeekTime(this.joinEndTime)
+				}
+			},
+			taskStartTime() {
+				if (this.startTime == 0) {
+					return "请选择"
+				}else{
+					return util_time.formatTaskWeekTime(this.startTime)
+				}
+			},
+			taskEndTime() {
+				if (this.endTime == 0) {
+					return "请选择"
+				}else{
+					return util_time.formatTaskWeekTime(this.endTime)
+				}
+			},
+			creditScore() {
+				return `≥ ${this.credit_score} 分`
+			}
+		},
+		methods: {
 			...mapMutations(["setLocation"]),
 			onSelectImage(e) {
 				console.log("select image ",e)
@@ -258,23 +374,36 @@
 			onDeleteImage(e) {
 				console.log("delete image ",e)
 			},
-			onClickNumItem(index) {
+			onClickNumItem(e) {
+				console.log("moneyitem ",e)
+				let index = e.detail.value
 				if (this.currentNum !== index) {
 					this.currentNum = index
 				}
 			},
-			onClickMoneyItem(index) {
+			onClickMoneyItem(e) {
+				console.log("moneyitem ",e)
+				let index = parseInt(e.detail.value)
 				if (this.currentMoney !== index) {
 					this.currentMoney = index
 				}
 			},
-			openPicker() {
+			openPicker(picktype) {
+				nowPickType = picktype
 				this.$refs.picker.open()
 			},
 			onPicker(e) {
-				console.log(e)
-				this.dateSelect = e.value
-				this.dateString = `${e.value[0]} ${e.value[1]}:${e.value[2]}:00`
+				// console.log(e)
+				//this.dateSelect = e.index
+				let stamp = util_time.getSecond(`${useDateArray[e.indexs[0]]} ${e.value[1]}:${e.value[2]}:00`)
+				if (nowPickType == pickType.joinEndTime) {
+					this.joinEndTime = stamp
+					// this.dateString = `${e.value[0]} ${e.value[1]}:${e.value[2]}`
+				}else if(nowPickType == pickType.taskStart) {
+					this.startTime = stamp
+				}else {
+					this.endTime = stamp
+				}
 			},
 			toChooseLocation(latitude,longitude) {
 				uni.chooseLocation({
@@ -322,15 +451,30 @@
 					api.toast("标题不能为空")
 					return false;
 				}
-				if (this.txtContent.length <= 0) {
-					api.toast("内容不能为空")
+				// if (this.txtContent.length <= 0) {
+				// 	api.toast("内容不能为空")
+				// 	return false;
+				// }
+				
+				let now = util_time.getSecond()
+				if (this.joinEndTime <= now) {
+					api.toast("报名截止时间不能小于当前时间")
 					return false;
 				}
 				
-				var stamp = Date.parse(this.dateString) || 0
-				if (stamp <= Date.now()) {
-					api.toast("报名截止时间不能小于当前时间")
-					return false;
+				if (this.haveTaskTime) {
+					if (this.startTime <= now) {
+						api.toast("开始时间不能小于当前时间")
+						return false
+					}
+					if (this.endTime < this.startTime) {
+						api.toast("结束时间不能小于开始时间")
+						return false
+					}
+					if (this.endTime <= this.joinEndTime) {
+						api.toast("结束时间不能小于报名截止时间")
+						return false
+					}
 				}
 				
 				var total = parseInt(this.txtManNum) + parseInt(this.txtWomanNum)
@@ -341,7 +485,7 @@
 				return true;
 			},
 			genTaskInfo() {
-				var user = this.user()
+				var user = this.user
 				var mann = parseInt(this.txtManNum)
 				var womann = parseInt(this.txtWomanNum)
 				var total = 0
@@ -353,7 +497,6 @@
 					total = mann + womann
 				}
 				
-				var endtime = Date.parse(this.dateString)/1000
 				var task = {
 					creator_name: user.name,
 					title: this.txtTitle,
@@ -363,8 +506,12 @@
 					womanMoney: parseInt(this.txtWomanMoney),
 					people_num: total,
 					man_num: mann,
-					end_time: endtime,
+					end_time: this.joinEndTime,
+					task_start_time:this.haveTaskTime ? this.startTime :0,
+					task_end_time:this.haveTaskTime ? this.endTime :0,
 					images: this.imageValue.map((v)=> v.url),
+					nonpublic:this.taskOpen ? 0 : 1,
+					credit_score:this.credit_score,
 				}
 				if (this.location) {
 					task.address = this.location
@@ -373,7 +520,7 @@
 			},
 			isSameTask(t1,t2) {
 				var check = ["title","content","money_type","money","womanMoney","people_num","man_num",
-				"end_time"];
+				"end_time","task_start_time","task_end_time"];
 				for (let f of check) {
 					if (t1[f] != t2[f]) {
 						return false
@@ -406,12 +553,24 @@
 				if (!this.checkSubmit()) {
 					return
 				}
+				
+				if (this.user.age <= 0) {
+					api.toast("请先进行实名验证")
+					util_page.toIdCardPage()
+					return
+				}
+				
 				var task = this.genTaskInfo()
 				if (this.editTask == null) {
+					uni.showLoading({
+						title:"发布中..."
+					})
 					api.apiCreateTask(task).then((res)=>{
 						// console.log("submit success ",task);
 						api.toast("发布成功")
 						uni.navigateBack({})
+					}).finally(()=>{
+						uni.hideLoading()
 					})
 				}else{
 					if (this.editTask.images == null) {
@@ -422,14 +581,27 @@
 						uni.navigateBack({})
 						return
 					}
+					uni.showLoading({
+						title:"发布中..."
+					})
 					api.apiUpdateTask(task).then((res)=>{
 						if (res) {							
 							api.toast("修改成功")
 							store.commit("updateTaskOne",res)
 							uni.navigateBack({})
 						}
+					}).finally(()=>{
+						uni.hideLoading()
 					})
 				}
+			},
+			onSetTaskTime(e) {
+				// console.log("checkbox",e)
+				this.haveTaskTime = e.detail.value
+			},
+			onTaskOpen(e) {
+				// console.log("open ",e)
+				this.taskOpen = e.detail.value
 			}
 		}
 	}
@@ -440,6 +612,7 @@
 	
 	.mainCol {
 		margin: 10px;
+		color: $uni-main-color;
 	}
 	
 	.titleStyle {
@@ -452,16 +625,40 @@
 	.colItem {
 		margin-bottom: 10px;
 		width: 100%;
+		// margin: 10rpx;
 	}
 	
 	.itemContent {
 		border-radius: 10px;
 		background-color: white;
+		// margin: 10rpx;
+		// padding: 10rpx;
+	}
+	
+	.contentPadding {
+		padding: 10px;
 	}
 	
 	.contentStyle {
 		width: 100%;
 		/* margin: 10px; */
+	}
+	
+	.lineMargin {
+		margin: 10px;
+	}
+	
+	.text-color-second {
+		color: $my-color-primary-second;
+	}
+	
+	.input-padding{
+		padding: 0rpx 10rpx;
+	}
+	
+	.text-score {
+		color: $my-color-primary-second;
+		font-size: 14px;
 	}
 	
 	// .fill-btn-primary {

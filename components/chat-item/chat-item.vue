@@ -7,18 +7,22 @@
 					<expanded></expanded>
 				</template>
 				<template v-else>
-					<avatar :src="chat.sendericon" :tocid="chat.cid" :inpage="inpage"></avatar>
+					<avatar :usercid="chat.cid" :tocid="chat.cid" :inpage="inpage"></avatar>
 				</template>
 				<view style="margin: 0rpx 20rpx;">				
 					<mycol :itemAlign="nameAlign">
 						<template v-if="showName">
 							<text class="user-name">{{chat.sendername}}</text>
 						</template>
-						<chat-item-content :chat="chat" :self="isSelf"></chat-item-content>
+						<view v-else style="height: 10px;"></view>
+						<myrow>
+							<uni-icons type="info-filled" size="20" color="#e43d33" v-if="chat.sendfail==true"></uni-icons>
+							<chat-item-content :chat="chat" :self="isSelf"></chat-item-content>
+						</myrow>
 					</mycol>
 				</view>
 				<template v-if="isSelf">
-					<avatar :src="chat.sendericon"></avatar>
+					<avatar :usercid="chat.cid"></avatar>
 				</template>
 				<template v-else>
 					<expanded></expanded>
@@ -65,7 +69,7 @@ import util_time from "../../common/util_time";
 				return this.isSelf ? "flex-end":"flex-start"
 			},
 			showName2() {
-				console.log("showname ",this.showName)
+				// console.log("showname ",this.showName)
 				return this.showName
 			},
 			showTime() {
@@ -79,19 +83,22 @@ import util_time from "../../common/util_time";
 	}
 </script>
 
-<style>
+<style lang="scss">
 	.chat-item {
 		margin: 30rpx;
 	}
 	
 	.user-name {
-		font-size: 30rpx;
-		color: grey;
+		font-size: 28rpx;
+		/* color: grey; */
+		color: $uni-secondary-color;
 	}
 	
 	.text-time {
-		font-size: 20rpx;
-		color: grey;
+		font-size: 28rpx;
+		// color: grey;
+		color: $uni-secondary-color;
+		margin: 16rpx;
 	}
 
 </style>

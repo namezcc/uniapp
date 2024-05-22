@@ -1,7 +1,12 @@
 <script>
 	import store from "@/store/index.js"
+import apihandle from "./common/api_handle"
 import util_emoji from "./common/util_emoji"
 import wsconn from "./common/wsconn"
+
+	// uni.onError((res)=>{
+	// 	console.log("geterror:",res)
+	// })
 
 	export default {
 		onLaunch: function() {
@@ -12,7 +17,29 @@ import wsconn from "./common/wsconn"
 			// wsconn
 			wsconn.init()
 		},
+		onError:function(res){
+			try{
+				// console.log("geterror ****:",res)
+				if (process.env.NODE_ENV != "development") {
+					// 上报错误
+					let errinfo = {
+						msg:res.message,
+						stack:res.stack,
+					}
+					apihandle.apiAppError(JSON.stringify(errinfo))
+				}				
+			}catch(e){
+				//TODO handle the exception
+				console.log(e.message)
+			}
+		},
 		onShow: function() {
+			console.log("env ",process.env.NODE_ENV)
+			if (process.env.NODE_ENV == "development") {
+				console.log("in debug")
+			}else{
+				console.log("in relese")
+			}
 			console.log('App Show')
 		},
 		onHide: function() {

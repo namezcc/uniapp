@@ -1,4 +1,5 @@
 $my-color-primary:#D32F2F;
+$my-color-primary-second:#ff7373;
 
 .fill-btn-primary {
 	width: 100%;
@@ -6,6 +7,22 @@ $my-color-primary:#D32F2F;
 	border-radius: 30px;
 	background-color: $my-color-primary;
 	color: white;	
+	height: 45px;
+	display: flex; /* 开启flex布局 */
+	justify-content: center; /* 水平居中对齐 */
+	align-items: center; /* 垂直居中对齐 */
+}
+
+.fill-btn-primary-disabled {
+	width: 100%;
+	font-size: 15px;
+	border-radius: 30px;
+	background-color: $my-color-primary-second;
+	color: white;
+	height: 45px;
+	display: flex; /* 开启flex布局 */
+	justify-content: center; /* 水平居中对齐 */
+	align-items: center; /* 垂直居中对齐 */
 }
 
 .class-ceter {
@@ -35,3 +52,47 @@ $my-color-primary:#D32F2F;
 .bg-color-white {
 	background-color: white;
 }
+
+.input-color {
+	// background-color: #9a9a9a;
+	background-color: #f8f8f8;
+}
+
+.task-title {
+	font-size: 16px;
+	color: $uni-main-color;
+	font-weight: bold;
+}
+
+.round-dot {
+  background: #b4dfc5;
+  display: inline-block;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+}
+
+.boxText {
+	padding: 0rpx 8rpx;
+	background-color: #f9e6e4;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #d54431;
+	// width: 44rpx;
+	height: 44rpx;
+	border-radius: 6rpx;
+}
+
+.timeContent {
+		border: 1px solid $uni-border-4;
+		border-radius: 10px;
+		padding: 5px;
+		color: $uni-base-color;
+		width: 240rpx;
+		font-size: 26rpx;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		
+	}

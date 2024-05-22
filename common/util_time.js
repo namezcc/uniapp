@@ -1,5 +1,6 @@
-function getSecond() {
-	return Math.floor(Date.now()/1000)
+function getSecond(timestr = null) {
+	let stamp = timestr != null ? Date.parse(timestr) : Date.now()
+	return Math.floor(stamp/1000)
 }
 
 // stamp 为秒级
@@ -38,8 +39,27 @@ function diffString(stamp) {
 	}
 }
 
+const weekString = ["日","一","二","三","四","五","六"]
+
+function formatTaskWeekTime(stamp) {
+	stamp *= 1000
+	const date = new Date(stamp);
+	const year = date.getFullYear();
+	const month = (date.getMonth() + 1).toString().padStart(2, '0');
+	const day = date.getDate().toString().padStart(2, '0');
+	const hours = date.getHours().toString().padStart(2, '0');
+	const minutes = date.getMinutes().toString().padStart(2, '0');
+	const seconds = date.getSeconds().toString().padStart(2, '0');
+	const week = weekString[date.getDay()]
+	
+	const formattedDate = `周${week} ${month}-${day} ${hours}:${minutes}`;
+	return formattedDate;
+}
+
 export default {
 	getSecond,
 	formatTime,
 	diffString,
+	formatTaskWeekTime,
+	weekString,
 }

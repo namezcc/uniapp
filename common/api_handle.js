@@ -52,11 +52,22 @@ var apihandle = {
 			toast("网络错误")
 		}
 	},
-	async apiUserLogin(phone,code) {
+	async apiUserLogin(phone) {
 		try{
-			var res = await http.request("userlogin","POST",{phone:phone,code:code})
+			var res = await http.request("userlogin","POST",{phone:phone})
 			if (this.checkData(res.data)) {
-				this.setToken(res.data.data)
+				this.setToken(res.data.token)
+				return res.data
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
+	async userloginWxCode(code) {
+		try{
+			var res = await http.request("userloginWxCode","POST",{code:code})
+			if (this.checkData(res.data)) {
+				this.setToken(res.data.data.token)
 				return res.data
 			}
 		}catch(e){
@@ -76,8 +87,9 @@ var apihandle = {
 		}
 	},
 	async apiGetUserInfo(cid) {
+		let url = cid ? "getUserInfo":"getSelfUserInfo"
 		try{
-			var res = await http.request("getUserInfo","GET",{cid:cid?cid:""},{header:authorHeader})
+			var res = await http.request(url,"GET",{cid:cid?cid:""},{header:authorHeader})
 			if (this.checkData(res.data)) {
 				return res.data.data
 			}
@@ -206,6 +218,16 @@ var apihandle = {
 			toast("网络错误")
 		}
 	},
+	async apiLoadOtherTaskInfo(cid,skip) {
+		try{
+			var res = await http.request("apiLoadOtherTaskInfo","GET",{cid,skip},{header:authorHeader})
+			if (this.checkData(res.data)) {
+				return res.data.data
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
 	async apiLoadTaskChat(taskid,start,num) {
 		try{
 			var res = await http.request("apiLoadTaskChat","GET",{taskid:taskid,start:start,num:num},{header:authorHeader})
@@ -239,6 +261,16 @@ var apihandle = {
 	async apiLoadUserChatData(id,start,num) {
 		try{
 			var res = await http.request("apiLoadUserChatData","GET",{id,start,num},{header:authorHeader})
+			if (this.checkData(res.data)) {
+				return res.data.data
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
+	async apiLoadOneUserChatData(cid) {
+		try{
+			var res = await http.request("apiLoadOneUserChatData","GET",{cid},{header:authorHeader})
 			if (this.checkData(res.data)) {
 				return res.data.data
 			}
@@ -281,6 +313,16 @@ var apihandle = {
 			var res = await http.request("apiReportUser","POST",data,{header:authorHeader})
 			if (this.checkData(res.data)) {
 				return res.data.data
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
+	async apiUserSuggest(data) {
+		try{
+			var res = await http.request("apiUserSuggest","POST",data)
+			if (this.checkData(res.data)) {
+				return true
 			}
 		}catch(e){
 			toast("网络错误")
@@ -348,15 +390,67 @@ var apihandle = {
 			toast("网络错误")
 		}
 	},
-	async apiEditSex(sex) {
+	async apiDeleteMyTaskInfo(id) {
 		try{
-			var res = await http.request("apiEditSex","GET",{sex},{header:authorHeader})
+			var res = await http.request("apiDeleteMyTaskInfo","GET",{taskid:id},{header:authorHeader})
 			if (this.checkData(res.data)) {
 				return true
 			}
 		}catch(e){
 			toast("网络错误")
 		}
+	},
+	async apiDeleteUserJoin(id) {
+		try{
+			var res = await http.request("apiDeleteUserJoin","GET",{taskid:id},{header:authorHeader})
+			if (this.checkData(res.data)) {
+				return true
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
+	async apiGetCreditToUserType(cid) {
+		try{
+			var res = await http.request("apiGetCreditToUserType","GET",{cid},{header:authorHeader})
+			if (this.checkData(res.data)) {
+				return res.data.data
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
+	async apiSetCreditToUserType(cid,type) {
+		try{
+			var res = await http.request("apiSetCreditToUserType","GET",{cid,type},{header:authorHeader})
+			if (this.checkData(res.data)) {
+				return res.data.data
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
+	async apiCheckIdCard(idcard,name) {
+		try{
+			var res = await http.request("apiCheckIdCard","GET",{idcard,name},{header:authorHeader})
+			if (this.checkData(res.data)) {
+				return true
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+		return false
+	},
+	async apiAppError(errinfo) {
+		try{
+			var res = await http.request("apiAppError","POST",{crash:errinfo},{header:authorHeader})
+			// if (this.checkData(res.data)) {
+			// 	return true
+			// }
+		}catch(e){
+			toast("网络错误")
+		}
+		return false
 	},
 }
 

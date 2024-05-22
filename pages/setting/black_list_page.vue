@@ -12,8 +12,12 @@
 				</uni-list-item>
 			</uni-list>
 		</view>
-		<view v-else>
-			空的
+		<view v-if="blackList==null || blackList.length == 0" style="width: 100%;">
+			<myrow mainAlign="center">					
+				<view style="width: 200px;">
+					<uv-divider text="" :dot="true"></uv-divider>
+				</view>
+			</myrow>
 		</view>
 	</view>
 </template>

@@ -1,50 +1,73 @@
 import apihandle from "../../common/api_handle"
 import { EnumLoadState, ServerConfig, UpdateEventType } from "../../common/define_const"
+import global_data from "../../common/global_data"
 import util_common from "../../common/util_common"
 
 async function loadTask(context,{skip,ref,usecash},listkey,statekey,loadfunc) {
 	let state = context.state
-	let list = state[listkey]
-	if (usecash) {
-		return list
+	if (!context.getters.isLogin) {
+		return
 	}
+	let list = state[listkey]
 	if (state[statekey] == EnumLoadState.Loading) {
 		return
 	}
-	if (!ref) {
+	let restask = []
+	let getfunc = context.getters.getTaskById
+	if (!ref || usecash) {
 		let vec = list.slice(skip,ServerConfig.LoadTaskNum)
 		if (vec.length > 0) {
-			let res = []
 			for (let id of vec) {
-				res.push(context.getters.getTaskById(id))
+				restask.push(getfunc(id))
 			}
-			return res
-		}
-		if (state[statekey] == EnumLoadState.noMore) {
+			if (vec.length >= ServerConfig.LoadTaskNum) {
+				return restask
+			}
+			skip += vec.length
+			if (usecash) {
+				return restask
+			}
+		}else if(state[statekey] == EnumLoadState.noMore){
 			return []
 		}
 	}
 	state[statekey] = EnumLoadState.Loading
+	let loadnum = ServerConfig.LoadTaskNum - restask.length
 	var res = await loadfunc(skip)
-	if (res) {
-		res = res.reverse()
-		context.commit("updateTaskData",res)
-		if (ref) {
-			state[listkey] = []
+	if (res?.result != null) {
+		// console.log(res)
+		let taskvec = res.result
+		for (let t of taskvec) {
+			t.join = res.task_join.find((join)=>{
+				return join.id == t.id
+			})
 		}
-		if (res.length < ServerConfig.LoadTaskNum) {
+		context.commit("updateTaskData",taskvec)
+		let idlist = res.tasklist.reverse()
+		if (ref) {
+			list = []
+			state[listkey] = list
+		}
+		if (taskvec.length < loadnum) {
 			state[statekey] = EnumLoadState.noMore
 		}else{
 			state[statekey] = EnumLoadState.More
 		}
-		for (let t of res) {
-			list.push(t.id)
+		if (listkey == "list_interest") {
+			for (let id of idlist) {
+				list.push(id)
+				restask.push(getfunc(id))
+			}			
+		}else{
+			for (let t of idlist) {
+				list.push(t.id)
+				restask.push(getfunc(t.id))
+			}			
 		}
 	}else{
 		state[statekey] = EnumLoadState.noMore
 	}
-	// console.log(res)
-	return res
+	return restask
 }
 
 export default {
@@ -78,10 +101,45 @@ export default {
 		},
 		deleteInterestTask(state,id) {
 			util_common.deleteArrayByVal(state.list_interest,id)
-		}
+		},
+		onKickOutTask(state,d) {
+			uni.$emit("onKickOutTask",d.id)
+			let task = state.task_data.get(d.id)
+			if (task && task.join) {
+				util_common.deleteArrayByFunc(task.join.data,(j)=>{
+					if (j.cid == global_data.cid) {
+						return true
+					}
+					return false
+				})
+				// state.task_data.delete(d.id)
+			}
+		},
+		deleteJoinTask(state,id) {
+			util_common.deleteArrayByVal(state.list_join,id)
+			uni.$emit("onDeleteTaskJoin")
+			apihandle.apiDeleteUserJoin(id)
+		},
+		deleteMyTask(state,id) {
+			util_common.deleteArrayByVal(state.list_my,id)
+			uni.$emit("onDeleteTaskMy")
+			apihandle.apiDeleteMyTaskInfo(id)
+		},
 	},
 	actions: { 
 		async loadTaskOne(context,id) {
+			var res = await apihandle.apiGetOneTaskInfo(id)
+			if (res) {
+				// console.log("get task ",res)
+				context.commit("updateTaskOne",res)
+			}
+			return res
+		},
+		async getTaskInfo(context,id) {
+			let task = context.getters.getTaskById(id)
+			if (task) {
+				return task
+			}
 			var res = await apihandle.apiGetOneTaskInfo(id)
 			if (res) {
 				// console.log("get task ",res)

@@ -45,5 +45,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		box-sizing: border-box;
+		height: 100%;
 	}
 </style>
