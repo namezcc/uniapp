@@ -37,6 +37,7 @@ import { ReportTaskName, ReportTaskType } from '../../common/define_const'
 import utilHttp from "@/common/http_util.js"
 import utilTask from "@/common/util_task.js"
 import apihandle from '../../common/api_handle'
+import util_common from '../../common/util_common'
 
 	export default {
 		data() {
@@ -73,20 +74,30 @@ import apihandle from '../../common/api_handle'
 			},
 			onSelectImage(e) {
 				// console.log("select image ",e)
-				const tempFilePaths = e.tempFilePaths;
-				for (let img of tempFilePaths) {					
-					utilHttp.uploadImage(img,(res)=>{
-						// console.log('上传成功', res);
-						// console.log('上传数据转换',JSON.parse(res.data));
-						// 取到文档服务器的值
-						let uploaddata = JSON.parse(res.data)
+				let flist = util_common.getTempFileList(e)
+				util_common.uploadFileList(flist).then((vec)=>{
+					for (let v of vec) {
 						let x = {}
-						x.url = utilTask.getImageUrlName(uploaddata.data)
+						x.url = v
 						x.extname = ''
-						x.name = uploaddata.data
+						x.name = ''
 						this.imageValue.push(x)
-					})
-				}
+					}
+				})
+				// const tempFilePaths = e.tempFilePaths;
+				// for (let img of tempFilePaths) {					
+				// 	utilHttp.uploadImage(img,(res)=>{
+				// 		// console.log('上传成功', res);
+				// 		// console.log('上传数据转换',JSON.parse(res.data));
+				// 		// 取到文档服务器的值
+				// 		let uploaddata = JSON.parse(res.data)
+				// 		let x = {}
+				// 		x.url = utilTask.getImageUrlName(uploaddata.data)
+				// 		x.extname = ''
+				// 		x.name = uploaddata.data
+				// 		this.imageValue.push(x)
+				// 	})
+				// }
 			},
 			onDeleteImage(e) {
 				// console.log("delete image ",e)

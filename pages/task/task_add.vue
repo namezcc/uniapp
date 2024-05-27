@@ -105,6 +105,12 @@
 							*别人支付给你的费用
 						</text>
 					</view>
+					<view class="lineMargin"></view>
+					<myrow>
+						<text>联系方式</text>
+						<expanded></expanded>
+						<input v-model="contact_way" placeholder="填写联系你的方式" class="contact-input" maxlength="30" />
+					</myrow>
 				</view>
 			</view>
 			<view class="colItem itemContent">
@@ -159,6 +165,12 @@
 					</myrow>
 				</view>
 			</view>
+			<myrow>
+				<label>
+					<checkbox value="1" :checked="agree" @click="setAgree" /><text class="agree-txt" @click="toPageNrfb">《帮帮内容发布规范》</text>
+				</label>
+				<expanded></expanded>
+			</myrow>
 			<view class="colItem" style="margin-top: 20px;">
 				<button @click="submitTask" class="fill-btn-primary" >{{optName}}</button>
 			</view>
@@ -176,6 +188,7 @@
 	import store from "@/store/index.js"
 	import util_time from "../../common/util_time"
 import util_page from "../../common/util_page"
+import util_common from "../../common/util_common"
 	
 	let useDateArray = [];
 	
@@ -265,6 +278,8 @@ import util_page from "../../common/util_page"
 				endTime:0,
 				taskOpen:true,
 				credit_score:80,
+				agree:true,
+				contact_way:"",
 			}
 		},
 		onLoad(e) {
@@ -299,6 +314,7 @@ import util_page from "../../common/util_page"
 				this.haveTaskTime = this.startTime > 0 && this.endTime > 0
 				this.taskOpen = !(t.nonpublic == true)
 				this.credit_score = t.credit_score || 0
+				this.contact_way = t.contact_way || ""
 				
 				if (t.address) {
 					this.locationString = t.address.name || t.address.address
@@ -331,21 +347,21 @@ import util_page from "../../common/util_page"
 				if (this.joinEndTime == 0) {
 					return "请选择日期"
 				}else{
-					return util_time.formatTaskWeekTime(this.joinEndTime)
+					return util_time.formatTaskWeekTime(this.joinEndTime,{day:true,week:true})
 				}
 			},
 			taskStartTime() {
 				if (this.startTime == 0) {
 					return "请选择"
 				}else{
-					return util_time.formatTaskWeekTime(this.startTime)
+					return util_time.formatTaskWeekTime(this.startTime,{day:true,week:true})
 				}
 			},
 			taskEndTime() {
 				if (this.endTime == 0) {
 					return "请选择"
 				}else{
-					return util_time.formatTaskWeekTime(this.endTime)
+					return util_time.formatTaskWeekTime(this.endTime,{day:true,week:true})
 				}
 			},
 			creditScore() {
@@ -356,20 +372,30 @@ import util_page from "../../common/util_page"
 			...mapMutations(["setLocation"]),
 			onSelectImage(e) {
 				console.log("select image ",e)
-				const tempFilePaths = e.tempFilePaths;
-				for (let img of tempFilePaths) {					
-					utilHttp.uploadImage(img,(res)=>{
-						console.log('上传成功', res);
-						// console.log('上传数据转换',JSON.parse(res.data));
-						// 取到文档服务器的值
-						let uploaddata = JSON.parse(res.data)
+				// const tempFilePaths = e.tempFilePaths;
+				// for (let img of tempFilePaths) {					
+				// 	utilHttp.uploadImage(img,(res)=>{
+				// 		console.log('上传成功', res);
+				// 		// console.log('上传数据转换',JSON.parse(res.data));
+				// 		// 取到文档服务器的值
+				// 		let uploaddata = JSON.parse(res.data)
+				// 		let x = {}
+				// 		x.url = utilTask.getImageUrlName(uploaddata.data)
+				// 		x.extname = ''
+				// 		x.name = uploaddata.data
+				// 		this.imageValue.push(x)
+				// 	})
+				// }
+				let flist = util_common.getTempFileList(e)
+				util_common.uploadFileList(flist).then((vec)=>{
+					for (let v of vec) {
 						let x = {}
-						x.url = utilTask.getImageUrlName(uploaddata.data)
+						x.url = v
 						x.extname = ''
-						x.name = uploaddata.data
+						x.name = ''
 						this.imageValue.push(x)
-					})
-				}
+					}
+				})
 			},
 			onDeleteImage(e) {
 				console.log("delete image ",e)
@@ -433,15 +459,28 @@ import util_page from "../../common/util_page"
 					latitude = this.userlocation.latitude
 					this.toChooseLocation(latitude,longitude)
 				}else{					
-					uni.getLocation({
-						success: (res) => {
-							// console.log("get location ",res)
+					// uni.getLocation({
+					// 	success: (res) => {
+					// 		// console.log("get location ",res)
+					// 		longitude = res.longitude
+					// 		latitude = res.latitude
+					// 		this.setLocation({latitude:latitude,longitude:longitude})
+					// 	},
+					// 	complete:() => {
+					// 		this.toChooseLocation(latitude,longitude)
+					// 	}
+					// })
+					
+					uni.getFuzzyLocation({
+						complete:() => {
+							this.toChooseLocation(latitude,longitude)
+						},
+						success:(res)=>{
+							console.log("get location ",res)
 							longitude = res.longitude
 							latitude = res.latitude
 							this.setLocation({latitude:latitude,longitude:longitude})
-						},
-						complete:() => {
-							this.toChooseLocation(latitude,longitude)
+							store.commit("setLocation",{latitude:res.latitude,longitude:res.longitude})
 						}
 					})
 				}
@@ -455,6 +494,11 @@ import util_page from "../../common/util_page"
 				// 	api.toast("内容不能为空")
 				// 	return false;
 				// }
+				
+				if (!this.agree) {
+					api.toast("请先阅读并勾选帮帮内容发布规范")
+					return
+				}
 				
 				let now = util_time.getSecond()
 				if (this.joinEndTime <= now) {
@@ -512,6 +556,7 @@ import util_page from "../../common/util_page"
 					images: this.imageValue.map((v)=> v.url),
 					nonpublic:this.taskOpen ? 0 : 1,
 					credit_score:this.credit_score,
+					contact_way:this.contact_way,
 				}
 				if (this.location) {
 					task.address = this.location
@@ -602,6 +647,14 @@ import util_page from "../../common/util_page"
 			onTaskOpen(e) {
 				// console.log("open ",e)
 				this.taskOpen = e.detail.value
+			},
+			setAgree() {
+				this.agree = !this.agree
+			},
+			toPageNrfb() {
+				uni.navigateTo({
+					url:"/pages/web/web_xy_nrfb"
+				})
 			}
 		}
 	}
@@ -661,6 +714,15 @@ import util_page from "../../common/util_page"
 		font-size: 14px;
 	}
 	
+	.agree-txt {
+		color: $uni-error;
+		font-size: 14px;
+	}
+	
+	.contact-input {
+		text-align: right;
+		// font-size: 14px;
+	}
 	// .fill-btn-primary {
 	// 	width: 100%;
 	// 	font-size: 15px;

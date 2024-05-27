@@ -29,8 +29,8 @@
 					<myrow>
 						<radio value="1" :checked="agree" style="transform:scale(0.7)" @click="onAgree"></radio>
 						<text @click="onAgree">我已阅读并同意</text>
-						<text class="agree-txt">《用户协议》</text>
-						<text class="agree-txt">《隐私协议》</text>
+						<text class="agree-txt" @click="toPageYh">《用户协议》</text>
+						<text class="agree-txt" @click="toPageYs">《隐私政策》</text>
 					</myrow>
 				</view>
 				<view style="height: 100px;width: 100%;"></view>
@@ -155,7 +155,17 @@
 			},
 			onAgree() {
 				this.agree = !this.agree
-			}
+			},
+			toPageYh() {
+				uni.navigateTo({
+					url:"/pages/web/web_xy_yh"
+				})
+			},
+			toPageYs() {
+				uni.navigateTo({
+					url:"/pages/web/web_xy_ys"
+				})
+			},
 		}
 	}
 </script>

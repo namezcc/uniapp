@@ -201,6 +201,30 @@
 				"navigationBarTitleText" : "建议/反馈",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/web/web_xy_nrfb",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/web/web_xy_yh",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/web/web_xy_ys",
+			"style" : 
+			{
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

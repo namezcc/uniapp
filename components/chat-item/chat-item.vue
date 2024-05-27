@@ -7,7 +7,7 @@
 					<expanded></expanded>
 				</template>
 				<template v-else>
-					<avatar :usercid="chat.cid" :tocid="chat.cid" :inpage="inpage"></avatar>
+					<avatar :usercid="chaticon" :tocid="chat.cid" :inpage="inpage"></avatar>
 				</template>
 				<view style="margin: 0rpx 20rpx;">				
 					<mycol :itemAlign="nameAlign">
@@ -22,7 +22,7 @@
 					</mycol>
 				</view>
 				<template v-if="isSelf">
-					<avatar :usercid="chat.cid"></avatar>
+					<avatar :usercid="chaticon"></avatar>
 				</template>
 				<template v-else>
 					<expanded></expanded>
@@ -36,6 +36,7 @@
 	import { mapState } from "vuex"
 import { PageType } from "../../common/define_const";
 import util_time from "../../common/util_time";
+import store from "../../store";
 	
 	export default {
 		name:"chat-item",
@@ -55,8 +56,16 @@ import util_time from "../../common/util_time";
 		},
 		data() {
 			return {
-				
+				chaticon:""
 			};
+		},
+		mounted() {
+			store.dispatch("getOtherUser",this.chat.cid).then((res)=>{
+				if (res) {
+					this.chaticon = res.icon
+					// console.log("user icon ",res.icon)
+				}
+			})
 		},
 		computed:{
 			...mapState({

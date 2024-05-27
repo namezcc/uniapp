@@ -89,20 +89,36 @@ import util_page from "../../common/util_page"
 			}
 		},
 		onLoad() {
-			// console.log("get apiGetTaskInfo")
+			console.log("get apiGetTaskInfo")
 			uni.getSystemInfo({
 			  success: (res) => {
 				this.winHeight = res.windowHeight
 			  }
 			})
+			
+			console.log("index onload")
+			uni.$on("onGetUserData",()=>{
+				this.onGetUserData()
+			})
+			
 			this.refreshTaskList()
 			// getlocation
-			uni.getLocation({
-				isHighAccuracy:true,
-				success: (res) => {
-					// console.log("get location ",res)
+			// uni.getLocation({
+			// 	isHighAccuracy:true,
+			// 	success: (res) => {
+			// 		// console.log("get location ",res)
+			// 		store.commit("setLocation",{latitude:res.latitude,longitude:res.longitude})
+			// 	},
+			// })
+			
+			uni.getFuzzyLocation({
+				success:(res)=>{
+					console.log("get location ",res)
 					store.commit("setLocation",{latitude:res.latitude,longitude:res.longitude})
 				},
+				fail:(res)=>{
+					console.log("get location fail",res)
+				}
 			})
 			
 			// uni.$on(UpdateEventType.Task,(tid)=>{
@@ -112,6 +128,8 @@ import util_page from "../../common/util_page"
 			// 		// this.taskList = this.taskList
 			// 	}
 			// })
+			
+			
 		},
 		computed: {
 			genTaskList() {
@@ -147,6 +165,7 @@ import util_page from "../../common/util_page"
 					uni.navigateTo({
 						url:"/pages/task/task_add"
 						// url:"/pages/message/test_chat_page"
+						// url:"/pages/web/web_xy_nrfb"
 					})
 					
 				}else{					
@@ -278,6 +297,21 @@ import util_page from "../../common/util_page"
 					
 					this.refreshTaskList()
 				}
+			},
+			onGetUserData() {
+				console.log("onGetUserData")
+				// uni.getUserProfile({
+				// 	desc:"设置微信昵称和头像",
+				// 	success: (sures) => {
+				// 		console.log("get wexin user",sures)
+				// 	},
+				// 	fail: (err) => {
+				// 		console.log("get weixin info fail",err)
+				// 	}
+				// })
+				uni.navigateTo({
+					url:"/pages/edit/edit_page?tip=1",
+				})
 			}
 		}
 	}

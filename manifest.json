@@ -78,10 +78,13 @@
             "urlCheck" : false
         },
         "usingComponents" : true,
-        "requiredPrivateInfos" : [ "chooseLocation", "getLocation" ],
+        "requiredPrivateInfos" : [ "chooseLocation", "getFuzzyLocation" ],
         "permission" : {
+            "scope.userFuzzyLocation" : {
+                "desc" : "推送附近的帮助委托"
+            },
             "scope.userLocation" : {
-                "desc" : "定位推送内容"
+                "desc" : "推送附近的帮助委托"
             }
         }
     },

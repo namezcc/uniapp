@@ -4,8 +4,8 @@
 			<template v-slot:title>
 				<view style="margin-top: 10px">
 					<myrow>
-						<avatar src="" :usercid="task.cid"/>
-						<text>{{task.creator_name}}</text>
+						<avatar :src="icon" :usercid="task.cid"/>
+						<!-- <text>{{task.creator_name}}</text> -->
 						<expanded/>
 						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 0">限女生</view>
 						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 1">限男生</view>
@@ -13,6 +13,9 @@
 							<text>报名 </text>
 							<text style="color: #f4d1b9;">{{numinfo[0]}}</text>
 							<text>/{{numinfo[1]}}</text>
+						</view>
+						<view v-if="myTask" style="margin-left: 10px;"  @click.stop="showMoreAction">
+							<uni-icons type="more-filled"></uni-icons>
 						</view>
 						<!-- <mycol>
 							<text-tag :text="taskStateString" :theme="taskStateTheme"></text-tag>
@@ -41,8 +44,8 @@
 				<myrow>
 					<text-tag :text="taskStateString" :theme="taskStateTheme"></text-tag>
 					<expanded></expanded>
-					<view class="" @click.stop="deleteJoin">
-						<uni-icons type="closeempty" v-if="showDelete"></uni-icons>
+					<view class="" @click.stop="deleteJoin" v-if="showDelete">
+						<uni-icons type="closeempty" ></uni-icons>
 					</view>
 				</myrow>
 			</view>
@@ -62,6 +65,7 @@ import { TaskShowState } from "../../common/define_const";
 	
 	export default {
 		name:"task-chat-item",
+		emits: ['clickClose'],
 		props: {
 			task: {
 				type: Object,
@@ -71,7 +75,16 @@ import { TaskShowState } from "../../common/define_const";
 		data() {
 			return {
 				theme:theme,
+				icon:"",
 			};
+		},
+		mounted() {
+			store.dispatch("getOtherUser",this.task.cid).then((res)=>{
+				if (res) {
+					this.icon = res.icon
+					// console.log("user icon ",res.icon)
+				}
+			})
 		},
 		computed:{
 			numinfo() {
@@ -132,6 +145,8 @@ import { TaskShowState } from "../../common/define_const";
 						return "被踢出";
 					case TaskShowState.Illegal:
 						return "已下架";
+					case TaskShowState.Finish:
+						return "已完成";
 					default:
 						break;
 				}
@@ -154,6 +169,8 @@ import { TaskShowState } from "../../common/define_const";
 						return "grey";
 					case TaskShowState.Illegal:
 						return "error";
+					case TaskShowState.Finish:
+						return "grey";
 					default:
 						break;
 				}
@@ -165,10 +182,41 @@ import { TaskShowState } from "../../common/define_const";
 					return true
 				}
 				return false
-			}
+			},
+			myTask() {
+				return this.task.cid == global_data.cid
+			},
 		},
 		methods:{
 			deleteJoin() {
+				// uni.showModal({
+				// 	title:"删除任务",
+				// 	content:`确认删除任务: ${this.task.title} 吗?`,
+				// 	success: (res) => {
+				// 		if (res.confirm) {
+				// 			console.log("delete join")
+				// 			store.commit("deleteJoinTask",this.task.id)
+				// 		}
+				// 	}
+				// })
+				this.$emit("clickClose")
+			},
+			finishTask() {
+				let state = util_task.getTaskState(this.task,global_data.cid)
+				if (state != TaskShowState.Open) {
+					return
+				}
+				uni.showModal({
+					title:"完成任务",
+					content:`确定完成: ${this.task.title} 吗? 任务完成后不可在报名`,
+					success: (res) => {
+						if (res.confirm) {
+							store.commit("finishMyTask",this.task.id)
+						}
+					}
+				})
+			},
+			deleteTask() {
 				uni.showModal({
 					title:"删除任务",
 					content:`确认删除任务: ${this.task.title} 吗?`,
@@ -177,6 +225,24 @@ import { TaskShowState } from "../../common/define_const";
 							console.log("delete join")
 							store.commit("deleteJoinTask",this.task.id)
 						}
+					}
+				})
+			},
+			showMoreAction() {
+				uni.showActionSheet({
+					itemList:["完成任务","取消任务"],
+					success: (i) => {
+						// console.log("share ",i.tapIndex)
+						switch (i.tapIndex){
+							case 0:
+								this.finishTask()
+								break;
+							case 1:
+								this.deleteTask()
+								break;
+						}
+					},
+					fail() {
 					}
 				})
 			}

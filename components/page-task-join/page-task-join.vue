@@ -2,8 +2,8 @@
 	<view class="content">
 		<z-paging v-if="firstLoaded || isCurrentPage" ref="paging" v-model="dataList" @query="queryList" 
 		 :default-page-size="pageSize" :fixed="customClick" :hide-empty-view="true">
-			<view v-for="(task,index) in dataList" @click="toChatPage(task)" :key="index">
-				<task-chat-item :task="task"></task-chat-item>
+			<view v-for="(task,index) in dataList" @click="toTaskInfo(task)" :key="index">
+				<task-chat-item :task="task" @clickClose="deleteTaskJoin(task)"></task-chat-item>
 			</view>
 			<view v-if="this.firstLoaded && dataList.length == 0" style="width: 100%;">
 				<myrow mainAlign="center">					
@@ -107,9 +107,30 @@ import global_data from '../../common/global_data';
 					})
 				}
 			},
+			toTaskInfo(task) {
+				if (task.cid != global_data.cid && task.state == util_task.TaskServerState.Illegal) {
+					apihandle.toast("任务已下架")
+					return
+				}
+				uni.navigateTo({
+					url:"/pages/task/task_info?taskid="+task.id,
+				})
+			},
 			onDeleteTaskJoin() {
 				this.usecash = true
 				this.$refs.paging.reload()
+			},
+			deleteTaskJoin(task) {
+				uni.showModal({
+					title:"从列表里删除",
+					content:`确认删除: ${task.title} 吗?`,
+					success: (res) => {
+						if (res.confirm) {
+							console.log("delete join")
+							store.commit("deleteJoinTask",task.id)
+						}
+					}
+				})
 			}
 		}
 	}

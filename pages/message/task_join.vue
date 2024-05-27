@@ -27,10 +27,10 @@
 		</view> -->
 		
 		<view class="" style="flex: 1;">			
-			<page-task-join :customClick="false" v-if="current == 0" :tabIndex="0" :currentIndex="current"/>
-			<page-task-my :customClick="false" v-if="current == 1" :tabIndex="1" :currentIndex="current" />
-			<page-user-chat :customClick="false" v-if="current == 2" :tabIndex="2" :currentIndex="current"/>
-			<page-interest-task :customClick="false" v-if="current == 3" :tabIndex="3" :currentIndex="current"/>
+			<page-task-join :customClick="false" v-show="current == 0" :tabIndex="0" :currentIndex="current"/>
+			<page-task-my :customClick="false" v-show="current == 1" :tabIndex="1" :currentIndex="current" />
+			<!-- <page-user-chat :customClick="false" v-show="current == 2" :tabIndex="2" :currentIndex="current"/> -->
+			<page-interest-task :customClick="false" v-show="current == 2" :tabIndex="2" :currentIndex="current"/>
 		</view>
 	</view>
 </template>
@@ -49,7 +49,7 @@ import util_page from "../../common/util_page"
 				tabList: [
 					{name:"已报名"},
 					{name:"我的"},
-					{name:"私聊"},
+					// {name:"私聊"},
 					{name:"兴趣"},
 				],
 			}

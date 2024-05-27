@@ -4,13 +4,13 @@
 			<template v-slot:title>
 				<view style="margin-top: 10px">
 					<myrow>
-						<avatar :src="task.creator_icon"/>
-						<view class="" style="margin-left: 8rpx;">							
+						<avatar :src="icon" />
+						<!-- <view class="" style="margin-left: 8rpx;">							
 							<mycol itemAlign="flex-start">
 								<text class="txt-name">{{task.creator_name}}</text>
-								<!-- <text class="txt-credit" v-if="creditScore">信用分:{{creditScore}}</text> -->
+								<text class="txt-credit" v-if="creditScore">信用分:{{creditScore}}</text>
 							</mycol>
-						</view>
+						</view> -->
 						<expanded/>
 						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 0">限女生</view>
 						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 1">限男生</view>
@@ -27,26 +27,32 @@
 			</template>
 			<myrow itemAlign="flex-start" :wrap="false">
 				<mycol itemAlign="flex-start">
-					<text style="white-space: pre-wrap" class="task-title">{{task.title}}</text>
+					<text class="task-title text-hide">{{task.title}}</text>
+					<text class="txt-content">{{task.content}}</text>
 					<view v-if="haveTaskRangeTime">
-						<view class="round-dot" style="margin: 6rpx;"></view>
-						<text style="font-size: 14px;">{{taskRangeStart}}</text>
+						<!-- <view class="round-dot" style="margin: 6rpx;"></view> -->
+						<myrow>							
+							<uv-icon name="calendar" color="#40c25f" size="20"></uv-icon>
+							<text style="font-size: 14px;">{{taskRangTime}}</text>
+						</myrow>
 					</view>
-					<view v-if="haveTaskRangeTime">
+					<!-- <view v-if="haveTaskRangeTime">
 						<view class="round-dot" style="margin: 6rpx;background:#f4c2a2"></view>
 						<text style="font-size: 14px;">{{taskRangeEnd}}</text>
-					</view>
+					</view> -->
 				</mycol>
 				<!-- <uni-title :title="task.title" type="h3"></uni-title> -->
 				<expanded></expanded>
-				<image style="width: 75px;height: 75px;margin: 10rpx;" v-if="taskImage.length" :src="taskImage[0]" mode="aspectFit"></image>
+				<view v-if="taskImage.length" style="width: 75px;height: 75px;margin: 10rpx;">
+					<image style="width: 75px;height: 75px;" :src="taskImage[0]" mode="aspectFill"></image>
+				</view>
 			</myrow>
 			<myrow>
 				<view v-if="haveReward" class="boxText">赏</view>
 				<text :style="{fontSize: '16px',color: moneyColor}" >{{taskMoney}}</text>
 				<expanded></expanded>
+				<uni-icons v-if="taskDistance" type="location-filled" color="#00aaff"></uni-icons>
 				<text :style="{fontSize: '12px'}" >{{taskDistance}}</text>
-				<uni-icons v-if="taskDistance" type="location-filled"></uni-icons>
 			</myrow>
 		</uni-card>
 	</view>
@@ -97,6 +103,18 @@ import util_common from "../../common/util_common"
 			haveTaskRangeTime() {
 				return (this.task.task_start_time ?? 0) > 0
 			},
+			taskRangTime() {
+				let isSameDay = util_time.isSameDay(this.task.task_start_time,this.task.task_end_time)
+				if (isSameDay) {
+					let start = util_time.formatTaskWeekTime(this.task.task_start_time,{day:true})
+					let endstr = util_time.formatTaskWeekTime(this.task.task_end_time)
+					return `${start} - ${endstr}`
+				}else{
+					let start = util_time.formatTaskWeekTime(this.task.task_start_time,{day:true,nohm:true})
+					let endstr = util_time.formatTaskWeekTime(this.task.task_end_time,{day:true,nohm:true})
+					return `${start} - ${endstr}`
+				}
+			},
 			taskRangeStart() {
 				return util_time.formatTaskWeekTime(this.task.task_start_time)+" 开始"
 			},
@@ -123,6 +141,9 @@ import util_common from "../../common/util_common"
 			},
 			creditScore() {
 				return this.taskuser == null ? null : util_common.getCreditShowScore(this.taskuser.credit_score)
+			},
+			icon() {
+				return this.taskuser?.icon || ""
 			}
 		},
 		methods:{
@@ -154,6 +175,24 @@ import util_common from "../../common/util_common"
 	.txt-name {
 		font-size: 14px;
 		color: $uni-base-color;
+	}
+	
+	.text-hide {
+	    display: -webkit-box; /*弹性伸缩盒子模型显示*/
+	    -webkit-box-orient: vertical; /*排列方式*/ 
+	    -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
+	    overflow: hidden; /*溢出隐藏*/
+	}
+	
+	.txt-content {
+		color: $uni-secondary-color;
+		font-size: 14px;
+		// white-space: normal !important;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
 	}
 	
 </style>

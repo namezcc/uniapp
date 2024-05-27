@@ -114,6 +114,7 @@ var TaskShowState = {
 	TaskDelete:4,		//任务以解散
 	Kicked:5,			//被踢出任务
 	Illegal:6,			//已下架
+	Finish:7,			//已完成
 }
 
 var CreditType = {

@@ -32,7 +32,7 @@ var apihandle = {
 	setToken(token) {
 		authorHeader["Authorization"] = token
 	},
-	checkData(data) {
+	checkData(data,res) {
 		if (data == undefined) {
 			toast(res.errMsg)
 			return false
@@ -42,10 +42,17 @@ var apihandle = {
 		}
 		return true
 	},
+	checkHttpRes(res) {
+		if (res?.statusCode != 200) {
+			toast("http错误:"+res.statusCode + " "+res.errMsg)
+			return false
+		}
+		return true
+	},
 	async apiGetPhoneCode(phone) {
 		try{
 			var res = await http.request("phoneCode","GET",{phoneNumber:phone})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data
 			}
 		}catch(e){
@@ -55,8 +62,8 @@ var apihandle = {
 	async apiUserLogin(phone) {
 		try{
 			var res = await http.request("userlogin","POST",{phone:phone})
-			if (this.checkData(res.data)) {
-				this.setToken(res.data.token)
+			if (this.checkData(res.data,res)) {
+				this.setToken(res.data.data.token)
 				return res.data
 			}
 		}catch(e){
@@ -66,7 +73,7 @@ var apihandle = {
 	async userloginWxCode(code) {
 		try{
 			var res = await http.request("userloginWxCode","POST",{code:code})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				this.setToken(res.data.data.token)
 				return res.data
 			}
@@ -78,7 +85,7 @@ var apihandle = {
 		try{
 			var header = {Authorization:token}
 			var res = await http.request("userRefreshToken","GET",null,{header:header})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				this.setToken(res.data.data)
 				return res.data
 			}
@@ -90,7 +97,7 @@ var apihandle = {
 		let url = cid ? "getUserInfo":"getSelfUserInfo"
 		try{
 			var res = await http.request(url,"GET",{cid:cid?cid:""},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -100,7 +107,7 @@ var apihandle = {
 	async apiGetTaskInfo(config) {
 		try{
 			var res = await http.request("apiGetTaskInfo","POST",config)
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -111,7 +118,7 @@ var apihandle = {
 	async apiCreateTask(task) {
 		try{
 			var res = await http.request("apiCreateTask","POST",task,{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -121,7 +128,7 @@ var apihandle = {
 	async apiUpdateTask(task) {
 		try{
 			var res = await http.request("apiUpdateTask","POST",task,{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -131,7 +138,7 @@ var apihandle = {
 	async apiSearchTask(config) {
 		try{
 			var res = await http.request("apiSearchTask","POST",config)
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -141,7 +148,7 @@ var apihandle = {
 	async apiJoinTask(id) {
 		try{
 			var res = await http.request("apiJoinTask","GET",{taskid:id},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -151,7 +158,7 @@ var apihandle = {
 	async apiQuitTask(id) {
 		try{
 			var res = await http.request("apiQuitTask","GET",{taskid:id},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -161,7 +168,7 @@ var apihandle = {
 	async apiKickTask(id,cid) {
 		try{
 			var res = await http.request("apiKickTask","GET",{taskid:id,kickcid:cid},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -171,7 +178,7 @@ var apihandle = {
 	async apiLoadInterest() {
 		try{
 			var res = await http.request("apiLoadInterest","GET",null,{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -181,7 +188,7 @@ var apihandle = {
 	async apiTaskPushInterest(id) {
 		try{
 			var res = await http.request("apiTaskPushInterest","GET",{taskid:id},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data
 			}
 		}catch(e){
@@ -191,7 +198,7 @@ var apihandle = {
 	async apiTaskPullInterest(id) {
 		try{
 			var res = await http.request("apiTaskPullInterest","GET",{taskid:id},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data
 			}
 		}catch(e){
@@ -201,7 +208,7 @@ var apihandle = {
 	async apiLoadMyJoinTaskInfo(skip) {
 		try{
 			var res = await http.request("apiLoadMyJoinTaskInfo","GET",{skip:skip},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -211,7 +218,7 @@ var apihandle = {
 	async apiLoadMyTaskInfo(skip) {
 		try{
 			var res = await http.request("apiLoadMyTaskInfo","GET",{skip:skip},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -221,7 +228,7 @@ var apihandle = {
 	async apiLoadOtherTaskInfo(cid,skip) {
 		try{
 			var res = await http.request("apiLoadOtherTaskInfo","GET",{cid,skip},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -231,7 +238,7 @@ var apihandle = {
 	async apiLoadTaskChat(taskid,start,num) {
 		try{
 			var res = await http.request("apiLoadTaskChat","GET",{taskid:taskid,start:start,num:num},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -241,7 +248,7 @@ var apihandle = {
 	async apiGetOneTaskInfo(taskid) {
 		try{
 			var res = await http.request("apiGetOneTaskInfo","GET",{taskid},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -251,7 +258,7 @@ var apihandle = {
 	async apiLoadUserChatList() {
 		try{
 			var res = await http.request("apiLoadUserChatList","GET",{},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -261,7 +268,7 @@ var apihandle = {
 	async apiLoadUserChatData(id,start,num) {
 		try{
 			var res = await http.request("apiLoadUserChatData","GET",{id,start,num},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -271,7 +278,7 @@ var apihandle = {
 	async apiLoadOneUserChatData(cid) {
 		try{
 			var res = await http.request("apiLoadOneUserChatData","GET",{cid},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -281,7 +288,7 @@ var apihandle = {
 	async apiDeleteUserChatData(id) {
 		try{
 			var res = await http.request("apiDeleteUserChatData","GET",{id},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -291,7 +298,7 @@ var apihandle = {
 	async apiLoadInterestTask(skip) {
 		try{
 			var res = await http.request("apiLoadInterestTask","GET",{skip},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -301,7 +308,7 @@ var apihandle = {
 	async apiReportTask(data) {
 		try{
 			var res = await http.request("apiReportTask","POST",data,{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -311,7 +318,7 @@ var apihandle = {
 	async apiReportUser(data) {
 		try{
 			var res = await http.request("apiReportUser","POST",data,{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -321,7 +328,7 @@ var apihandle = {
 	async apiUserSuggest(data) {
 		try{
 			var res = await http.request("apiUserSuggest","POST",data)
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return true
 			}
 		}catch(e){
@@ -331,7 +338,7 @@ var apihandle = {
 	async apiGetBlackList() {
 		try{
 			var res = await http.request("apiGetBlackList","GET",{},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -341,7 +348,7 @@ var apihandle = {
 	async apiPushBlackList(cid) {
 		try{
 			var res = await http.request("apiPushBlackList","GET",{cid},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -351,7 +358,7 @@ var apihandle = {
 	async apiPullBlackList(cid) {
 		try{
 			var res = await http.request("apiPullBlackList","GET",{cid},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -361,7 +368,7 @@ var apihandle = {
 	async apiGetUserList(cidvec) {
 		try{
 			var res = await http.request("apiGetUserList","POST",{cids:cidvec},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -373,7 +380,7 @@ var apihandle = {
 			let header = {...authorHeader}
 			header['content-type'] = 'application/x-www-form-urlencoded'
 			var res = await http.request("apiSetUserIcon","POST",{icon:iconurl},{header})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return true
 			}
 		}catch(e){
@@ -383,7 +390,7 @@ var apihandle = {
 	async apiEditName(name) {
 		try{
 			var res = await http.request("apiEditName","GET",{name},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return true
 			}
 		}catch(e){
@@ -393,7 +400,17 @@ var apihandle = {
 	async apiDeleteMyTaskInfo(id) {
 		try{
 			var res = await http.request("apiDeleteMyTaskInfo","GET",{taskid:id},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
+				return true
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+	},
+	async apiSetFinishTask(id) {
+		try{
+			var res = await http.request("apiSetFinishTask","GET",{taskid:id},{header:authorHeader})
+			if (this.checkData(res.data,res)) {
 				return true
 			}
 		}catch(e){
@@ -403,7 +420,7 @@ var apihandle = {
 	async apiDeleteUserJoin(id) {
 		try{
 			var res = await http.request("apiDeleteUserJoin","GET",{taskid:id},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return true
 			}
 		}catch(e){
@@ -413,7 +430,7 @@ var apihandle = {
 	async apiGetCreditToUserType(cid) {
 		try{
 			var res = await http.request("apiGetCreditToUserType","GET",{cid},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -423,7 +440,7 @@ var apihandle = {
 	async apiSetCreditToUserType(cid,type) {
 		try{
 			var res = await http.request("apiSetCreditToUserType","GET",{cid,type},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}
 		}catch(e){
@@ -433,7 +450,7 @@ var apihandle = {
 	async apiCheckIdCard(idcard,name) {
 		try{
 			var res = await http.request("apiCheckIdCard","GET",{idcard,name},{header:authorHeader})
-			if (this.checkData(res.data)) {
+			if (this.checkData(res.data,res)) {
 				return true
 			}
 		}catch(e){
@@ -444,13 +461,33 @@ var apihandle = {
 	async apiAppError(errinfo) {
 		try{
 			var res = await http.request("apiAppError","POST",{crash:errinfo},{header:authorHeader})
-			// if (this.checkData(res.data)) {
+			// if (this.checkData(res.data,res)) {
 			// 	return true
 			// }
 		}catch(e){
 			toast("网络错误")
 		}
 		return false
+	},
+	async apiGetOssCredential() {
+		try{
+			var res = await http.request("apiGetOssCredential","GET",{},{header:authorHeader})
+			return res.data
+		}catch(e){
+			toast("网络错误")
+		}
+		return null
+	},
+	async apiGetPostPolicy(ext) {
+		try{
+			var res = await http.request("apiGetPostPolicy","GET",{ext},{header:authorHeader})
+			if (this.checkHttpRes(res)) {
+				return res.data
+			}
+		}catch(e){
+			toast("网络错误")
+		}
+		return null
 	},
 }
 

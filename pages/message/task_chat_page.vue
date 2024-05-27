@@ -13,7 +13,7 @@
 					<myrow>
 						<view style="width: 150px;">							
 							<myrow>								
-								<avatar :usercid="task.cid" :tocid="task.cid" :inpage="inpage"></avatar>
+								<avatar :src="taskicon" :usercid="task.cid" :tocid="task.cid" :inpage="inpage"></avatar>
 								<text style="text-overflow: ellipsis;">{{task.creator_name}}</text>
 							</myrow>
 						</view>
@@ -85,6 +85,7 @@ import apihandle from "../../common/api_handle";
 				chatList:[],
 				chatlen:0,
 				inpage:PageType.ChatTask,
+				taskicon:"",
 			}
 		},
 		onLoad() {
@@ -97,6 +98,13 @@ import apihandle from "../../common/api_handle";
 			uni.$on("onKickOutTask",this.onTaskBeKick)
 			
 			store.commit("saveTaskChatIndex",this.taskid)
+			
+			store.dispatch("getOtherUser",this.task.cid).then((res)=>{
+				if (res) {
+					this.taskicon = res.icon
+					// console.log("user icon ",res.icon)
+				}
+			})
 		},
 		onUnload() {
 			uni.$off(["getTaskChat","reloadTaskChatData","onKickOutTask"])

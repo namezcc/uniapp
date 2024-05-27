@@ -33,9 +33,9 @@
 					<myrow mainAlign="center">
 						<text :class="creditScore>=0 ? 'score-good':'score-bad'">{{creditScore}}</text>
 					</myrow>
-					<template v-slot:right>
+					<!-- <template v-slot:right>
 						<button style="margin: 0px 10px;height: 30px;padding: 0px 8px;" :class="inBlackList? 'fill-btn-primary-disabled': 'fill-btn-primary'" @click="toChatPage">私聊</button>
-					</template>
+					</template> -->
 				</uni-section>
 				
 				<myrow mainAlign="center">

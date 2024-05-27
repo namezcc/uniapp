@@ -1,6 +1,6 @@
 <template>
 	<view :style="[avatorBox]">
-		<uv-avatar :src="userurl" :size="radius" @click="toUserPage"></uv-avatar>
+		<uv-avatar :src="src" :size="radius" @click="toUserPage"></uv-avatar>
 		<view class="sex-icon">
 			<uv-icon v-if="sex!=null" :name="iconname" :color="sexcolor" :bold="true"></uv-icon>
 		</view>
@@ -35,23 +35,23 @@ import global_data from '../../common/global_data';
 				default:0,
 			}
 		},
-		mounted() {
-			if (this.usercid > 0) {
-				// 加载玩家数据
-				store.dispatch("getOtherUser",this.usercid).then((res)=>{
-					if (res) {
-						this.userurl = res.icon
-						// console.log("user icon ",res.icon)
-					}
-				})
-			}
+		// mounted() {
+			// if (this.usercid > 0) {
+			// 	// 加载玩家数据
+			// 	store.dispatch("getOtherUser",this.usercid).then((res)=>{
+			// 		if (res) {
+			// 			this.userurl = res.icon
+			// 			// console.log("user icon ",res.icon)
+			// 		}
+			// 	})
+			// }
 			// console.log("user icon data",this.src)
-		},
+		// },
 		data() {
 			return {
 				iconname: this.sex == EnumSex.WOMAN ? "woman" : "man",
 				sexcolor: this.sex == EnumSex.WOMAN ? "pink" : "royalblue",
-				userurl:this.src,
+				// userurl:this.src,
 			};
 		},
 		computed:{

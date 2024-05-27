@@ -1,10 +1,15 @@
 <template>
 	<view class="col-class">
 		<view style="margin: 10px;padding: 5px;background-color: #fff;border-radius: 10px;">
-			<uv-input type="text" v-model="txtName" border="none"></uv-input>
+			<!-- #ifndef MP-WEIXIN -->
+				<uv-input type="text" v-model="txtName" border="none"></uv-input>
+			<!-- #endif -->
+			<!-- #ifdef MP-WEIXIN -->
+				<input type="nickname" v-model="txtName" placeholder="请输入昵称"/>
+			<!-- #endif -->
 		</view>
 		<view style="margin: 0px 15px;">
-			<text class="tip">2-15个字符</text>
+			<text class="tip">1-15个字符</text>
 		</view>
 		<view style="height: 100%;"></view>
 		<view style="margin: 10px;">

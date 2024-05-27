@@ -16,10 +16,12 @@
 				</uv-grid>
 			</view>
 		</uv-popup>
+		<uv-action-sheet ref="actionShare" :actions="actionList" title="分享到" cancelText="取消" 
+		round="10" @select="onSelectShare"></uv-action-sheet>
 		<scroll-view scroll-y="true" :refresherEnabled="true" @refresherrefresh="onPullDownRefresh" :refresher-triggered="refreshFinish"
 		 style="height: 0;flex: 1;">
 		<myrow :customStyle="{backgroundColor: '#fff',padding:'10px'}">
-			<avatar :src="task.creator_icon" :tocid="task.cid"/>
+			<avatar :src="userIcon" :tocid="task.cid"/>
 			<text>{{task.creator_name}}</text>
 			<expanded></expanded>
 			<view v-if="!selfTask" style="margin: 5px;">
@@ -31,6 +33,7 @@
 			</view>
 			<view style="width: 5px;"></view>
 		</myrow>
+		<uni-notice-bar v-if="taskIllegal" text="存在违规内容,请修改!" />
 		<!-- style="height: 100%;" -->
 			<swiper :indicator-dots="true" :autoplay="false" v-if="images.length" style="height: 300px;background-color: #fff;">
 				<template v-for="(u,index) in images" :key="index">
@@ -59,10 +62,17 @@
 				</view>
 				<view class="cell-info" @click="toMemberPage">
 					<myrow>
-						<text class="text-subtitle">报名信息</text>
+						<text class="text-subtitle">报名成员</text>
 						<expanded></expanded>
 						<text>{{numString}}</text>
 						<uni-icons type="right"></uni-icons>
+					</myrow>
+				</view>
+				<view class="cell-info">
+					<myrow>
+						<text class="text-subtitle">联系方式</text>
+						<expanded></expanded>
+						<text>{{task.contact_way}}</text>
 					</myrow>
 				</view>
 				<view v-if="task.address != null" class="cell-info" @click="toMapLocation">
@@ -138,6 +148,7 @@
 import util_time from "../../common/util_time"
 import util_page from "../../common/util_page"
 import util_common from "../../common/util_common"
+import global_data from "../../common/global_data"
 	
 	var optState = {
 		join:0,
@@ -152,23 +163,38 @@ import util_common from "../../common/util_common"
 		data() {
 			return {
 				taskid:null,
+				fromShare:false,
 				refreshFinish: false,
 				theme:theme,
 				task:null,
+				taskuser:null,
+				actionList:[
+					{name:"微信聊天",openType:"share"},
+					// {name:"朋友圈",openType:"share"},
+				]
 			}
 		},
 		onLoad(e) {
 			// this.task = store.getters.getTaskById(e.taskid)
 			this.taskid = e.taskid
+			this.fromShare = e.share == 1
 			
 			uni.showLoading({
 			})
 			store.dispatch("getTaskInfo",this.taskid).then((res)=>{
-				if (res && res.state != util_task.TaskServerState.Illegal) {
+				if (res && (res.cid == global_data.cid || res.state != util_task.TaskServerState.Illegal)) {
 					this.task = res
+					
+					store.dispatch("getOtherUser",this.task.cid).then((userres)=>{
+						if (userres) {
+							this.taskuser = userres
+						}
+					})
 				}else{
 					apihandle.toast("任务已下架")
-					uni.navigateBack()
+					if (!this.fromShare) {
+						uni.navigateBack()
+					}
 				}
 			}).finally(()=>{
 				uni.hideLoading()
@@ -193,13 +219,22 @@ import util_common from "../../common/util_common"
 			selfTask() {
 				return this.task.cid == this.user.cid
 			},
+			userIcon() {
+				return this.taskuser?.icon || ""
+			},
 			isDelete() {
 				return this.task.delete == 1
 			},
 			starType() {
+				if (this.fromShare) {
+					return "star"
+				}
 				return this.inInterestTask(this.taskid) ? "star-filled" : "star"
 			},
 			starColor() {
+				if (this.fromShare) {
+					return "#333333"
+				}
 				return this.inInterestTask(this.taskid) ? theme.primary :"#333333"
 			},
 			images() {
@@ -222,7 +257,13 @@ import util_common from "../../common/util_common"
 				return this.task.address?.name || "无"
 			},
 			getOptState() {
+				if (this.fromShare) {
+					return optState.join
+				}
 				var task = this.task
+				if (task.state == util_task.TaskServerState.Finish) {
+					return optState.finish
+				}
 				var user = this.user
 				var userjoin = util_task.getJoinByCid(user.cid,task)
 				if (userjoin) {
@@ -264,18 +305,50 @@ import util_common from "../../common/util_common"
 				}
 			},
 			taskStartTime() {
-				return util_time.formatTaskWeekTime(this.task.task_start_time)
+				return util_time.formatTaskWeekTime(this.task.task_start_time,{day:true,week:true})
 			},
 			taskEndTime() {
-				return util_time.formatTaskWeekTime(this.task.task_end_time)
+				return util_time.formatTaskWeekTime(this.task.task_end_time,{day:true,week:true})
 			},
 			taskCreditScore() {
 				let score = this.task.credit_score || 0
 				return `≥ ${score} 分`
+			},
+			taskIllegal() {
+				return this.task.state == util_task.TaskServerState.Illegal
+			}
+		},
+		onShareAppMessage(res) {
+			console.log("onShareAppMessage:",res)
+			let money = ""
+			if (this.task.money_type == TaskMoneyType.Reward) {
+				money = "奖励 " + this.moneyString
+			}
+			let image = this.images.length > 0 ? this.images[0] : ""
+			return {
+				title:this.task.title+" "+money,
+				path:"/pages/task/task_info?taskid="+this.task.id,
+				imageUrl:image,
+			}
+		},
+		onShareTimeline(res) {
+			console.log("onShareTimeline:",res)
+			let money = ""
+			if (this.task.money_type == TaskMoneyType.Reward) {
+				money = "奖励 " + this.moneyString
+			}
+			// let image = this.images.length > 0 ? this.images[0] : ""
+			return {
+				title:this.task.title+" "+money,
+				query:"taskid="+this.task.id+"&share=1"
+				// imageUrl:image,
 			}
 		},
 		methods: {
 			onPullDownRefresh() {
+				if (this.fromShare) {
+					return
+				}
 				this.refreshFinish = true
 				// console.log("onRefreshTask")
 				store.dispatch("loadTaskOne",this.taskid).then((res)=>{
@@ -283,6 +356,9 @@ import util_common from "../../common/util_common"
 				})
 			},
 			onStarClick() {
+				if (this.fromShare) {
+					return
+				}
 				if (this.inInterestTask(this.taskid)) {
 					// 取消收藏
 					apihandle.apiTaskPullInterest(this.taskid).then((res)=>{
@@ -306,6 +382,9 @@ import util_common from "../../common/util_common"
 				}
 			},
 			toMemberPage() {
+				if (this.fromShare) {
+					return
+				}
 				// console.log("toMemberPage")
 				uni.navigateTo({
 					url:"/pages/task/task_member?taskid="+this.taskid,
@@ -315,6 +394,9 @@ import util_common from "../../common/util_common"
 				})
 			},
 			toMapLocation() {
+				if (this.fromShare) {
+					return
+				}
 				var addr = this.task.address
 				if (!addr) {
 					return
@@ -329,6 +411,9 @@ import util_common from "../../common/util_common"
 				})
 			},
 			toEditPage() {
+				if (this.fromShare) {
+					return
+				}
 				uni.navigateTo({
 					url:"/pages/task/task_add?taskid="+this.taskid,
 				})
@@ -350,6 +435,10 @@ import util_common from "../../common/util_common"
 					apihandle.toast("报名时间已结束")
 					return false
 				}
+				if (this.task.state == util_task.TaskServerState.Finish) {
+					apihandle.toast("任务已结束")
+					return false
+				}
 				if (this.task.state != 1) {
 					apihandle.toast("任务未开始")
 					return false
@@ -357,6 +446,9 @@ import util_common from "../../common/util_common"
 				return true
 			},
 			optAction() {
+				if (this.fromShare) {
+					return
+				}
 				var state = this.getOptState
 				if (state == optState.join) {
 					if (!this.checkJoin()) {
@@ -383,34 +475,49 @@ import util_common from "../../common/util_common"
 				}
 			},
 			openPopup() {
+				if (this.fromShare) {
+					return
+				}
 				this.$refs.popup.open()
 			},
 			showShare() {
-				uni.showActionSheet({
-					// title:"分享到",
-					// alertText:"分享到",
-					itemList:["已报名","我的发布","私聊"],
-					success: (i) => {
-						// console.log("share ",i.tapIndex)
-						let url = ""
-						switch (i.tapIndex){
-							case 0:
-								url = "/pages/task/task_share?join=1"
-								break;
-							case 1:
-								url = "/pages/task/task_share?join=0"
-								break;
-							case 2:
-								url = "/pages/task/task_share_user?id="+this.taskid
-								break;
-						}
-						uni.navigateTo({
-							url:url
-						})
-					},
-					fail() {
-					}
-				})
+				if (this.fromShare) {
+					return
+				}
+				if (this.task.state == util_task.TaskServerState.Illegal) {
+					apihandle.toast("存在违规内容请修改")
+					return
+				}
+				this.$refs.actionShare.open()
+				// uni.showActionSheet({
+				// 	// title:"分享到",
+				// 	// alertText:"分享到",
+				// 	// itemList:["已报名","我的发布","私聊"],
+				// 	itemList:["微信聊天","朋友圈"],
+				// 	success: (i) => {
+				// 		// console.log("share ",i.tapIndex)
+				// 		let url = ""
+				// 		switch (i.tapIndex){
+				// 			case 0:
+				// 				url = "/pages/task/task_share?join=1"
+				// 				break;
+				// 			case 1:
+				// 				url = "/pages/task/task_share?join=0"
+				// 				break;
+				// 			case 2:
+				// 				url = "/pages/task/task_share_user?id="+this.taskid
+				// 				break;
+				// 		}
+				// 		uni.navigateTo({
+				// 			url:url
+				// 		})
+				// 	},
+				// 	fail() {
+				// 	}
+				// })
+			},
+			onSelectShare(e) {
+				console.log("select share:",e)
 			},
 			// 解散任务
 			deleteTask() {
@@ -434,19 +541,16 @@ import util_common from "../../common/util_common"
 					url:`/pages/report/report_task_page?cid=${this.user.cid}&taskid=${this.taskid}`
 				})
 			},
-			onImgTouchStart(e) {
-				console.log("touch start")
-				this.viewImage = true
-			},
-			onImgTouchMove(e) {
-				console.log("touch move")
-				this.viewImage = false
-			},
+			// onImgTouchStart(e) {
+			// 	console.log("touch start")
+			// 	this.viewImage = true
+			// },
+			// onImgTouchMove(e) {
+			// 	console.log("touch move")
+			// 	this.viewImage = false
+			// },
 			previewImage(index) {
-				// console.log("previewImage")
-				// if (!this.viewImage) {
-				// 	return
-				// }
+				
 				uni.previewImage({
 					urls:this.images,
 					current:index,

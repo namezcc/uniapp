@@ -200,11 +200,14 @@ function getTaskState(t,cid) {
 		return TaskShowState.InCheck
 	}else if (t.state == TaskServerState.CheckFail) {
 		return TaskShowState.CheckFail
+	}else if(t.state == TaskServerState.Finish){
+		return TaskShowState.Finish
 	}
 	
 	if (t.task_end_time > 0 && util_time.getSecond() > t.task_end_time) {
 		return TaskShowState.TaskTimeEnd
 	}
+	
 	return TaskShowState.Open
 }
 

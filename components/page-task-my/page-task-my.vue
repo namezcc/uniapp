@@ -3,8 +3,8 @@
 	</view> -->
 		<z-paging v-if="firstLoaded || isCurrentPage" ref="paging" v-model="dataList" @query="queryList" 
 		 :default-page-size="pageSize" :fixed="customClick" :hide-empty-view="true">
-			<view v-for="(task,index) in dataList" @click="toChatPage(task)" :key="index">
-				<task-chat-item :task="task"></task-chat-item>
+			<view v-for="(task,index) in dataList" @click="toTaskInfo(task)" :key="index">
+				<task-chat-item :task="task" @clickClose="deleteTaskMy(task)"></task-chat-item>
 			</view>
 			<view v-if="this.firstLoaded && dataList.length == 0" style="width: 100%;">
 				<myrow mainAlign="center">					
@@ -21,6 +21,7 @@
 	import apihandle from '@/common/api_handle';
 	import store from '../../store';
 import util_task from '../../common/util_task';
+import global_data from '../../common/global_data';
 	
 	export default {
 		name:"page-task-my",
@@ -98,9 +99,34 @@ import util_task from '../../common/util_task';
 				})
 				// console.log("toChatPage")
 			},
+			toTaskInfo(task) {
+				if (task.cid != global_data.cid && task.state == util_task.TaskServerState.Illegal) {					
+					apihandle.toast("任务已下架")
+					return
+				}
+				uni.navigateTo({
+					url:"/pages/task/task_info?taskid="+task.id,
+				})
+			},
 			onDeleteTaskMy() {
 				this.usecash = true
 				this.$refs.paging.reload()
+			},
+			deleteTaskMy(task) {
+				uni.showModal({
+					title:"解散并从列表删除",
+					content:"确定解散任务吗?",
+					success: (res) => {
+						if (res.confirm) {
+							store.commit("deleteMyTask",task.id)
+							// apihandle.toast("已解散")
+							// uni.navigateBack()
+							// uni.switchTab({
+							// 	url: '/pages/message/task_join'
+							// });
+						}
+					}
+				})
 			}
 		}
 	}

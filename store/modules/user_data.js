@@ -87,7 +87,15 @@ export default {
 			api.apiGetUserInfo().then((res)=>{
 				if (res) {
 					// console.log(res)
+					console.log("getUserData success",res)
 					context.commit("setUser",res)
+					setTimeout(()=>{						
+						if (res.icon == "") {
+							uni.$emit("onGetUserData",res)
+						}
+					},1000)
+					// #ifdef MP-WEIXIN
+					// #endif
 				}else{
 					// context.commit("login","")
 				}

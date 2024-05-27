@@ -5,7 +5,7 @@
 			<view v-for="(task,index) in dataList" :key="index" @click="toTaskInfo(task)">
 				<task-item :task="task"></task-item>
 			</view>
-			<view v-if="this.firstLoaded && dataList.length == 0" style="width: 100%;">
+			<view v-if="dataList.length == 0" style="width: 100%;">
 				<myrow mainAlign="center">					
 					<view style="width: 200px;">
 						<uv-divider text="" :dot="true"></uv-divider>

@@ -2,6 +2,7 @@ import apihandle from "../../common/api_handle"
 import { EnumLoadState, ServerConfig, UpdateEventType } from "../../common/define_const"
 import global_data from "../../common/global_data"
 import util_common from "../../common/util_common"
+import util_task from "../../common/util_task"
 
 async function loadTask(context,{skip,ref,usecash},listkey,statekey,loadfunc) {
 	let state = context.state
@@ -122,9 +123,18 @@ export default {
 		},
 		deleteMyTask(state,id) {
 			util_common.deleteArrayByVal(state.list_my,id)
+			util_common.deleteArrayByVal(state.list_join,id)
 			uni.$emit("onDeleteTaskMy")
+			uni.$emit("onDeleteTaskJoin")
 			apihandle.apiDeleteMyTaskInfo(id)
 		},
+		finishMyTask(state,id) {
+			let task = state.task_data.get(id)
+			if (task) {
+				apihandle.apiSetFinishTask(id)
+				task.state = util_task.TaskServerState.Finish
+			}
+		}
 	},
 	actions: { 
 		async loadTaskOne(context,id) {

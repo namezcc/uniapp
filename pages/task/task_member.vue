@@ -12,6 +12,7 @@
 								<text-tag :text="creditScore(mem)"></text-tag>
 							</mycol>
 							<expanded></expanded>
+							<button style="margin-right: 10px;" @click.stop="contactPeople(mem)" type="primary" v-if="optContact(index)" size="mini" >联系</button>
 							<button @click.stop="kickPeople(mem)" type="warn" v-if="optKick(index)" size="mini" >踢出</button>
 							<button disabled="true" v-if="optFinish(index)" size="mini">已完成</button>
 						</myrow>
@@ -74,7 +75,19 @@ import util_task from "../../common/util_task"
 					return MemOpt.Kick
 				}
 			},
+			optContact(index) {
+				let mem = this.task.join.data[index]
+				if (mem.cid != this.cid) {
+					if (this.task?.cid == this.cid) {
+						return true
+					}
+				}
+				return false
+			},
 			optKick(index) {
+				if (this.task?.cid != this.cid) {
+					return false
+				}
 				let mem = this.task.join.data[index]
 				return this.optState(mem) == MemOpt.Kick
 			},
@@ -87,6 +100,31 @@ import util_task from "../../common/util_task"
 				this.kickmsg = `确定踢掉 ${mem.name} 吗?`
 				this.kickCid = mem.cid
 				this.$refs.alertDialog.open()
+			},
+			contactPeople(mem) {
+				// console.log("contact ",mem)
+				uni.showModal({
+					content:mem.phone,
+					cancelText:"复制",
+					confirmText:"拨打电话",
+					cancelColor:"#07c160",
+					confirmColor:"#007aff",
+					success: (res) => {
+						if (res.confirm) {
+							// 拨打电话
+							uni.makePhoneCall({
+								phoneNumber:mem.phone,
+							})
+						}else{
+							uni.setClipboardData({
+								data:mem.phone,
+								success: () => {
+									apihandle.toast("内容已复制")
+								}
+							})
+						}
+					}
+				})
 			},
 			kickCancle() {
 				this.kickCid = null

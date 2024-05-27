@@ -38,6 +38,7 @@ import utilHttp from "@/common/http_util.js"
 import utilTask from "@/common/util_task.js"
 import apihandle from '../../common/api_handle'
 import global_data from '../../common/global_data'
+import util_common from '../../common/util_common'
 	
 	export default {
 		data() {
@@ -56,7 +57,7 @@ import global_data from '../../common/global_data'
 			}
 		},
 		onLoad(e) {
-			this.cid = e.cid
+			this.cid = parseInt(e.cid)
 		},
 		methods: {
 			toSelectPage() {
@@ -73,20 +74,30 @@ import global_data from '../../common/global_data'
 			},
 			onSelectImage(e) {
 				// console.log("select image ",e)
-				const tempFilePaths = e.tempFilePaths;
-				for (let img of tempFilePaths) {					
-					utilHttp.uploadImage(img,(res)=>{
-						// console.log('上传成功', res);
-						// console.log('上传数据转换',JSON.parse(res.data));
-						// 取到文档服务器的值
-						let uploaddata = JSON.parse(res.data)
+				// const tempFilePaths = e.tempFilePaths;
+				// for (let img of tempFilePaths) {					
+				// 	utilHttp.uploadImage(img,(res)=>{
+				// 		// console.log('上传成功', res);
+				// 		// console.log('上传数据转换',JSON.parse(res.data));
+				// 		// 取到文档服务器的值
+				// 		let uploaddata = JSON.parse(res.data)
+				// 		let x = {}
+				// 		x.url = utilTask.getImageUrlName(uploaddata.data)
+				// 		x.extname = ''
+				// 		x.name = uploaddata.data
+				// 		this.imageValue.push(x)
+				// 	})
+				// }
+				let flist = util_common.getTempFileList(e)
+				util_common.uploadFileList(flist).then((vec)=>{
+					for (let v of vec) {
 						let x = {}
-						x.url = utilTask.getImageUrlName(uploaddata.data)
+						x.url = v
 						x.extname = ''
-						x.name = uploaddata.data
+						x.name = ''
 						this.imageValue.push(x)
-					})
-				}
+					}
+				})
 			},
 			onDeleteImage(e) {
 				// console.log("delete image ",e)
@@ -103,7 +114,7 @@ import global_data from '../../common/global_data'
 					content:this.txtContent,
 					images:this.imageValue.map((v)=>v.url)
 				}
-				apihandle.apiReportTask(data).then((res)=>{
+				apihandle.apiReportUser(data).then((res)=>{
 					apihandle.toast("举报成功")
 					uni.navigateBack({})
 				})

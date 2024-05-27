@@ -11,7 +11,7 @@
 				<text>图片</text>
 			</view>
 			<view style="margin: 5px;">
-				<uni-file-picker v-model="imageValue" title="选择图片" limit="3" :imageStyles="imageStyle" file-mediatype="image"
+				<uni-file-picker :auto-upload="false" v-model="imageValue" title="选择图片" limit="3" :imageStyles="imageStyle" file-mediatype="image"
 				@delete="onDeleteImage" @select="onSelectImage">
 					<uni-icons type="plusempty" style="color: black;"></uni-icons>
 				</uni-file-picker>
@@ -29,6 +29,7 @@
 	import utilTask from "@/common/util_task.js"
 	import apihandle from '../../common/api_handle'
 import global_data from "../../common/global_data"
+import util_common from "../../common/util_common"
 	
 	export default {
 		data() {
@@ -42,25 +43,45 @@ import global_data from "../../common/global_data"
 					height: '70px',
 					backgroundColor: 'white',
 				},
+				tempImages:[],
 			}
 		},
 		methods: {
 			onSelectImage(e) {
 				// console.log("select image ",e)
 				const tempFilePaths = e.tempFilePaths;
-				for (let img of tempFilePaths) {					
-					utilHttp.uploadImage(img,(res)=>{
-						// console.log('上传成功', res);
-						// console.log('上传数据转换',JSON.parse(res.data));
-						// 取到文档服务器的值
-						let uploaddata = JSON.parse(res.data)
-						let x = {}
-						x.url = utilTask.getImageUrlName(uploaddata.data)
-						x.extname = ''
-						x.name = uploaddata.data
-						this.imageValue.push(x)
+				
+				for (var i = 0; i < tempFilePaths.length; i++) {
+					let img = tempFilePaths[i]
+					var fileName = e.tempFiles[i].name;
+					util_common.uploadFile(img,fileName,(res)=>{
+						if (res) {
+							let x = {}
+							x.url = res
+							x.extname = ''
+							x.name = fileName
+							this.imageValue.push(x)
+						}else{
+							apihandle.toast("图片上传失败")
+						}
 					})
 				}
+				// this.tempImages = util_common.getTempFileList(e)
+				// console.log("select image ",this.tempImages)
+				// console.log("select imageValue ",this.imageValue)
+				// for (let img of tempFilePaths) {					
+					// utilHttp.uploadImage(img,(res)=>{
+					// 	// console.log('上传成功', res);
+					// 	// console.log('上传数据转换',JSON.parse(res.data));
+					// 	// 取到文档服务器的值
+					// 	let uploaddata = JSON.parse(res.data)
+					// 	let x = {}
+					// 	x.url = utilTask.getImageUrlName(uploaddata.data)
+					// 	x.extname = ''
+					// 	x.name = uploaddata.data
+					// 	this.imageValue.push(x)
+					// })
+				// }
 			},
 			onDeleteImage(e) {
 				// console.log("delete image ",e)

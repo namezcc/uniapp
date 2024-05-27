@@ -35,6 +35,11 @@ function splitByMarkers(str, startMarker, endMarker,nomark) {
     return result;
 }
 
+function getExtName(fname) {
+	return fname.split(".").pop()
+}
+
 export default {
-	splitByMarkers
+	splitByMarkers,
+	getExtName,
 }
