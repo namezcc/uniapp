@@ -35,16 +35,17 @@ async function loadTask(context,{skip,ref,usecash},listkey,statekey,loadfunc) {
 	state[statekey] = EnumLoadState.Loading
 	let loadnum = ServerConfig.LoadTaskNum - restask.length
 	var res = await loadfunc(skip)
-	if (res?.result != null) {
+	if (res != null) {
 		// console.log(res)
-		let taskvec = res.result
-		for (let t of taskvec) {
-			t.join = res.task_join.find((join)=>{
-				return join.id == t.id
-			})
-		}
+		// let taskvec = res.result
+		let taskvec = res
+		// for (let t of taskvec) {
+		// 	t.join = res.task_join.find((join)=>{
+		// 		return join.id == t.id
+		// 	})
+		// }
 		context.commit("updateTaskData",taskvec)
-		let idlist = res.tasklist.reverse()
+		// let idlist = res.tasklist.reverse()
 		if (ref) {
 			list = []
 			state[listkey] = list
@@ -54,17 +55,24 @@ async function loadTask(context,{skip,ref,usecash},listkey,statekey,loadfunc) {
 		}else{
 			state[statekey] = EnumLoadState.More
 		}
-		if (listkey == "list_interest") {
-			for (let id of idlist) {
-				list.push(id)
-				restask.push(getfunc(id))
-			}			
-		}else{
-			for (let t of idlist) {
-				list.push(t.id)
-				restask.push(getfunc(t.id))
-			}			
-		}
+		
+		for (let t of taskvec) {
+			list.push(t.id)
+			// restask.push(getfunc(t.id))
+		}			
+		restask = taskvec
+		
+		// if (listkey == "list_interest") {
+		// 	for (let id of idlist) {
+		// 		list.push(id)
+		// 		restask.push(getfunc(id))
+		// 	}			
+		// }else{
+		// 	for (let t of idlist) {
+		// 		list.push(t.id)
+		// 		restask.push(getfunc(t.id))
+		// 	}			
+		// }
 	}else{
 		state[statekey] = EnumLoadState.noMore
 	}

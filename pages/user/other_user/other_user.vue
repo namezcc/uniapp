@@ -78,6 +78,7 @@ import { EnumSex } from "@/common/define_const";
 import util_common from '../../../common/util_common';
 import { mapState } from "vuex"
 import util_page from '../../../common/util_page';
+import global_data from '../../../common/global_data';
 	
 	export default {
 		onLoad(d) {
@@ -85,11 +86,13 @@ import util_page from '../../../common/util_page';
 			store.dispatch("getOtherUser",this.cid).then((res)=>{
 				this.user = res
 			})
-			store.dispatch("getUserCreditType",this.cid).then((res)=>{
-				if (res != null) {
-					this.ctype = res
-				}
-			})
+			if (global_data.isLogin()) {				
+				store.dispatch("getUserCreditType",this.cid).then((res)=>{
+					if (res != null) {
+						this.ctype = res
+					}
+				})
+			}
 			this.fromPage = d.fromPage || 0
 			
 			this.loadTask()
@@ -163,12 +166,20 @@ import util_page from '../../../common/util_page';
 				this.$refs.popup.open()
 			},
 			toReportPage() {
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
+					return
+				}
 				uni.navigateTo({
 					url:`/pages/report/report_user_page?cid=${this.cid}`
 				})
 			},
 			onAddBlackList() {
 				this.$refs.popup.close()
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
+					return
+				}
 				if (this.inBlackList) {
 					uni.showModal({
 						title:`将"${this.user.name}"取消拉黑`,
@@ -198,6 +209,10 @@ import util_page from '../../../common/util_page';
 				}
 			},
 			setCreditType(isgood) {
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
+					return
+				}
 				let v = CreditType.None
 				if (isgood) {
 					v = this.ctype == CreditType.Good ? CreditType.None : CreditType.Good
@@ -213,6 +228,9 @@ import util_page from '../../../common/util_page';
 				store.commit("setOtherUserCredit",{cid:this.cid,ctype:v})
 			},
 			loadTask() {
+				if (!global_data.isLogin()) {
+					return
+				}
 				if (this.loadstate != EnumLoadState.More) {
 					return
 				}

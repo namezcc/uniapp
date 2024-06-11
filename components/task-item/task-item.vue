@@ -27,7 +27,7 @@
 			</template>
 			<myrow itemAlign="flex-start" :wrap="false">
 				<mycol itemAlign="flex-start">
-					<text class="task-title text-hide">{{task.title}}</text>
+					<text class="task-title text-nothide">{{task.title}}</text>
 					<text class="txt-content">{{task.content}}</text>
 					<view v-if="haveTaskRangeTime">
 						<!-- <view class="round-dot" style="margin: 6rpx;"></view> -->
@@ -101,7 +101,7 @@ import util_common from "../../common/util_common"
 				return utiltask.haveRewardMoney(this.task)
 			},
 			haveTaskRangeTime() {
-				return (this.task.task_start_time ?? 0) > 0
+				return (this.task.task_start_time || 0) > 0
 			},
 			taskRangTime() {
 				let isSameDay = util_time.isSameDay(this.task.task_start_time,this.task.task_end_time)
@@ -182,6 +182,14 @@ import util_common from "../../common/util_common"
 	    -webkit-box-orient: vertical; /*排列方式*/ 
 	    -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
 	    overflow: hidden; /*溢出隐藏*/
+	}
+	
+	.text-nothide {
+	    // display: -webkit-box; /*弹性伸缩盒子模型显示*/
+	    // -webkit-box-orient: vertical; /*排列方式*/ 
+	    // -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
+	    // overflow: hidden; /*溢出隐藏*/
+		white-space: pre-wrap;
 	}
 	
 	.txt-content {

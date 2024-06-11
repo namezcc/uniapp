@@ -564,8 +564,8 @@ import util_common from "../../common/util_common"
 				return task
 			},
 			isSameTask(t1,t2) {
-				var check = ["title","content","money_type","money","womanMoney","people_num","man_num",
-				"end_time","task_start_time","task_end_time"];
+				var check = ["title","content","money_type","money","womanMoney","people_num","man_num","contact_way",
+				"end_time","task_start_time","task_end_time","credit_score","nonpublic"];
 				for (let f of check) {
 					if (t1[f] != t2[f]) {
 						return false
@@ -632,6 +632,7 @@ import util_common from "../../common/util_common"
 					api.apiUpdateTask(task).then((res)=>{
 						if (res) {							
 							api.toast("修改成功")
+							// console.log(res)
 							store.commit("updateTaskOne",res)
 							uni.navigateBack({})
 						}

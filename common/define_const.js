@@ -4,6 +4,10 @@
 // var WsHost = "ws://47.99.56.195:10002/"
 var HostBase = "http://192.168.0.77:8999"
 var WsHost = "ws://192.168.0.77:10002/"
+if (process.env.NODE_ENV != "development") {
+	HostBase = "https://bangbangweituo.com:18999"
+	WsHost = "wss://bangbangweituo.com:10002/"
+}
 
 var ErrCode = {
 	SUCCESS:0,

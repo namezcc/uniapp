@@ -42,7 +42,7 @@ export default {
 			// console.log("setLocation ",loc)
 		},
 		setInterestTask(state,data) {
-			state.interestTask = data
+			state.interestTask = data.map(v => v.taskid)
 		},
 		pushInterestTask(state,id) {
 			state.interestTask.push(id)

@@ -159,6 +159,12 @@ function getTempFileList(e) {
 	}
 	return res
 }
+// 是否朋友圈分享打开
+function isFromPYQ() {
+	let options = uni.getLaunchOptionsSync();
+	console.log("scene:",options.scene)
+	return options.scene == 1154
+}
 
 export default {
 	getSystemInfo,
@@ -170,4 +176,5 @@ export default {
 	uploadFile,
 	uploadFileList,
 	getTempFileList,
+	isFromPYQ,
 }

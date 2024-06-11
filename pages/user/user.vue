@@ -153,6 +153,10 @@ import util_common from "../../common/util_common"
 				})
 			},
 			toIdcardPage() {
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
+					return
+				}
 				util_page.toIdCardPage()
 			}
 		}

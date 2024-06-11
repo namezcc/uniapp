@@ -24,6 +24,13 @@
 					线上帮帮
 				</view>
 			</myrow>
+			<view style="margin: 5px 10px 2px 10px;">				
+				<myrow>
+					<view class="cond-box" :class="{'cond-open': haveMoney}" @click="switchCond(1)">
+						有奖励
+					</view>
+				</myrow>
+			</view>
 		</view>
 		<!-- <view style="flex: 1;">
 		</view> -->
@@ -86,6 +93,8 @@ import util_page from "../../common/util_page"
 				onlineLoadState: EnumLoadState.More,
 				selectType:taskSelectType.OffLine,
 				onlineloaded:false,
+				condMoney:false,
+				condMoneyOnline:false,
 			}
 		},
 		onLoad() {
@@ -154,6 +163,24 @@ import util_page from "../../common/util_page"
 				// console.log("genTaskList ",res)
 				return res
 			},
+			haveMoney() {
+				return this.selectType == taskSelectType.OffLine ? this.condMoney : this.condMoneyOnline
+			}
+		},
+		onShareAppMessage(res) {
+			return {
+				title:"帮帮委托",
+				path:"/pages/index/index",
+				// imageUrl:image,
+			}
+		},
+		onShareTimeline(res) {
+			// console.log("onShareTimeline:",res)
+			return {
+				title:"帮帮委托",
+				query:""
+				// imageUrl:image,
+			}
 		},
 		methods: {
 			onAddTask() {
@@ -240,29 +267,40 @@ import util_page from "../../common/util_page"
 					}
 					this.onlineLoadState = EnumLoadState.Loading
 				}
-				this.getTaskList()
+				this.getTaskList(false)
 			},
 			async refreshTaskList() {
 				taskConfig = util_task.newTaskConfig()
-				await this.getTaskList()
+				await this.getTaskList(true)
 			},
-			async getTaskList() {
+			async getTaskList(ref) {
 				let stype = this.selectType
 				taskConfig.select_type = stype
+				let condmoney = stype == taskSelectType.OffLine ? this.condMoney : this.condMoneyOnline
+				taskConfig.haveMoney = condmoney ? 1 : 0;
 				var res = await api.apiGetTaskInfo(taskConfig)
 				if (res?.data.length) {
 					// console.log(res)
 					taskConfig = res.config
 					store.commit("updateTaskData",res.data)
+					let ndata = res.data.map(v=>v.id)
 					if (stype == taskSelectType.OffLine) {
-						this.taskList = res.data.map(v=>v.id)
+						if (ref) {
+							this.taskList = ndata
+						}else{
+							this.taskList.push(...ndata)
+						}
 						if (taskConfig.locMax > 0) {
 							this.loadState = EnumLoadState.noMore
 						}else{
 							this.loadState = EnumLoadState.More
 						}						
 					} else{
-						this.onlineTaskList = res.data.map(v=>v.id)
+						if (ref) {
+							this.onlineTaskList = ndata
+						}else{
+							this.onlineTaskList.push(...ndata)
+						}
 						if (taskConfig.globelMax > 0) {
 							this.onlineLoadState = EnumLoadState.noMore
 						}else{
@@ -271,8 +309,10 @@ import util_page from "../../common/util_page"
 					}
 				}else{
 					if (stype == taskSelectType.OffLine) {
+						this.taskList = []
 						this.loadState = EnumLoadState.noMore						
 					}else{
+						this.onlineTaskList = []
 						this.onlineLoadState = EnumLoadState.noMore						
 					}
 				}
@@ -297,6 +337,16 @@ import util_page from "../../common/util_page"
 					
 					this.refreshTaskList()
 				}
+			},
+			switchCond(stype) {
+				if (stype == 1) {
+					if (this.selectType == taskSelectType.OffLine) {
+						this.condMoney = !this.condMoney
+					}else{
+						this.condMoneyOnline = !this.condMoneyOnline
+					}
+				}
+				this.refreshTaskList()
 			},
 			onGetUserData() {
 				console.log("onGetUserData")
@@ -328,6 +378,23 @@ import util_page from "../../common/util_page"
 	}
 	
 	.select-color {
+		background-color: $uni-success-light;
+		color: $uni-main-color;
+	}
+	
+	.cond-box {
+		border-radius: 20px;
+		padding: 3px 8px;
+		color: $uni-base-color;
+		font-size: 12px;
+		background-color: #ddd;
+	}
+	
+	.cond-close {
+		background-color: #ccc;
+	}
+	
+	.cond-open {
 		background-color: $uni-success-light;
 		color: $uni-main-color;
 	}

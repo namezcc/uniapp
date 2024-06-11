@@ -141,11 +141,15 @@
 					return
 				}
 				
+				uni.showLoading({
+					title:"登录中..."
+				})
 				api.once("userloginWxCode",(unlock)=>{
 					api.userloginWxCode(e.detail.code).then((res)=>{
 						if (res) {
 							console.log(res)
 							store.commit("login",res.data.token)
+							uni.hideLoading()
 							api.toast("登录成功")
 							uni.navigateBack()
 						}

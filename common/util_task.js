@@ -125,6 +125,7 @@ function newTaskConfig() {
 		locMax: 0,
 		search: "",
 		select_type:0,
+		haveMoney:0,
 	}
 }
 
@@ -184,7 +185,8 @@ var TaskServerState = {
 }
 
 function getTaskState(t,cid) {
-	if (t.state == TaskServerState.Illegal) {
+	let state = t.state || 0
+	if (state == TaskServerState.Illegal) {
 		return TaskShowState.Illegal
 	}
 	
@@ -196,11 +198,11 @@ function getTaskState(t,cid) {
 		return TaskShowState.Kicked
 	}
 	
-	if (t.state == TaskServerState.InCheck) {
+	if (state == TaskServerState.InCheck) {
 		return TaskShowState.InCheck
-	}else if (t.state == TaskServerState.CheckFail) {
+	}else if (state == TaskServerState.CheckFail) {
 		return TaskShowState.CheckFail
-	}else if(t.state == TaskServerState.Finish){
+	}else if(state == TaskServerState.Finish){
 		return TaskShowState.Finish
 	}
 	

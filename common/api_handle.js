@@ -137,7 +137,7 @@ var apihandle = {
 	},
 	async apiSearchTask(config) {
 		try{
-			var res = await http.request("apiSearchTask","POST",config)
+			var res = await http.request("apiSearchTask","POST",config,{header:authorHeader})
 			if (this.checkData(res.data,res)) {
 				return res.data.data
 			}

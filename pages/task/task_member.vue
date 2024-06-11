@@ -19,6 +19,13 @@
 					</template>
 				</uni-list-item>
 			</uni-list>
+			<view v-if="emptyMember" style="width: 100%;">
+				<myrow mainAlign="center">					
+					<view style="width: 200px;">
+						<uv-divider text="" :dot="true"></uv-divider>
+					</view>
+				</myrow>
+			</view>
 		</scroll-view>
 		<view>
 			<!-- 提示窗示例 -->
@@ -56,13 +63,19 @@ import util_task from "../../common/util_task"
 			this.task = store.getters.getTaskById(e.taskid)
 			let cidvec = util_task.getTaskJoinCidvec(this.task)
 			store.dispatch("getOtherUserListOrCash",cidvec).then((res)=>{
-				this.member = res
+				if (res) {					
+					// console.log("get member",res)
+					this.member = res
+				}
 			})
 		},
 		computed:{
 			...mapState({
 				cid: state => state.user_data.user.cid,
 			}),
+			emptyMember() {
+				return this.member.length == 0
+			}
 		},
 		methods: {
 			optState(mem) {

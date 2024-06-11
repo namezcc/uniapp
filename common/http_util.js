@@ -7,6 +7,7 @@ async function request(url,method,data,config) {
 		// timeout:5000, 5s
 		data:data,
 		header: config?.header || {},
+		sslVerify:false,
 	}
 	return await uni.request(opt)
 }

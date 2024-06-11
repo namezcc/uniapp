@@ -12,7 +12,7 @@ import wsconn from "./common/wsconn"
 		onLaunch: function() {
 			console.warn('当前组件仅支持 uni_modules 目录结构 ，请升级 HBuilderX 到 3.1.0 版本以上！')
 			console.log('App Launch')
-			util_emoji.initEmoji()
+			// util_emoji.initEmoji()
 			store.commit("loadToken")
 			// wsconn
 			wsconn.init()
@@ -27,6 +27,12 @@ import wsconn from "./common/wsconn"
 						stack:res.stack,
 					}
 					apihandle.apiAppError(JSON.stringify(errinfo))
+					// #ifdef MP-WEIXIN
+						let log = uni.getRealtimeLogManager()
+						if (log) {
+							log.info(errinfo)
+						}
+					// #endif
 				}				
 			}catch(e){
 				//TODO handle the exception

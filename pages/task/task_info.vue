@@ -21,7 +21,7 @@
 		<scroll-view scroll-y="true" :refresherEnabled="true" @refresherrefresh="onPullDownRefresh" :refresher-triggered="refreshFinish"
 		 style="height: 0;flex: 1;">
 		<myrow :customStyle="{backgroundColor: '#fff',padding:'10px'}">
-			<avatar :src="userIcon" :tocid="task.cid"/>
+			<avatar :src="userIcon" :tocid="avatorCid"/>
 			<text>{{task.creator_name}}</text>
 			<expanded></expanded>
 			<view v-if="!selfTask" style="margin: 5px;">
@@ -72,7 +72,7 @@
 					<myrow>
 						<text class="text-subtitle">联系方式</text>
 						<expanded></expanded>
-						<text>{{task.contact_way}}</text>
+						<text @click="copyContactWay">{{contactWay}}</text>
 					</myrow>
 				</view>
 				<view v-if="task.address != null" class="cell-info" @click="toMapLocation">
@@ -90,7 +90,7 @@
 						<text>{{timeString}}</text>
 					</myrow>
 				</view>
-				<view class="cell-info" v-if="(task.task_start_time ?? 0) > 0">
+				<view class="cell-info" v-if="(task.task_start_time || 0) > 0">
 					<uni-section title="开始结束时间" type="circle">						
 						<myrow mainAlign="center">
 							<view class="timeContent">
@@ -170,14 +170,16 @@ import global_data from "../../common/global_data"
 				taskuser:null,
 				actionList:[
 					{name:"微信聊天",openType:"share"},
-					// {name:"朋友圈",openType:"share"},
+					{name:"分享到朋友圈请点右上角"},
 				]
 			}
 		},
 		onLoad(e) {
 			// this.task = store.getters.getTaskById(e.taskid)
 			this.taskid = e.taskid
-			this.fromShare = e.share == 1
+			if (util_common.isFromPYQ()) {
+				this.fromShare = true
+			}
 			
 			uni.showLoading({
 			})
@@ -216,6 +218,9 @@ import global_data from "../../common/global_data"
 			// task() {
 			// 	return store.getters.getTaskById(this.taskid)
 			// },
+			avatorCid() {
+				return this.fromShare ? 0 : this.task.cid
+			},
 			selfTask() {
 				return this.task.cid == this.user.cid
 			},
@@ -316,6 +321,15 @@ import global_data from "../../common/global_data"
 			},
 			taskIllegal() {
 				return this.task.state == util_task.TaskServerState.Illegal
+			},
+			contactWay() {
+				let way = this.task.contact_way || ""
+				if (way.length > 0) {
+					way = `${way}(点击复制)`
+				}else{
+					way = "无"
+				}
+				return way
 			}
 		},
 		onShareAppMessage(res) {
@@ -357,6 +371,10 @@ import global_data from "../../common/global_data"
 			},
 			onStarClick() {
 				if (this.fromShare) {
+					return
+				}
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
 					return
 				}
 				if (this.inInterestTask(this.taskid)) {
@@ -449,6 +467,10 @@ import global_data from "../../common/global_data"
 				if (this.fromShare) {
 					return
 				}
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
+					return
+				}
 				var state = this.getOptState
 				if (state == optState.join) {
 					if (!this.checkJoin()) {
@@ -459,9 +481,9 @@ import global_data from "../../common/global_data"
 							this.task.join = res.join
 							store.commit("updateTaskOne",this.task)
 							apihandle.toast("报名成功")
-							uni.navigateTo({
-								url:"/pages/message/task_chat_page?taskid="+this.task.id,
-							})
+							// uni.navigateTo({
+							// 	url:"/pages/message/task_chat_page?taskid="+this.task.id,
+							// })
 						}
 					})
 				}else if (state == optState.quit) {
@@ -517,7 +539,7 @@ import global_data from "../../common/global_data"
 				// })
 			},
 			onSelectShare(e) {
-				console.log("select share:",e)
+				// console.log("select share:",e)
 			},
 			// 解散任务
 			deleteTask() {
@@ -537,6 +559,10 @@ import global_data from "../../common/global_data"
 				})
 			},
 			toReportPage() {
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
+					return
+				}
 				uni.navigateTo({
 					url:`/pages/report/report_task_page?cid=${this.user.cid}&taskid=${this.taskid}`
 				})
@@ -555,6 +581,16 @@ import global_data from "../../common/global_data"
 					urls:this.images,
 					current:index,
 				})
+			},
+			copyContactWay() {
+				if (this.task.contact_way?.length > 0) {					
+					uni.setClipboardData({
+						data:this.task.contact_way,
+						success: () => {
+							apihandle.toast("内容已复制")
+						}
+					})
+				}
 			}
 		}
 	}
