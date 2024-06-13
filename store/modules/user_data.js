@@ -87,7 +87,7 @@ export default {
 			api.apiGetUserInfo().then((res)=>{
 				if (res) {
 					// console.log(res)
-					console.log("getUserData success",res)
+					console.log("getUserData success")
 					context.commit("setUser",res)
 					setTimeout(()=>{						
 						if (res.icon == "") {

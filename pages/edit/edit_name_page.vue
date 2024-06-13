@@ -64,7 +64,7 @@ import apihandle from "../../common/api_handle"
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.tip {
 		color: $uni-base-color;

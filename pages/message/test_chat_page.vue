@@ -147,5 +147,5 @@
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 </style>

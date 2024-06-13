@@ -4,8 +4,8 @@
 			<mycol mainAlign="center">
 				<view style="height: 50px;"></view>
 				<myrow mainAlign="center">
-					<!-- <uni-easyinput :primaryColor="colorTheme.primary" @input="onPhoneInput" :maxlength="11" type="number" placeholder="手机号"/> -->
-					<view class="logo">
+					<uni-easyinput v-if="showTestInput" :primaryColor="colorTheme.primary" @input="onPhoneInput" :maxlength="11" type="number" placeholder="手机号"/>
+					<view class="logo" v-if="!showTestInput">
 						<text>帮  帮</text>
 					</view>
 				</myrow>
@@ -18,13 +18,17 @@
 					<button @click="getPhoneCode" type="warn" :style="{backgroundColor:colorTheme.primary,marginLeft: '20px',width:'100px'}" size="mini" :disabled="codeDisabled">{{codeTip}}</button>
 				</myrow> -->
 				<expanded></expanded>
+					<button v-if="showTestInput" @click="login" type="warn" class="login-btn" :style="{backgroundColor:colorTheme.primary}" >一键登录</button>
+					<button v-if="!showTestInput" type="warn" class="login-btn" :style="{backgroundColor:colorTheme.primary}" 
+					open-type="getPhoneNumber" @getphonenumber="getPhonenumber">手机号一键登录</button>
 				<!-- #ifndef MP-WEIXIN -->
-					<button @click="login" type="warn" class="login-btn" :style="{backgroundColor:colorTheme.primary}" >测试一键登录</button>
 				<!-- #endif -->
 				<!-- #ifdef MP-WEIXIN -->
-					<button type="warn" class="login-btn" :style="{backgroundColor:colorTheme.primary}" 
-					open-type="getPhoneNumber" @getphonenumber="getPhonenumber">手机号一键登录</button>
 				<!-- #endif -->
+				<view style="margin-top: 10px;" v-if="showOpenTest">
+					<text v-if="!showTestInput" style="font-size: 14px;color: #ccc;" @click="openTestInput(true)">手动输入登录</text>
+					<text v-if="showTestInput" style="font-size: 14px;color: #ccc;" @click="openTestInput(false)">返回自动登录</text>
+				</view>
 				<view style="margin-top: 20px;font-size: 14px;">					
 					<myrow>
 						<radio value="1" :checked="agree" style="transform:scale(0.7)" @click="onAgree"></radio>
@@ -59,12 +63,20 @@
 				codeTip:"",
 				codeDisabled:false,
 				agree:false,
+				showTestInput:false,
+				showOpenTest:false,
 			}
 		},
 		onLoad() {
 			// util.getSystemInfo((res)=>{
 			// 	this.winHeight = res.windowHeight
 			// })
+			
+			api.apiGetOpenTestInput().then((res)=>{
+				if (res == 1) {
+					this.showOpenTest = true
+				}
+			})
 		},
 		methods: {
 			onPhoneInput(val) {
@@ -103,12 +115,15 @@
 					})
 				}
 			},
+			openTestInput(res) {
+				this.showTestInput = res
+			},
 			login() {
 				if (!this.agree) {
 					api.toast("请阅读并勾选用户协议")
 					return
 				}
-				if (process.env.NODE_ENV == "development") {
+				if (this.phone.length == 0 && process.env.NODE_ENV == "development") {
 					this.phone = "15757181901"
 					// #ifdef MP-WEIXIN
 						this.phone = "15757181904"
@@ -175,7 +190,7 @@
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.logo {
 		border-radius: 10px;

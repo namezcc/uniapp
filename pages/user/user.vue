@@ -77,9 +77,11 @@ import util_common from "../../common/util_common"
 			}
 		},
 		onShow() {
-			if (this.user.cid <= 0) {
-				util_page.toLoginPageDialog()
-			}
+			setTimeout(()=>{				
+				if (this.user.cid <= 0) {
+					util_page.toLoginPageDialog()
+				}
+			},100)
 		},
 		onPullDownRefresh() {
 			this.onPullDownRefresh2()
@@ -164,7 +166,7 @@ import util_common from "../../common/util_common"
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	.user-btn {
 		/* width: 200rpx; */
 		/* height: 50rpx; */

@@ -53,5 +53,5 @@ import { ReportTaskName, ReportUserName } from '../../common/define_const'
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 </style>

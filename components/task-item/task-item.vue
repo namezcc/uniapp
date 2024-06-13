@@ -161,7 +161,7 @@ import util_common from "../../common/util_common"
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.uni-card {
 		border-radius: 10px;

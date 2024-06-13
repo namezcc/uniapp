@@ -34,7 +34,7 @@
 <style>
 	@font-face {
 	  font-family: "iconfont"; /* Project id 2878519 */
-	  src:url('/static/font/iconfont.ttf') format('truetype');
+	  src:url('/style/font/iconfont.ttf') format('truetype');
 	}
 	
 	.myfont {

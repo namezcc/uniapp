@@ -34,11 +34,11 @@
 			<view style="width: 5px;"></view>
 		</myrow>
 		<uni-notice-bar v-if="taskIllegal" text="存在违规内容,请修改!" />
-		<!-- style="height: 100%;" -->
-			<swiper :indicator-dots="true" :autoplay="false" v-if="images.length" style="height: 300px;background-color: #fff;">
+		<!-- style="height: 100%;height: 300px;width: 100%;background-color: #fff;" -->
+			<swiper :indicator-dots="true" :autoplay="false" v-if="images.length" :style="{height: swiperHeight+'px'}">
 				<template v-for="(u,index) in images" :key="index">
-					<swiper-item style="height: 300px;">
-						<image :src="u" mode="aspectFit" style="height: 300px;width: 100%;" @click="previewImage(index)"></image>
+					<swiper-item>
+						<image :src="u" mode="aspectFill" :style="{width: '100%',height:swiperHeight+'px'}" @load="onImageLoaded" @click="previewImage(index)"></image>
 					</swiper-item>
 				</template>
 			</swiper>
@@ -157,6 +157,9 @@ import global_data from "../../common/global_data"
 		full:3,
 		sexMan:4,
 		sexWoman:5,
+		inCheck:6,
+		illegal:7,
+		outTime:8,
 	}
 	
 	export default {
@@ -171,7 +174,9 @@ import global_data from "../../common/global_data"
 				actionList:[
 					{name:"微信聊天",openType:"share"},
 					{name:"分享到朋友圈请点右上角"},
-				]
+				],
+				swiperHeight:300,
+				imageHeight:0,
 			}
 		},
 		onLoad(e) {
@@ -266,8 +271,13 @@ import global_data from "../../common/global_data"
 					return optState.join
 				}
 				var task = this.task
-				if (task.state == util_task.TaskServerState.Finish) {
+				let tstate = task.state || 0
+				if (tstate == util_task.TaskServerState.Finish) {
 					return optState.finish
+				}else if(tstate == util_task.TaskServerState.InCheck){
+					return optState.inCheck
+				}else if(tstate == util_task.TaskServerState.CheckFail || tstate == util_task.TaskServerState.Illegal){
+					return optState.illegal
 				}
 				var user = this.user
 				var userjoin = util_task.getJoinByCid(user.cid,task)
@@ -281,6 +291,10 @@ import global_data from "../../common/global_data"
 					let limitsex = util_task.getLimitSex(task)
 					if (limitsex != EnumSex.NONE && limitsex != user.sex) {
 						return limitsex == EnumSex.WOMAN ? optState.sexWoman : optState.sexMan
+					}
+					let now = util_time.getSecond()
+					if (now > task.end_time) {
+						return optState.outTime
 					}
 					if (util_task.canJoin(task,user.sex)) {
 						return optState.join
@@ -307,7 +321,14 @@ import global_data from "../../common/global_data"
 					return "限女生"
 				}else if(state == optState.sexMan){
 					return "限男生"
+				}else if(state == optState.inCheck){
+					return "审核中"
+				}else if(state == optState.illegal){
+					return "内容违规"
+				}else if(state == optState.outTime){
+					return "已结束报名"
 				}
+				
 			},
 			taskStartTime() {
 				return util_time.formatTaskWeekTime(this.task.task_start_time,{day:true,week:true})
@@ -335,7 +356,7 @@ import global_data from "../../common/global_data"
 		onShareAppMessage(res) {
 			console.log("onShareAppMessage:",res)
 			let money = ""
-			if (this.task.money_type == TaskMoneyType.Reward) {
+			if (this.task.money_type == TaskMoneyType.Reward && this.task.money > 0) {
 				money = "奖励 " + this.moneyString
 			}
 			let image = this.images.length > 0 ? this.images[0] : ""
@@ -348,7 +369,7 @@ import global_data from "../../common/global_data"
 		onShareTimeline(res) {
 			console.log("onShareTimeline:",res)
 			let money = ""
-			if (this.task.money_type == TaskMoneyType.Reward) {
+			if (this.task.money_type == TaskMoneyType.Reward && this.task.money > 0) {
 				money = "奖励 " + this.moneyString
 			}
 			// let image = this.images.length > 0 ? this.images[0] : ""
@@ -453,12 +474,21 @@ import global_data from "../../common/global_data"
 					apihandle.toast("报名时间已结束")
 					return false
 				}
-				if (this.task.state == util_task.TaskServerState.Finish) {
+				let tstate = this.task.state || 0
+				if (tstate == util_task.TaskServerState.Finish) {
 					apihandle.toast("任务已结束")
 					return false
 				}
-				if (this.task.state != 1) {
-					apihandle.toast("任务未开始")
+				if (tstate == util_task.TaskServerState.InCheck) {
+					apihandle.toast("审核中")
+					return false
+				}
+				if (tstate == util_task.TaskServerState.CheckFail) {
+					apihandle.toast("内容违规无法报名")
+					return false
+				}
+				if (tstate == util_task.TaskServerState.Illegal) {
+					apihandle.toast("内容违规无法报名")
 					return false
 				}
 				return true
@@ -491,6 +521,7 @@ import global_data from "../../common/global_data"
 						if (res) {
 							this.task.join = res.join
 							store.commit("updateTaskOne",this.task)
+							store.commit("deleteJoinTask",this.task.id)
 							apihandle.toast("已退出")
 						}
 					})
@@ -575,6 +606,15 @@ import global_data from "../../common/global_data"
 			// 	console.log("touch move")
 			// 	this.viewImage = false
 			// },
+			onImageLoaded(e) {
+				if (this.imageHeight == 0) {
+					console.log("imageload",e)
+					this.imageHeight = e.detail.height
+					if (this.imageHeight > this.swiperHeight) {
+						this.swiperHeight = Math.min(this.imageHeight,450)
+					}
+				}
+			},
 			previewImage(index) {
 				
 				uni.previewImage({
@@ -597,7 +637,7 @@ import global_data from "../../common/global_data"
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.headTop {
 		background-color: #fff;

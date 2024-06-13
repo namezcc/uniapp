@@ -489,6 +489,18 @@ var apihandle = {
 		}
 		return null
 	},
+	async apiGetOpenTestInput() {
+		try{
+			var res = await http.request("apiGetOpenTestInput","GET",{})
+			if (this.checkData(res.data,res)) {
+				return res.data.data
+			}
+		}catch(e){
+			toast("网络错误")
+			console.log(e)
+		}
+		return null
+	},
 }
 
 export default apihandle

@@ -97,7 +97,7 @@
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	page {
 		height: 100%;

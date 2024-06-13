@@ -79,7 +79,7 @@ import store from '../../store';
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.main-contain {
 		// padding: 10px 20px;

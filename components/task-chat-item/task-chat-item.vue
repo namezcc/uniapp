@@ -62,6 +62,7 @@ import util_time from '@/common/util_time';
 import util_task from "@/common/util_task.js";
 import global_data from "../../common/global_data";
 import { TaskShowState } from "../../common/define_const";
+import apihandle from "../../common/api_handle";
 	
 	export default {
 		name:"task-chat-item",
@@ -204,6 +205,7 @@ import { TaskShowState } from "../../common/define_const";
 			finishTask() {
 				let state = util_task.getTaskState(this.task,global_data.cid)
 				if (state != TaskShowState.Open) {
+					apihandle.toast("进行中才可完成")
 					return
 				}
 				uni.showModal({
@@ -223,7 +225,8 @@ import { TaskShowState } from "../../common/define_const";
 					success: (res) => {
 						if (res.confirm) {
 							console.log("delete join")
-							store.commit("deleteJoinTask",this.task.id)
+							// store.commit("deleteJoinTask",this.task.id)
+							store.commit("deleteMyTask",this.task.id)
 						}
 					}
 				})
@@ -257,7 +260,7 @@ import { TaskShowState } from "../../common/define_const";
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.uni-card {
 		border-radius: 10px;

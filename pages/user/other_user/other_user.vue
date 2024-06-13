@@ -290,7 +290,7 @@ import global_data from '../../../common/global_data';
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.user-btn {
 		/* width: 200rpx; */

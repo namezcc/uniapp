@@ -2,10 +2,10 @@
 	<view  class="mainCol">
 		<mycol>			
 			<view class="titleStyle colItem">
-				<uv-input v-model="txtTitle" placeholder="任务标题" maxlength="30" inputAlign="center" shape="circle" />
+				<uv-input v-model="txtTitle" placeholder="标题" maxlength="30" inputAlign="center" shape="circle" />
 			</view>
 			<view class="contentStyle colItem">
-				<uv-textarea v-model="txtContent" placeholder="任务内容..." count maxlength="500" height="100" ></uv-textarea>
+				<uv-textarea v-model="txtContent" placeholder="详细内容..." count maxlength="500" height="100" ></uv-textarea>
 			</view>
 			<view class="colItem itemContent">
 				<view class="contentPadding">
@@ -145,7 +145,7 @@
 					</myrow>
 					<view class="lineMargin"></view>
 					<myrow>
-						<text>任务地点</text>
+						<text>地点</text>
 						<expanded></expanded>
 						<text @click="openMap" style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;max-width: 200px;">{{locationString}}</text>
 						<uni-icons type="location-filled"></uni-icons>
@@ -195,7 +195,7 @@ import util_common from "../../common/util_common"
 	function getDateArray() {
 		const datesArray = [];
 		const currentDate = new Date();
-		for (let i = 0; i < 30; i++) {
+		for (let i = 0; i < 90; i++) {
 			const futureDate = new Date();
 			futureDate.setDate(currentDate.getDate() + i);
 			
@@ -262,7 +262,7 @@ import util_common from "../../common/util_common"
 				],
 				dateSelect:[],
 				// dateString: "请选择日期",
-				locationString: "线下任务请选择",
+				locationString: "线下委托请选择",
 				location: null,
 				joinEndTime:0,
 				numtype:["男女不限","自定义","限女生","限男生"],
@@ -272,7 +272,7 @@ import util_common from "../../common/util_common"
 					{text:"限女生",value:2},
 					{text:"限男生",value:3},
 				],
-				moneyType:["任务奖励","任务收费"],
+				moneyType:["奖励","收费"],
 				haveTaskTime:false,
 				startTime:0,
 				endTime:0,
@@ -341,7 +341,7 @@ import util_common from "../../common/util_common"
 				userlocation: state => state.user_data.location,
 			}),
 			optName() {
-				return this.editTask == null ? "发布任务" : "确认修改"
+				return this.editTask == null ? "发布" : "确认修改"
 			},
 			taskJoinEndTime() {
 				if (this.joinEndTime == 0) {
@@ -612,8 +612,14 @@ import util_common from "../../common/util_common"
 					})
 					api.apiCreateTask(task).then((res)=>{
 						// console.log("submit success ",task);
-						api.toast("发布成功")
-						uni.navigateBack({})
+						
+						// api.toast("发布成功")
+						// uni.navigateBack({})
+						if (res) {
+							this.submitRes("发布成功")
+						}else{
+							this.submitRes("发布失败,请重试")
+						}
 					}).finally(()=>{
 						uni.hideLoading()
 					})
@@ -630,16 +636,31 @@ import util_common from "../../common/util_common"
 						title:"发布中..."
 					})
 					api.apiUpdateTask(task).then((res)=>{
-						if (res) {							
-							api.toast("修改成功")
-							// console.log(res)
+						if (res) {
+							this.submitRes("发布成功")
+							res.join = this.editTask.join
 							store.commit("updateTaskOne",res)
-							uni.navigateBack({})
+						}else{
+							this.submitRes("发布失败,请重试")
 						}
 					}).finally(()=>{
 						uni.hideLoading()
 					})
 				}
+			},
+			submitRes(title,back = true) {
+				uni.showModal({
+					title:title,
+					// content:"感谢您的提交,我们会及时查看",
+					success: (res) => {
+						if (res.confirm && back) {
+							uni.navigateBack({})
+						}
+					},
+					fail: () => {
+						// uni.navigateBack({})
+					}
+				})
 			},
 			onSetTaskTime(e) {
 				// console.log("checkbox",e)
@@ -662,7 +683,7 @@ import util_common from "../../common/util_common"
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.mainCol {
 		margin: 10px;

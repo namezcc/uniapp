@@ -368,7 +368,7 @@ import util_page from "../../common/util_page"
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.select-box {
 		border-radius: 20px;

@@ -143,7 +143,7 @@ import store from '../../store';
 </script>
 
 <style lang="scss" scoped>
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	.msg-content {
 		// margin: 0 16rpx;

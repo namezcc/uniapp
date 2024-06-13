@@ -1,10 +1,11 @@
 <template>
 	<view>
+		<view style="margin-top: 20px;"></view>
 		<view class="class-ceter">
 			<!-- #ifndef MP-WEIXIN -->
 				<view class="avator-box">
 					<button @click="onChooseIcon" class="button-avator">				
-						<avatar :src="user.icon" :radius="65"></avatar>
+						<avatar :src="user.icon" :radius="75"></avatar>
 					</button>
 					<uni-icons type="camera" class="camera-icon" :size="30"></uni-icons>
 				</view>
@@ -12,7 +13,7 @@
 			<!-- #ifdef MP-WEIXIN -->
 				<view class="avator-box">					
 					<button @chooseavatar="onChooseAvatar" open-type="chooseAvatar" class="button-avator">
-						<avatar :src="user.icon" :radius="65"></avatar>
+						<avatar :src="user.icon" :radius="75"></avatar>
 					</button>
 					<uni-icons type="camera" class="camera-icon" :size="30"></uni-icons>
 				</view>
@@ -76,7 +77,11 @@ import store from "../../store"
 			},
 			onChooseAvatar(e) {
 				// console.log("onChooseAvatar",e)
+				uni.showLoading({
+					title:"上传中..."
+				})
 				util_common.uploadFile(e.detail.avatarUrl,e.detail.avatarUrl,(url)=>{
+					uni.hideLoading()
 					if (url) {
 						console.log("url ",url)
 						apihandle.apiSetUserIcon(url).then((setres)=>{
@@ -92,7 +97,7 @@ import store from "../../store"
 						})
 					}else{
 						apihandle.toast("操作失败,请重试")
-						uni.navigateBack()
+						// uni.navigateBack()
 					}
 				})
 				
@@ -142,7 +147,7 @@ import store from "../../store"
 </script>
 
 <style lang="scss">
-	@import "@/static/my.scss";
+	@import "@/style/my.scss";
 	
 	button::after{
 		border: none;
@@ -160,8 +165,8 @@ import store from "../../store"
 	
 	.avator-box {
 		position: relative;
-		height: 70px;
-		width: 70px;
+		height: 80px;
+		width: 80px;
 	}
 	
 	.camera-icon {
