@@ -72,6 +72,7 @@
 	import { ChatContentType, PageType } from '@/common/define_const';
 	import util_chat from '@/common/util_chat';
 	import utilHttp from "@/common/http_util.js"
+import util_common from "../../common/util_common";
 	
 	export default {
 		onLoad(d) {
@@ -153,17 +154,27 @@
 					count: 9,
 					sourceType: ['album'],
 					success: (cres) => {
-						const tempFilePaths = cres.tempFilePaths;
-						for (let img of tempFilePaths) {					
-							utilHttp.uploadImage(img,(res)=>{
-								// console.log('上传成功', res);
-								// console.log('上传数据转换',JSON.parse(res.data));
-								// 取到文档服务器的值
-								let uploaddata = JSON.parse(res.data)
-								let url = util_task.getImageUrlName(uploaddata.data)
+						let flist = util_common.getTempFileList(cres)
+						uni.showLoading({
+							title:"发送中..."
+						})
+						util_common.uploadFileList(flist).then((vec)=>{
+							for (let url of vec) {
 								this.sendImageMsg(url)
-							})
-						}
+							}
+							uni.hideLoading()
+						})
+						// const tempFilePaths = cres.tempFilePaths;
+						// for (let img of tempFilePaths) {					
+						// 	utilHttp.uploadImage(img,(res)=>{
+						// 		// console.log('上传成功', res);
+						// 		// console.log('上传数据转换',JSON.parse(res.data));
+						// 		// 取到文档服务器的值
+						// 		let uploaddata = JSON.parse(res.data)
+						// 		let url = util_task.getImageUrlName(uploaddata.data)
+						// 		this.sendImageMsg(url)
+						// 	})
+						// }
 					}
 				})
 			},

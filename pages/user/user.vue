@@ -150,6 +150,10 @@ import util_common from "../../common/util_common"
 				})
 			},
 			toSuggestPage() {
+				if (!global_data.isLogin()) {
+					util_page.toLoginPageDialog()
+					return
+				}
 				uni.navigateTo({
 					url:"/pages/setting/suggest_page"
 				})

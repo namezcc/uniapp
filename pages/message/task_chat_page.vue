@@ -10,21 +10,22 @@
 			<template #top>
 				<!-- <uni-nav-bar :border="false" :shadow="false" :title="task.title" right-icon="more-filled" @clickRight="onMore" backgroundColor="#F8F8F8"></uni-nav-bar> -->
 				<view style="padding: 5px 10px;background-color: #F8F8F8;">
-					<myrow>
-						<view style="width: 150px;">							
+					<myrow mainAlign="space-between">
+						<view style="">							
 							<myrow>								
 								<avatar :src="taskicon" :usercid="task.cid" :tocid="task.cid" :inpage="inpage"></avatar>
-								<text style="text-overflow: ellipsis;">{{task.creator_name}}</text>
+								<text style="text-overflow: ellipsis;">{{userName}}</text>
 							</myrow>
 						</view>
-						<expanded>
-							<view class="class-ceter">
-								<text>({{taskPeopleNum}})</text>
-							</view>
-						</expanded>
-						<view style="width: 150px;">
+						<!-- <view class="class-ceter">
+							
+						</view> -->
+						<!-- <expanded>
+						</expanded> -->
+						<view style="" @click="onMore">
 							<myrow mainAlign="flex-end">
-								<uni-icons type="more-filled" @click="onMore" size="28px"></uni-icons>
+								<text>({{taskPeopleNum}})</text>
+								<uni-icons style="margin: 0px 5px;" type="right" size="28px"></uni-icons>
 							</myrow>
 						</view>
 					</myrow>
@@ -72,6 +73,7 @@
 	import utilHttp from "@/common/http_util.js"
 	import util_task from '../../common/util_task';
 import apihandle from "../../common/api_handle";
+import util_common from "../../common/util_common";
 	
 
 	export default {
@@ -86,6 +88,7 @@ import apihandle from "../../common/api_handle";
 				chatlen:0,
 				inpage:PageType.ChatTask,
 				taskicon:"",
+				taskuser:null,
 			}
 		},
 		onLoad() {
@@ -101,6 +104,7 @@ import apihandle from "../../common/api_handle";
 			
 			store.dispatch("getOtherUser",this.task.cid).then((res)=>{
 				if (res) {
+					this.taskuser = res
 					this.taskicon = res.icon
 					// console.log("user icon ",res.icon)
 				}
@@ -119,6 +123,9 @@ import apihandle from "../../common/api_handle";
 			taskPeopleNum() {
 				let num = util_task.getJoinNum(this.task)
 				return (num[0]+num[1])+"/"+this.task.people_num
+			},
+			userName() {
+				return this.taskuser?.name || ""
 			}
 		},
 		methods: {
@@ -146,13 +153,14 @@ import apihandle from "../../common/api_handle";
 				this.$refs.inputBar.onInputFocus();
 			},
 			getLastChatTime(index) {
+				// console.log("index:",index,this.chatList[index])
 				return index+1 < this.chatList.length ? this.chatList[index+1].send_time : 0
 				// return index-1 >= 0 ? this.chatList[index-1].send_time : 0
 			},
 			onGetTaskChat(data) {
 				// console.log("emit ",data)
 				
-				this.$refs.paging.addChatRecordData(data.data)
+				this.$refs.paging.addChatRecordData(data.data[0])
 				this.chatlen += 1
 				store.commit("saveTaskChatIndex",this.taskid)
 				// if (data.count < 0) {
@@ -188,7 +196,7 @@ import apihandle from "../../common/api_handle";
 			sendChatMsg(type,content) {
 				var chat = util_chat.makeChatInfo(type,content,this.user)
 				store.commit("sendTaskChat",{id:this.taskid,chat:chat})
-				this.$refs.paging.addChatRecordData([chat])
+				this.$refs.paging.addChatRecordData(chat)
 				this.chatlen += 1
 			},
 			sendImageMsg(url) {
@@ -204,17 +212,27 @@ import apihandle from "../../common/api_handle";
 					count: 9,
 					sourceType: ['album'],
 					success: (cres) => {
-						const tempFilePaths = cres.tempFilePaths;
-						for (let img of tempFilePaths) {					
-							utilHttp.uploadImage(img,(res)=>{
-								// console.log('上传成功', res);
-								// console.log('上传数据转换',JSON.parse(res.data));
-								// 取到文档服务器的值
-								let uploaddata = JSON.parse(res.data)
-								let url = util_task.getImageUrlName(uploaddata.data)
+						// const tempFilePaths = cres.tempFilePaths;
+						let flist = util_common.getTempFileList(cres)
+						uni.showLoading({
+							title:"发送中..."
+						})
+						util_common.uploadFileList(flist).then((vec)=>{
+							for (let url of vec) {
 								this.sendImageMsg(url)
-							})
-						}
+							}
+							uni.hideLoading()
+						})
+						// for (let img of tempFilePaths) {					
+						// 	utilHttp.uploadImage(img,(res)=>{
+						// 		// console.log('上传成功', res);
+						// 		// console.log('上传数据转换',JSON.parse(res.data));
+						// 		// 取到文档服务器的值
+						// 		let uploaddata = JSON.parse(res.data)
+						// 		let url = util_task.getImageUrlName(uploaddata.data)
+						// 		this.sendImageMsg(url)
+						// 	})
+						// }
 					}
 				})
 			},

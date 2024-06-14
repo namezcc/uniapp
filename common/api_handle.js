@@ -49,16 +49,16 @@ var apihandle = {
 		}
 		return true
 	},
-	async apiGetPhoneCode(phone) {
-		try{
-			var res = await http.request("phoneCode","GET",{phoneNumber:phone})
-			if (this.checkData(res.data,res)) {
-				return res.data
-			}
-		}catch(e){
-			toast("网络错误")
-		}
-	},
+	// async apiGetPhoneCode(phone) {
+	// 	try{
+	// 		var res = await http.request("phoneCode","GET",{phoneNumber:phone})
+	// 		if (this.checkData(res.data,res)) {
+	// 			return res.data
+	// 		}
+	// 	}catch(e){
+	// 		toast("网络错误")
+	// 	}
+	// },
 	async apiUserLogin(phone) {
 		try{
 			var res = await http.request("userlogin","POST",{phone:phone})

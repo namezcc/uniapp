@@ -7,7 +7,7 @@
 					<expanded></expanded>
 				</template>
 				<template v-else>
-					<avatar :usercid="chaticon" :tocid="chat.cid" :inpage="inpage"></avatar>
+					<avatar :src="chaticon" :tocid="chat.cid" :inpage="inpage"></avatar>
 				</template>
 				<view style="margin: 0rpx 20rpx;">				
 					<mycol :itemAlign="nameAlign">
@@ -15,14 +15,14 @@
 							<text class="user-name">{{chat.sendername}}</text>
 						</template>
 						<view v-else style="height: 10px;"></view>
-						<myrow>
+						<myrow :mainAlign="isSelf ? 'flex-end':'flex-start'">
 							<uni-icons type="info-filled" size="20" color="#e43d33" v-if="chat.sendfail==true"></uni-icons>
 							<chat-item-content :chat="chat" :self="isSelf"></chat-item-content>
 						</myrow>
 					</mycol>
 				</view>
 				<template v-if="isSelf">
-					<avatar :usercid="chaticon"></avatar>
+					<avatar :src="chaticon"></avatar>
 				</template>
 				<template v-else>
 					<expanded></expanded>
@@ -60,12 +60,15 @@ import store from "../../store";
 			};
 		},
 		mounted() {
-			store.dispatch("getOtherUser",this.chat.cid).then((res)=>{
-				if (res) {
-					this.chaticon = res.icon
-					// console.log("user icon ",res.icon)
+			this.getIcon()
+		},
+		watch:{
+			chat:(newv,oldv)=>{
+				console.log("chat change new old this ",newv.cid,oldv.cid,this.chat.cid)
+				if (newv.cid != oldv.cid) {
+					this.getIcon()
 				}
-			})
+			}
 		},
 		computed:{
 			...mapState({
@@ -86,6 +89,17 @@ import store from "../../store";
 			},
 			timeString() {
 				return util_time.diffString(this.chat.send_time)
+			}
+		},
+		methods:{
+			getIcon() {
+				this.chaticon = this.chat.sendericon
+				// store.dispatch("getOtherUser",this.chat.cid).then((res)=>{
+				// 	if (res) {
+				// 		this.chaticon = res.icon
+				// 		// console.log("user chat ",this.chat.content,res.icon)
+				// 	}
+				// })
 			}
 		}
 		

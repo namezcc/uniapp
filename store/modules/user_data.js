@@ -12,6 +12,7 @@ export default {
 		interestTask: [],	//兴趣列表
 		blackList:[],		//黑名单
 		user_map: new Map(),
+		preget_user_map:new Map(),
 		user_credit_type: new Map(),		//评价类型
 	},
 	getters: {
@@ -125,7 +126,25 @@ export default {
 			if (u) {
 				return u
 			}
+			
+			let getnum = 1
+			while (getnum < 3){
+				let inget = context.state.preget_user_map.get(cid)
+				if (inget) {
+					await util_common.waitTime(1000)
+					u = context.state.user_map.get(cid)
+					if (u) {
+						return u
+					}
+					getnum++
+				}else{
+					break
+				}
+			}
+			
+			context.state.preget_user_map.set(cid,true)
 			u = await api.apiGetUserInfo(cid)
+			context.state.preget_user_map.delete(cid)
 			if (u) {
 				context.state.user_map.set(cid,u)
 			}

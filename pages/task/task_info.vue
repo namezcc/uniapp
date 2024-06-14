@@ -189,20 +189,20 @@ import global_data from "../../common/global_data"
 			uni.showLoading({
 			})
 			store.dispatch("getTaskInfo",this.taskid).then((res)=>{
-				if (res && (res.cid == global_data.cid || res.state != util_task.TaskServerState.Illegal)) {
-					this.task = res
-					
-					store.dispatch("getOtherUser",this.task.cid).then((userres)=>{
-						if (userres) {
-							this.taskuser = userres
-						}
-					})
-				}else{
-					apihandle.toast("任务已下架")
-					if (!this.fromShare) {
-						uni.navigateBack()
+				this.task = res
+				
+				store.dispatch("getOtherUser",this.task.cid).then((userres)=>{
+					if (userres) {
+						this.taskuser = userres
 					}
-				}
+				})
+				// if (res && (res.cid == global_data.cid || res.state != util_task.TaskServerState.Illegal)) {
+				// }else{
+				// 	apihandle.toast("任务已下架")
+				// 	if (!this.fromShare) {
+				// 		uni.navigateBack()
+				// 	}
+				// }
 			}).finally(()=>{
 				uni.hideLoading()
 			})

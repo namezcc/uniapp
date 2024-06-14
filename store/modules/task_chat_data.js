@@ -158,7 +158,6 @@ export default {
 				let index = getLastChatIndex(chat)
 				// if (downloadnum > 0) {
 				// }
-				chat.state = EnumLoadState.Loading
 				let onlinenum = chat.count - (chat.index - index)
 				if (onlinenum < taskChatNum) {
 					downloadnum = onlinenum
@@ -168,6 +167,7 @@ export default {
 				if (downloadnum == 0) {
 					return
 				}
+				chat.state = EnumLoadState.Loading
 				var res = await apihandle.apiLoadTaskChat(tid,index - taskChatNum - chat.index,downloadnum)
 				
 				if (chat.head.length > 0) {

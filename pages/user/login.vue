@@ -92,28 +92,28 @@
 				// if (!this.$refs.ucode.canGetCode) {
 				// 	return
 				// }
-				if (process.env.NODE_ENV == "development") {
-					this.phone = "15757181901"
-					// #ifdef MP-WEIXIN
-						this.phone = "15757181904"
-					// #endif
-				}
+				// if (process.env.NODE_ENV == "development") {
+				// 	this.phone = "15757181901"
+				// 	// #ifdef MP-WEIXIN
+				// 		this.phone = "15757181904"
+				// 	// #endif
+				// }
 				
-				if (this.phone.length == 0) {
-					api.toast("手机号错误")
-				}else{
-					api.once("apiGetPhoneCode",(unlock)=>{						
-						api.apiGetPhoneCode(this.phone).then((res)=>{
-							if (res && res.code == ErrCode.SUCCESS) {
-								// this.$refs.ucode.start()
-								// api.toast("验证码已发送 "+res.data)
-								this.code = res.data
-								this.login()
-							}
-							unlock();
-						})
-					})
-				}
+				// if (this.phone.length == 0) {
+				// 	api.toast("手机号错误")
+				// }else{
+				// 	api.once("apiGetPhoneCode",(unlock)=>{						
+				// 		api.apiGetPhoneCode(this.phone).then((res)=>{
+				// 			if (res && res.code == ErrCode.SUCCESS) {
+				// 				// this.$refs.ucode.start()
+				// 				// api.toast("验证码已发送 "+res.data)
+				// 				this.code = res.data
+				// 				this.login()
+				// 			}
+				// 			unlock();
+				// 		})
+				// 	})
+				// }
 			},
 			openTestInput(res) {
 				this.showTestInput = res

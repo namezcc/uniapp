@@ -204,7 +204,6 @@ export default {
 			
 			if (downloadnum > 0 && chat.state == EnumLoadState.More) {
 				var index = getLastChatIndex(chat)
-				chat.state = EnumLoadState.Loading
 				let onlinenum = chat.count - (chat.indexid - index)
 				if (onlinenum < userChatNum) {
 					downloadnum = onlinenum
@@ -214,6 +213,7 @@ export default {
 				if (downloadnum == 0) {
 					return
 				}
+				chat.state = EnumLoadState.Loading
 				var res = await apihandle.apiLoadUserChatData(tid,index - userChatNum - chat.indexid,downloadnum)
 				if (chat.head.length > 0) {
 					chat.data.splice(0,0,...chat.head)

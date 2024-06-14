@@ -35,6 +35,11 @@ import global_data from '../../common/global_data';
 				default:0,
 			}
 		},
+		// watch:{
+		// 	src:(newv,oldv)=>{
+		// 		console.log("avatar url change",newv,oldv)
+		// 	}
+		// },
 		// mounted() {
 			// if (this.usercid > 0) {
 			// 	// 加载玩家数据

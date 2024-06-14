@@ -80,7 +80,9 @@ function camSafeUrlEncode(str) {
 }
 
 function getUploadInfo(extName,callback) {
+	console.log("getUploadInfo start")
 	apihandle.apiGetPostPolicy(extName).then((res)=>{
+		console.log("GetPostPolicy")
 		callback(res)
 	})
 }
@@ -97,19 +99,30 @@ function uploadOssFile(opt,callback) {
 	};
 	// 如果服务端用了临时密钥计算，需要传 x-cos-security-token
 	if (opt.securityToken) formData['x-cos-security-token'] = opt.securityToken;
+	let url = 'https://' + opt.cosHost
+	console.log("upload host",url)
 	uni.uploadFile({
-	   url: 'https://' + opt.cosHost, //仅为示例，非真实的接口地址
+	   url: url, //仅为示例，非真实的接口地址
 	   filePath: opt.filePath,
 	   name: 'file',
 	   formData: formData,
 	   success: (res) => {
+			console.log("upload success")
 		  if (![200, 204].includes(res.statusCode)) return callback(res);
 		  var fileUrl = 'https://' + opt.cosHost + '/' + camSafeUrlEncode(opt.cosKey).replace(/%2F/g, '/');
 		  callback && callback(null, fileUrl);
 	   },
 	   error(err) {
+		   console.log("upload err",err)
 		  callback && callback(err);
 	   },
+	   fail: (err) => {
+			console.log("upload fail",err)
+			callback(err);
+	   },
+	   complete: () => {
+			console.log("upload complete")
+	   }
 	});
 }
 
@@ -166,6 +179,14 @@ function isFromPYQ() {
 	return options.scene == 1154
 }
 
+function waitTime(ns) {
+	return new Promise((resolve,reject)=>{
+		setTimeout(()=>{
+			resolve(true)
+		},ns)
+	})
+}
+
 export default {
 	getSystemInfo,
 	getIconUrl,
@@ -177,4 +198,5 @@ export default {
 	uploadFileList,
 	getTempFileList,
 	isFromPYQ,
+	waitTime,
 }

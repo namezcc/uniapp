@@ -87,7 +87,7 @@ import global_data from '../../common/global_data';
 				this.usecash = false
 			},
 			toChatPage(task) {
-				if (task.state == util_task.TaskServerState.Illegal) {
+				if (task.cid != global_data.cid && task.state == util_task.TaskServerState.Illegal) {
 					apihandle.toast("任务已下架")
 					return
 				}

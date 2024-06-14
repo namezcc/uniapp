@@ -76,14 +76,14 @@ import store from "../../store"
 				})
 			},
 			onChooseAvatar(e) {
-				// console.log("onChooseAvatar",e)
+				console.log("onChooseAvatar",e)
 				uni.showLoading({
 					title:"上传中..."
 				})
 				util_common.uploadFile(e.detail.avatarUrl,e.detail.avatarUrl,(url)=>{
 					uni.hideLoading()
 					if (url) {
-						console.log("url ",url)
+						// console.log("url ",url)
 						apihandle.apiSetUserIcon(url).then((setres)=>{
 							console.log("apiSetUserIcon setres",setres)
 							if (setres) {

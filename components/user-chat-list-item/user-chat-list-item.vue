@@ -43,7 +43,7 @@ import store from '../../store';
 			},
 			icon() {
 				// console.log("icon ",this.user?.icon)
-				return util_common.getIconUrl(this.user?.icon)
+				return this.user?.icon
 			},
 			timeString() {
 				return util_time.diffString(this.chat.send_time)

@@ -13,17 +13,17 @@ async function request(url,method,data,config) {
 }
 
 function uploadImage(filepath,success) {
-	uni.uploadFile({
-		url: HostBase+"/apiUploadOssImage",
-		filePath: filepath,
-		name: 'file',
-		// 成功函数
-		success: success,
-		// 失败提示用户重新上传
-		fail: error => {
-			console.log('上传失败', error);
-		}
-	})
+	// uni.uploadFile({
+	// 	url: HostBase+"/apiUploadOssImage",
+	// 	filePath: filepath,
+	// 	name: 'file',
+	// 	// 成功函数
+	// 	success: success,
+	// 	// 失败提示用户重新上传
+	// 	fail: error => {
+	// 		console.log('上传失败', error);
+	// 	}
+	// })
 }
 
 export default {
