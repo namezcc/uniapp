@@ -7,11 +7,12 @@
 </template>
 
 <script>
-import { HostBase } from '../../common/define_const'
+import { WebHost } from '../../common/define_const'
 	export default {
 		data() {
+			console.log("webHost:",WebHost)
 			return {
-				host:HostBase+"/web/bbwt_nrfb.html"
+				host:WebHost+"/bbwt_nrfb.html"
 			}
 		},
 		methods: {

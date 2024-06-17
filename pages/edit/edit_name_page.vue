@@ -39,7 +39,7 @@ import apihandle from "../../common/api_handle"
 			}),
 		},
 		methods: {
-			onSave() {
+			async onSave() {
 				let len = this.txtName.length
 				if (len <= 0 || len > 15) {
 					apihandle.toast("昵称不符合规则")
@@ -48,6 +48,24 @@ import apihandle from "../../common/api_handle"
 				if (this.txtName == this.user.name) {
 					uni.navigateBack()
 					return
+				}
+				
+				// 检测违规
+				let res = await apihandle.apiVerifyTextContent(this.txtName,1)
+				let result = res?.result
+				console.log("apiVerifyTextContent",res)
+				if (result?.suggest == "risky") {
+					switch (result.label){
+						case 20001:
+						case 20002:
+						case 20003:
+						case 20006:
+						case 20008:
+							apihandle.toast("昵称违规请修改")
+							return;
+						default:
+							break;
+					}
 				}
 				apihandle.apiEditName(this.txtName).then((res)=>{
 					if (res) {

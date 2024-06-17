@@ -187,6 +187,10 @@ function waitTime(ns) {
 	})
 }
 
+function toInt(str) {
+	return parseInt(str) || 0
+}
+
 export default {
 	getSystemInfo,
 	getIconUrl,
@@ -199,4 +203,5 @@ export default {
 	getTempFileList,
 	isFromPYQ,
 	waitTime,
+	toInt,
 }

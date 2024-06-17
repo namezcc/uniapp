@@ -29,8 +29,9 @@
 			<myrow itemAlign="flex-start" :wrap="false">
 				<text style="white-space: pre-wrap;" class="task-title">{{task.title}}</text>
 				<expanded></expanded>
+				<view style="margin-left: 5px;"></view>
 				<view v-if="haveReward" class="boxText">赏</view>
-				<text :style="{fontSize: '16px',color: theme.primary}" >{{taskMoney}}</text>
+				<text :style="{fontSize: '16px',color: theme.primary,whiteSpace: 'nowrap'}" >{{taskMoney}}</text>
 			</myrow>
 			<view class="text-chat" v-if="taskChat">
 				<myrow>

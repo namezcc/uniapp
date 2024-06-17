@@ -80,6 +80,21 @@ export default {
 				u.credit_score += score
 				api.apiSetCreditToUserType(cid,ctype)
 			}
+		},
+		getWxOpenId(state,user) {
+			let openid = user.openid || ""
+			if (openid.length == 0) {
+				uni.login({
+					provider:"weixin",
+					fail:(res)=>{
+						console.log("getOpenCode fail",res)
+					},
+					success:(res)=>{
+						console.log("getOpenCode success",res)
+						api.apiGetOpenId(res.code)
+					}
+				})
+			}
 		}
 	},
 	actions: { 
@@ -96,6 +111,7 @@ export default {
 						}
 					},1000)
 					// #ifdef MP-WEIXIN
+						context.commit("getWxOpenId",res)
 					// #endif
 				}else{
 					// context.commit("login","")

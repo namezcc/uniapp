@@ -2,11 +2,16 @@
 // var WsHost = "ws://192.168.0.39:10002/"
 // var HostBase = "http://47.99.56.195:18999"
 // var WsHost = "ws://47.99.56.195:10002/"
+// var HostBase = "https://localhost:8999"
+// var WsHost = "wss://localhost:10002/"
+// var WebHost = "https://localhost"
 var HostBase = "http://192.168.0.77:8999"
 var WsHost = "ws://192.168.0.77:10002/"
+var WebHost = "http://192.168.0.77:443"
 if (process.env.NODE_ENV != "development") {
 	HostBase = "https://bangbangweituo.com:18999"
 	WsHost = "wss://bangbangweituo.com:10002/"
+	WebHost = "https://bangbangweituo.com"
 }
 
 var ErrCode = {
@@ -132,6 +137,7 @@ export {
 	EnumSex,
 	HostBase,
 	WsHost,
+	WebHost,
 	TaskMoneyType,
 	EnumLoadState,
 	LoadState,

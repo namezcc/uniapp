@@ -65,6 +65,7 @@
 				agree:false,
 				showTestInput:false,
 				showOpenTest:false,
+				opencode:"",
 			}
 		},
 		onLoad() {
@@ -77,6 +78,8 @@
 					this.showOpenTest = true
 				}
 			})
+			
+			this.getOpenCode()
 		},
 		methods: {
 			onPhoneInput(val) {
@@ -118,6 +121,19 @@
 			openTestInput(res) {
 				this.showTestInput = res
 			},
+			getOpenCode() {
+				console.log("getOpenCode ")
+				uni.login({
+					provider:"weixin",
+					fail:(res)=>{
+						console.log("getOpenCode fail",res)
+					},
+					success:(res)=>{
+						console.log("getOpenCode success",res)
+						this.opencode = res.code
+					}
+				})
+			},
 			login() {
 				if (!this.agree) {
 					api.toast("请阅读并勾选用户协议")
@@ -133,7 +149,7 @@
 					api.toast("手机号错误")
 				}else{
 					api.once("apiUserLogin",(unlock)=>{
-						api.apiUserLogin(this.phone).then((res)=>{
+						api.apiUserLogin(this.phone,this.opencode).then((res)=>{
 							if (res) {
 								console.log(res)
 								store.commit("login",res.data.token)
@@ -160,7 +176,7 @@
 					title:"登录中..."
 				})
 				api.once("userloginWxCode",(unlock)=>{
-					api.userloginWxCode(e.detail.code).then((res)=>{
+					api.userloginWxCode(e.detail.code,this.opencode).then((res)=>{
 						if (res) {
 							console.log(res)
 							store.commit("login",res.data.token)

@@ -167,7 +167,7 @@
 			</view>
 			<myrow>
 				<label>
-					<checkbox value="1" :checked="agree" @click="setAgree" /><text class="agree-txt" @click="toPageNrfb">《帮帮内容发布规范》</text>
+					<checkbox value="1" :checked="agree" @click="setAgree" /><text class="agree-txt" @click.stop="toPageNrfb">《帮帮内容发布规范》</text>
 				</label>
 				<expanded></expanded>
 			</myrow>
@@ -520,8 +520,19 @@ import util_common from "../../common/util_common"
 						return false
 					}
 				}
+				if (util_common.toInt(this.txtManMoney) < 0 || util_common.toInt(this.txtWomanMoney) < 0) {
+					api.toast("金额不能小于0")
+					return false
+				}
 				
-				var total = parseInt(this.txtManNum) + parseInt(this.txtWomanNum)
+				let mann = util_common.toInt(this.txtManNum)
+				let womann = util_common.toInt(this.txtWomanNum)
+				if (mann < 0 || womann < 0) {
+					api.toast("人数不能小于0")
+					return
+				}
+				
+				var total = mann + womann
 				if (total <= 0 || total > 100) {
 					api.toast("总人数限制 1~100 人")
 					return false;
@@ -530,8 +541,8 @@ import util_common from "../../common/util_common"
 			},
 			genTaskInfo() {
 				var user = this.user
-				var mann = parseInt(this.txtManNum)
-				var womann = parseInt(this.txtWomanNum)
+				var mann = util_common.toInt(this.txtManNum)
+				var womann = util_common.toInt(this.txtWomanNum)
 				var total = 0
 				if (this.currentNum == 0) {
 					// 不分性别
@@ -546,8 +557,8 @@ import util_common from "../../common/util_common"
 					title: this.txtTitle,
 					content: this.txtContent,
 					money_type: this.currentMoney,
-					money: parseInt(this.txtManMoney),
-					womanMoney: parseInt(this.txtWomanMoney),
+					money: util_common.toInt(this.txtManMoney),
+					womanMoney: util_common.toInt(this.txtWomanMoney),
 					people_num: total,
 					man_num: mann,
 					end_time: this.joinEndTime,

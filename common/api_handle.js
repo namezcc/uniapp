@@ -32,12 +32,20 @@ var apihandle = {
 	setToken(token) {
 		authorHeader["Authorization"] = token
 	},
-	checkData(data,res) {
+	checkData(data,res,tolog=false) {
 		if (data == undefined) {
-			toast(res.errMsg)
+			if (tolog) {
+				console.log(res.errMsg)
+			}else{
+				toast(res.errMsg)
+			}
 			return false
 		}else if (data.code != ErrCode.SUCCESS) {
-			toast(data.msg)
+			if (tolog) {
+				console.log(data.msg)
+			}else{
+				toast(data.msg)
+			}
 			return false
 		}
 		return true
@@ -59,9 +67,9 @@ var apihandle = {
 	// 		toast("网络错误")
 	// 	}
 	// },
-	async apiUserLogin(phone) {
+	async apiUserLogin(phone,opencode) {
 		try{
-			var res = await http.request("userlogin","POST",{phone:phone})
+			var res = await http.request("userlogin","POST",{phone:phone,opencode})
 			if (this.checkData(res.data,res)) {
 				this.setToken(res.data.data.token)
 				return res.data
@@ -70,9 +78,9 @@ var apihandle = {
 			toast("网络错误")
 		}
 	},
-	async userloginWxCode(code) {
+	async userloginWxCode(code,opencode) {
 		try{
-			var res = await http.request("userloginWxCode","POST",{code:code})
+			var res = await http.request("userloginWxCode","POST",{code:opencode})
 			if (this.checkData(res.data,res)) {
 				this.setToken(res.data.data.token)
 				return res.data
@@ -496,10 +504,33 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			// toast("网络错误")
 			console.log(e)
 		}
 		return null
+	},
+	async apiGetOpenId(opencode) {
+		try{
+			var res = await http.request("apiGetOpenId","GET",{opencode},{header:authorHeader})
+			if (this.checkData(res.data,res)) {
+				return true
+			}
+		}catch(e){
+			// toast("网络错误")
+			console.log("apiGetOpenId",e)
+		}
+		return false
+	},
+	async apiVerifyTextContent(content,scene) {
+		try{
+			var res = await http.request("apiVerifyTextContent","POST",{content,scene},{header:authorHeader})
+			if (this.checkData(res.data,res)) {
+				return res.data.data
+			}
+		}catch(e){
+			// toast("网络错误")
+			console.log("apiVerifyTextContent",e)
+		}
 	},
 }
 

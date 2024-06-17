@@ -5,11 +5,11 @@
 </template>
 
 <script>
-	import { HostBase } from '../../common/define_const'
+	import { WebHost } from '../../common/define_const'
 	export default {
 		data() {
 			return {
-				host:HostBase+"/web/bbwt_yh.html"
+				host:WebHost+"/bbwt_yh.html"
 			}
 		},
 		methods: {
