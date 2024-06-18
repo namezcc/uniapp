@@ -121,7 +121,7 @@ import { color } from '../../common/theme';
 						let cid = this.dataList[index]
 						store.commit("deleteUserChat",cid)
 						this.usecash = true
-						this.$refs.paging.reload()						
+						this.$refs.paging?.reload()						
 					},
 					fail() {
 					}

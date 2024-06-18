@@ -83,11 +83,19 @@ import util_common from "../../common/util_common"
 			};
 		},
 		mounted() {
-			store.dispatch("getOtherUser",this.task.cid).then((res)=>{
-				if (res) {
-					this.taskuser = res
-				}
-			})
+			this.setUser()
+		},
+		watch:{
+			task:{
+				handler(newv,oldv){
+					// console.log("taskchange",newv,oldv)
+					if (newv.cid == oldv?.cid) {
+						return
+					}
+					this.setUser()
+				},
+				immediate:false
+			}
 		},
 		computed:{
 			numinfo() {
@@ -149,7 +157,14 @@ import util_common from "../../common/util_common"
 		methods:{
 			...mapState({
 				location: state => state.user_data.location
-			})
+			}),
+			setUser() {
+				store.dispatch("getOtherUser",this.task.cid).then((res)=>{
+					if (res) {
+						this.taskuser = res
+					}
+				})
+			}
 		},
 		options: {
 			multpleSlots: true,

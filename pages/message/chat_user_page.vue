@@ -125,7 +125,7 @@ import util_common from "../../common/util_common";
 			},
 			reloadChat() {
 				this.chatlen = 0
-				this.$refs.paging.reload()
+				this.$refs.paging?.reload()
 				// console.log("reload user chat")
 			},
 			getLastChatTime(index) {

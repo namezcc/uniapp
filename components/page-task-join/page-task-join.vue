@@ -118,7 +118,7 @@ import global_data from '../../common/global_data';
 			},
 			onDeleteTaskJoin() {
 				this.usecash = true
-				this.$refs.paging.reload()
+				this.$refs.paging?.reload()
 			},
 			deleteTaskJoin(task) {
 				uni.showModal({

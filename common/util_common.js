@@ -137,7 +137,7 @@ function uploadFile(path,fname,callback) {
 				}else{
 					console.log("uploadoss url:",url)
 				}
-				callback(url)
+				callback(url,err)
 			})
 		}else{
 			callback(null)

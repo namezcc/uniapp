@@ -10,7 +10,7 @@
 			<view class="colItem itemContent">
 				<view class="contentPadding">
 					<uni-file-picker v-model="imageValue" title="选择图片" limit="9" :imageStyles="imageStyle" file-mediatype="image"
-					@delete="onDeleteImage" @select="onSelectImage">
+					@delete="onDeleteImage" @select="onSelectImage" :sizeType="['compressed']" >
 						<uni-icons type="plusempty" style="color: black;"></uni-icons>
 					</uni-file-picker>
 				</view>
@@ -548,6 +548,10 @@ import util_common from "../../common/util_common"
 					// 不分性别
 					total = mann
 					mann = -1
+				}else if(this.currentNum == 2) {
+					womann = mann
+					mann = 0
+					total = mann + womann
 				}else{
 					total = mann + womann
 				}

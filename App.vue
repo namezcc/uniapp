@@ -17,20 +17,21 @@ import wsconn from "./common/wsconn"
 			// wsconn
 			wsconn.init()
 		},
-		onError:function(res){
+		onError:function(err){
 			try{
-				// console.log("geterror ****:",res)
+				// console.log("geterror ****:" + err)
 				if (process.env.NODE_ENV != "development") {
 					// 上报错误
 					let errinfo = {
-						msg:res.message,
-						stack:res.stack,
+						msg:err.message,
+						stack:err.stack,
+						all:" " + err,
 					}
 					apihandle.apiAppError(JSON.stringify(errinfo))
 					// #ifdef MP-WEIXIN
 						let log = uni.getRealtimeLogManager()
 						if (log) {
-							log.info(errinfo)
+							log.info(err)
 						}
 					// #endif
 				}				

@@ -88,6 +88,23 @@ import apihandle from "../../common/api_handle";
 				}
 			})
 		},
+		watch:{
+			task:{
+				handler(newv,oldv){
+					if (newv.cid == oldv?.cid) {
+						return
+					}
+					// console.log("taskchange",newv.title,oldv.title)
+					store.dispatch("getOtherUser",newv.cid).then((res)=>{
+						if (res) {
+							this.icon = res.icon
+							// console.log("user icon ",res.icon)
+						}
+					})
+				},
+				immediate:false
+			}
+		},
 		computed:{
 			numinfo() {
 				let num = utiltask.getJoinNum(this.task)
@@ -138,7 +155,7 @@ import apihandle from "../../common/api_handle";
 					case TaskShowState.InCheck:
 						return "审核中";
 					case TaskShowState.CheckFail:
-						return "审核失败";
+						return "未通过审核";
 					case TaskShowState.TaskTimeEnd:
 						return "已结束";
 					case TaskShowState.TaskDelete:

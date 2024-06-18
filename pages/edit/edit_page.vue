@@ -42,7 +42,7 @@ import store from "../../store"
 	export default {
 		data() {
 			return {
-				
+				// errtxt:""
 			}
 		},
 		onLoad(e) {
@@ -80,7 +80,7 @@ import store from "../../store"
 				uni.showLoading({
 					title:"上传中..."
 				})
-				util_common.uploadFile(e.detail.avatarUrl,e.detail.avatarUrl,(url)=>{
+				util_common.uploadFile(e.detail.avatarUrl,e.detail.avatarUrl,(url,err)=>{
 					uni.hideLoading()
 					if (url) {
 						// console.log("url ",url)
@@ -91,13 +91,16 @@ import store from "../../store"
 								apihandle.toast("设置成功")
 								// uni.navigateBack()
 							}else{
-								apihandle.toast("操作失败,请重试")
+								apihandle.toast("操作失败请重试")
 								// uni.navigateBack()
 							}
 						})
 					}else{
 						apihandle.toast("操作失败,请重试")
 						// uni.navigateBack()
+						// if (err) {
+						// 	this.errtxt = err.toString()
+						// }
 					}
 				})
 				

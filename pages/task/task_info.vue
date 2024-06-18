@@ -119,6 +119,13 @@
 					<text>{{task.createAt}}</text>
 				</myrow>
 				</view>
+				<view class="cell-info">
+				<myrow>
+					<text class="text-subtitle">是否公开</text>
+					<expanded></expanded>
+					<text>{{task.nonpublic == 1 ? "不公开" :"公开"}}</text>
+				</myrow>
+				</view>
 			</view>
 			<view style="height: 50px;"></view>
 		</scroll-view>
@@ -354,6 +361,9 @@ import global_data from "../../common/global_data"
 			}
 		},
 		onShareAppMessage(res) {
+			if (!this.checkShare()) {
+				return
+			}
 			console.log("onShareAppMessage:",res)
 			let money = ""
 			if (this.task.money_type == TaskMoneyType.Reward && this.task.money > 0) {
@@ -367,6 +377,9 @@ import global_data from "../../common/global_data"
 			}
 		},
 		onShareTimeline(res) {
+			if (!this.checkShare()) {
+				return
+			}
 			console.log("onShareTimeline:",res)
 			let money = ""
 			if (this.task.money_type == TaskMoneyType.Reward && this.task.money > 0) {
@@ -533,12 +546,23 @@ import global_data from "../../common/global_data"
 				}
 				this.$refs.popup.open()
 			},
+			checkShare() {
+				let state = this.task.state || util_task.TaskServerState.InCheck
+				if (state == util_task.TaskServerState.Illegal || state == util_task.TaskServerState.CheckFail) {
+					apihandle.toast("存在违规内容请修改")
+					return false
+				}
+				if (state == util_task.TaskServerState.InCheck) {
+					apihandle.toast("审核中")
+					return false
+				}
+				return true
+			},
 			showShare() {
 				if (this.fromShare) {
 					return
 				}
-				if (this.task.state == util_task.TaskServerState.Illegal) {
-					apihandle.toast("存在违规内容请修改")
+				if (!this.checkShare()) {
 					return
 				}
 				this.$refs.actionShare.open()

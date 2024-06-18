@@ -57,6 +57,12 @@ var apihandle = {
 		}
 		return true
 	},
+	catchError(e,showtip=true) {
+		if (showtip) {
+			toast("网络不可用")
+		}
+		console.log(e)
+	},
 	// async apiGetPhoneCode(phone) {
 	// 	try{
 	// 		var res = await http.request("phoneCode","GET",{phoneNumber:phone})
@@ -64,7 +70,7 @@ var apihandle = {
 	// 			return res.data
 	// 		}
 	// 	}catch(e){
-	// 		toast("网络错误")
+	// 		this.catchError(e)
 	// 	}
 	// },
 	async apiUserLogin(phone,opencode) {
@@ -75,7 +81,7 @@ var apihandle = {
 				return res.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async userloginWxCode(code,opencode) {
@@ -86,7 +92,7 @@ var apihandle = {
 				return res.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiUserRefreshToken(token){
@@ -98,18 +104,18 @@ var apihandle = {
 				return res.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiGetUserInfo(cid) {
 		let url = cid ? "getUserInfo":"getSelfUserInfo"
 		try{
 			var res = await http.request(url,"GET",{cid:cid?cid:""},{header:authorHeader})
-			if (this.checkData(res.data,res)) {
+			if (this.checkData(res.data,res,true)) {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiGetTaskInfo(config) {
@@ -119,8 +125,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
-			console.log(e)
+			this.catchError(e,false)
 		}
 	},
 	async apiCreateTask(task) {
@@ -130,7 +135,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiUpdateTask(task) {
@@ -140,7 +145,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiSearchTask(config) {
@@ -150,7 +155,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiJoinTask(id) {
@@ -160,7 +165,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiQuitTask(id) {
@@ -170,7 +175,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiKickTask(id,cid) {
@@ -180,7 +185,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiLoadInterest() {
@@ -190,7 +195,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiTaskPushInterest(id) {
@@ -200,7 +205,7 @@ var apihandle = {
 				return res.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiTaskPullInterest(id) {
@@ -210,7 +215,7 @@ var apihandle = {
 				return res.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiLoadMyJoinTaskInfo(skip) {
@@ -220,7 +225,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiLoadMyTaskInfo(skip) {
@@ -230,7 +235,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiLoadOtherTaskInfo(cid,skip) {
@@ -240,7 +245,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiLoadTaskChat(taskid,start,num) {
@@ -250,7 +255,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiGetOneTaskInfo(taskid) {
@@ -260,7 +265,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiLoadUserChatList() {
@@ -270,7 +275,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiLoadUserChatData(id,start,num) {
@@ -280,7 +285,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiLoadOneUserChatData(cid) {
@@ -290,7 +295,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiDeleteUserChatData(id) {
@@ -300,7 +305,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiLoadInterestTask(skip) {
@@ -310,7 +315,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiReportTask(data) {
@@ -320,7 +325,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiReportUser(data) {
@@ -330,7 +335,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiUserSuggest(data) {
@@ -340,7 +345,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiGetBlackList() {
@@ -350,7 +355,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiPushBlackList(cid) {
@@ -360,7 +365,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiPullBlackList(cid) {
@@ -370,7 +375,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiGetUserList(cidvec) {
@@ -380,7 +385,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiSetUserIcon(iconurl) {
@@ -392,7 +397,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiEditName(name) {
@@ -402,7 +407,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiDeleteMyTaskInfo(id) {
@@ -412,7 +417,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiSetFinishTask(id) {
@@ -422,7 +427,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiDeleteUserJoin(id) {
@@ -432,7 +437,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiGetCreditToUserType(cid) {
@@ -442,7 +447,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 	},
 	async apiSetCreditToUserType(cid,type) {
@@ -452,7 +457,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 	},
 	async apiCheckIdCard(idcard,name) {
@@ -462,7 +467,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e)
 		}
 		return false
 	},
@@ -473,7 +478,7 @@ var apihandle = {
 			// 	return true
 			// }
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 		return false
 	},
@@ -482,7 +487,7 @@ var apihandle = {
 			var res = await http.request("apiGetOssCredential","GET",{},{header:authorHeader})
 			return res.data
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 		return null
 	},
@@ -493,7 +498,7 @@ var apihandle = {
 				return res.data
 			}
 		}catch(e){
-			toast("网络错误")
+			this.catchError(e,false)
 		}
 		return null
 	},
@@ -504,8 +509,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			// toast("网络错误")
-			console.log(e)
+			this.catchError(e,false)
 		}
 		return null
 	},
@@ -516,7 +520,7 @@ var apihandle = {
 				return true
 			}
 		}catch(e){
-			// toast("网络错误")
+			// this.catchError(e)
 			console.log("apiGetOpenId",e)
 		}
 		return false
@@ -528,7 +532,7 @@ var apihandle = {
 				return res.data.data
 			}
 		}catch(e){
-			// toast("网络错误")
+			// this.catchError(e)
 			console.log("apiVerifyTextContent",e)
 		}
 	},
