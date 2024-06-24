@@ -20,21 +20,23 @@
 		round="10" @select="onSelectShare"></uv-action-sheet>
 		<scroll-view scroll-y="true" :refresherEnabled="true" @refresherrefresh="onPullDownRefresh" :refresher-triggered="refreshFinish"
 		 style="height: 0;flex: 1;">
-		<myrow :customStyle="{backgroundColor: '#fff',padding:'10px'}">
-			<avatar :src="userIcon" :tocid="avatorCid"/>
-			<text>{{task.creator_name}}</text>
+		<myrow :customStyle="{backgroundColor: '#fff',padding:'5px 10px'}" :wrap="false">
+			<view @click="toOtherUser" >
+				<myrow :customStyle="{width:'auto'}">				
+					<avatar :src="userIcon" />
+					<text style="margin-left: 5px;">{{task.creator_name}}</text>
+				</myrow>
+			</view>
 			<expanded></expanded>
 			<view v-if="!selfTask" style="margin: 5px;">
 				<uni-icons :type="starType" size="24" @click="onStarClick" :color="starColor"></uni-icons>
 			</view>
-			<text :style="{margin: '5px',color:theme.primary}" v-if="selfTask" @click="toEditPage">编辑</text>
 			<view style="margin: 5px;">
 				<uni-icons size="24" type="more-filled" @click="openPopup"></uni-icons>
 			</view>
-			<view style="width: 5px;"></view>
+			<!-- <view style="width: 5px;"></view> -->
 		</myrow>
 		<uni-notice-bar v-if="taskIllegal" text="存在违规内容,请修改!" />
-		<!-- style="height: 100%;height: 300px;width: 100%;background-color: #fff;" -->
 			<swiper :indicator-dots="true" :autoplay="false" v-if="images.length" :style="{height: swiperHeight+'px'}">
 				<template v-for="(u,index) in images" :key="index">
 					<swiper-item>
@@ -43,9 +45,7 @@
 				</template>
 			</swiper>
 			<view class="box-radius">
-				<!-- <uni-title :title="task.title" type="h2"></uni-title> -->
 				<uni-section :title="task.title" type="line" titleFontSize="18px">					
-					<!-- <text class="task-title">{{}}</text> -->
 					<view style="font-size: 14px;margin: 5px;">
 						<text>{{task.content}}</text>
 					</view>
@@ -72,15 +72,16 @@
 					<myrow>
 						<text class="text-subtitle">联系方式</text>
 						<expanded></expanded>
-						<text @click="copyContactWay">{{contactWay}}</text>
+						<text class="text-location" style="max-width: 220px;" @click="copyContactWay">{{contactWay}}</text>
 					</myrow>
 				</view>
 				<view v-if="task.address != null" class="cell-info" @click="toMapLocation">
 					<myrow>
 						<text class="text-subtitle">任务地点</text>
 						<expanded></expanded>
-						<text>{{location}}</text>
-						<uni-icons v-if="this.task.address != null" type="right"></uni-icons>
+						<view style="width: 20px;"></view>
+						<text class="text-location">{{location}}</text>
+						<uni-icons type="location-filled" color="#00aaff"></uni-icons>
 					</myrow>
 				</view>
 				<view class="cell-info">
@@ -105,6 +106,13 @@
 				</view>
 			</view>
 			<view class="box-radius">
+				<view class="cell-info">
+					<myrow>
+						<text class="text-subtitle">年龄限制</text>
+						<expanded></expanded>
+						<text>{{ageLimit}}</text>
+					</myrow>
+				</view>
 				<view class="cell-info">
 					<myrow>
 						<text class="text-subtitle">信用分限制</text>
@@ -136,6 +144,9 @@
 				<text class="text-share">分享</text>
 			</mycol>
 			<button @click="optAction" :class="canAction?'fill-btn-primary':'fill-btn-primary-disabled'">{{optName}}</button>
+			<!-- <expanded>
+			</expanded> -->
+			<text :style="{margin: '0px 10px',color:theme.primary,whiteSpace:'nowrap'}" v-if="selfTask" @click="toEditPage">编辑</text>
 		</myrow>
 		<view class="bg-color-white">
 			<uv-safe-bottom></uv-safe-bottom>
@@ -147,7 +158,7 @@
 <script>
 	import store from "@/store/index.js"
 	import util_task from "@/common/util_task"
-	import { EnumSex, ErrCode, TaskMoneyType, UpdateEventType, UserFinishState } from "../../common/define_const"
+	import { AgeType, EnumSex, ErrCode, PageType, TaskMoneyType, UpdateEventType, UserFinishState } from "../../common/define_const"
 	import apihandle from "@/common/api_handle"
 	import { mapState,mapGetters } from "vuex"
 	import {color as theme} from "@/common/theme.js"
@@ -343,6 +354,15 @@ import global_data from "../../common/global_data"
 			taskEndTime() {
 				return util_time.formatTaskWeekTime(this.task.task_end_time,{day:true,week:true})
 			},
+			ageLimit() {
+				let agemin = this.task.agemin || 0
+				let agemax = this.task.agemax || 0
+				if (agemin < AgeType.Min || agemax < AgeType.Max) {
+					return "18 - 不限"
+				}
+				agemax = agemax >= AgeType.Max ? "不限" : `${agemax}岁`
+				return `${agemin} - ${agemax}`
+			},
 			taskCreditScore() {
 				let score = this.task.credit_score || 0
 				return `≥ ${score} 分`
@@ -353,7 +373,7 @@ import global_data from "../../common/global_data"
 			contactWay() {
 				let way = this.task.contact_way || ""
 				if (way.length > 0) {
-					way = `${way}(点击复制)`
+					way = `(点击复制)${way}`
 				}else{
 					way = "无"
 				}
@@ -471,11 +491,23 @@ import global_data from "../../common/global_data"
 				})
 			},
 			checkJoin() {
-				if (this.user.age <= 0) {
+				let age = this.user.age
+				if (age <= 0) {
 					apihandle.toast("请先进行实名验证")
 					util_page.toIdCardPage()
 					return false
 				}
+				
+				let agemin = this.task.agemin || 0
+				let agemax = this.task.agemax || 0
+				if (agemin >= AgeType.Min && agemax >= AgeType.Min) {
+					agemax = agemax >= AgeType.Max ? 100 : agemax
+					if (age < agemin || age > agemax) {
+						apihandle.toast("年龄限制无法报名")
+						return false
+					}
+				}
+				
 				let needscore = this.task.credit_score||0
 				let uscore = util_common.getCreditShowScore(this.user.credit_score)
 				if (uscore < needscore) {
@@ -630,6 +662,16 @@ import global_data from "../../common/global_data"
 			// 	console.log("touch move")
 			// 	this.viewImage = false
 			// },
+			toOtherUser() {
+				if (this.task.cid == global_data.cid) {
+					return
+				}
+				if (this.avatorCid > 0) {
+					uni.navigateTo({
+						url:`/pages/user/other_user/other_user?cid=${this.avatorCid}`
+					})
+				}
+			},
 			onImageLoaded(e) {
 				if (this.imageHeight == 0) {
 					console.log("imageload",e)
@@ -703,6 +745,12 @@ import global_data from "../../common/global_data"
 		font-size: 14px;
 	}
 	
+	.text-location {
+		overflow: hidden; /* 确保文本超出容器时会被截断 */
+		text-overflow: ellipsis; /* 使用省略号表示文本溢出 */
+		white-space: nowrap;
+		max-width: 200px;
+	}
 	
 	
 </style>

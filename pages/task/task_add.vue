@@ -152,6 +152,14 @@
 					</myrow>
 					<view class="lineMargin"></view>
 					<myrow>
+						<text>年龄限制</text>
+						<expanded></expanded>
+						<text @click="openAgePicker">{{ageLimit}}</text>
+						<uni-icons type="right"></uni-icons>
+						<uv-picker ref="agepicker" :columns="pickerAgeColums" :defaultIndex="pickerAgeDefault" @confirm="onPickerAge" ></uv-picker>
+					</myrow>
+					<view class="lineMargin"></view>
+					<myrow>
 						<text>信用分</text>
 						<expanded></expanded>
 						<text class="text-score">{{creditScore}}</text>
@@ -189,6 +197,7 @@
 	import util_time from "../../common/util_time"
 import util_page from "../../common/util_page"
 import util_common from "../../common/util_common"
+import { AgeType } from "../../common/define_const"
 	
 	let useDateArray = [];
 	
@@ -224,6 +233,15 @@ import util_common from "../../common/util_common"
 		for (var i = 0; i < 60; i++) {
 			arr.push(i.toString().padStart(2, '0'))
 		}
+		return arr
+	}
+	
+	function getAgeArray() {
+		let arr = [];
+		for (var i = 18; i <= 65; i++) {
+			arr.push(i.toString())
+		}
+		arr.push("不限")
 		return arr
 	}
 	
@@ -280,6 +298,10 @@ import util_common from "../../common/util_common"
 				credit_score:80,
 				agree:true,
 				contact_way:"",
+				pickerAgeColums:[getAgeArray(),getAgeArray()],
+				agemin:18,
+				agemax:AgeType.Max,
+				pickerAgeDefault:[0,AgeType.Max-18],
 			}
 		},
 		onLoad(e) {
@@ -315,6 +337,8 @@ import util_common from "../../common/util_common"
 				this.taskOpen = !(t.nonpublic == true)
 				this.credit_score = t.credit_score || 0
 				this.contact_way = t.contact_way || ""
+				this.agemin = t.agemin || 18
+				this.agemax = t.agemax || 65
 				
 				if (t.address) {
 					this.locationString = t.address.name || t.address.address
@@ -366,6 +390,11 @@ import util_common from "../../common/util_common"
 			},
 			creditScore() {
 				return `≥ ${this.credit_score} 分`
+			},
+			ageLimit() {
+				let min = this.agemin >= AgeType.Max ? AgeType.Min : this.agemin
+				let max = this.agemax >= AgeType.Max ? "不限" : `${this.agemax}岁`
+				return `${min} - ${max}`
 			}
 		},
 		methods: {
@@ -418,6 +447,9 @@ import util_common from "../../common/util_common"
 				nowPickType = picktype
 				this.$refs.picker.open()
 			},
+			openAgePicker() {
+				this.$refs.agepicker.open()
+			},
 			onPicker(e) {
 				// console.log(e)
 				//this.dateSelect = e.index
@@ -430,6 +462,12 @@ import util_common from "../../common/util_common"
 				}else {
 					this.endTime = stamp
 				}
+			},
+			onPickerAge(e) {
+				// console.log(e)
+				//this.dateSelect = e.index
+				this.agemin = Math.min(e.indexs[0],e.indexs[1]) + AgeType.Min
+				this.agemax = Math.max(e.indexs[0],e.indexs[1]) + AgeType.Min
 			},
 			toChooseLocation(latitude,longitude) {
 				uni.chooseLocation({
@@ -572,6 +610,8 @@ import util_common from "../../common/util_common"
 					nonpublic:this.taskOpen ? 0 : 1,
 					credit_score:this.credit_score,
 					contact_way:this.contact_way,
+					agemin: this.agemin,
+					agemax: this.agemax,
 				}
 				if (this.location) {
 					task.address = this.location

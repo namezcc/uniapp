@@ -132,6 +132,11 @@ var CreditType = {
 	Good:1,
 }
 
+var AgeType = {
+	Min:18,
+	Max:66,
+}
+
 export {
 	ErrCode,
 	EnumSex,
@@ -152,4 +157,5 @@ export {
 	ReportUserName,
 	TaskShowState,
 	CreditType,
+	AgeType,
 }

@@ -54,7 +54,7 @@
 				</view>
 			</myrow>
 		</view>
-		<template v-for="task in tasklist">
+		<template v-for="(task,index) in tasklist" :key="index">
 			<view @click="toTaskInfo(task)">
 				<task-item :task="task"></task-item>
 			</view>
@@ -238,7 +238,7 @@ import global_data from '../../../common/global_data';
 				this.loadstate = EnumLoadState.Loading
 				apihandle.apiLoadOtherTaskInfo(this.cid,this.tasklist.length).then((res)=>{
 					if (res) {
-						res = res.reverse()
+						// res = res.reverse()
 						
 						store.commit("updateTaskData",res)
 						

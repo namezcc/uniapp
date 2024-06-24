@@ -225,6 +225,14 @@
 				"navigationBarTitleText" : "",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/setting/help_page",
+			"style" : 
+			{
+				"navigationBarTitleText" : "使用帮助",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

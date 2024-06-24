@@ -1,8 +1,8 @@
 <template>
 	<view class="col-class" style="height: 100%;">
-		<!-- <uni-nav-bar :fixed="true" left-icon="plus-filled" :color="navcolor" @clickLeft="onAddTask" :border="false" right-icon="search" @clickRight="onToSearchPage">
-			<template #default>
-				<view class="search-index"></view>
+		<!-- <uni-nav-bar :fixed="true" @clickLeft="onAddTask" :border="false">
+			<template v-slot:left>
+				<text>使用帮助</text>
 			</template>
 		</uni-nav-bar> -->
 		<!-- <uv-navbar title="" :fixed="true">
@@ -22,6 +22,10 @@
 				<view style="width: 20px;"></view>
 				<view class="select-box" :class="{'select-color': selectType==1}" @click="switchSelectType(1)">
 					线上帮帮
+				</view>
+				<view style="width: 20px;"></view>
+				<view class="select-box" @click="toHelpPage">
+					使用帮助
 				</view>
 			</myrow>
 			<view style="margin: 5px 10px 2px 10px;">				
@@ -348,6 +352,11 @@ import util_page from "../../common/util_page"
 				}
 				this.refreshTaskList()
 			},
+			toHelpPage() {
+				uni.navigateTo({
+					url:"/pages/setting/help_page"
+				})
+			},
 			onGetUserData() {
 				console.log("onGetUserData")
 				// uni.getUserProfile({
@@ -397,6 +406,16 @@ import util_page from "../../common/util_page"
 	.cond-open {
 		background-color: $uni-success-light;
 		color: $uni-main-color;
+	}
+	
+	.txt-help {
+		color: $uni-main-color;
+	}
+	
+	.help-box {
+		border-radius: 20px;
+		padding: 3px 8px;
+		background-color: $uni-success-light;
 	}
 	
 </style>
