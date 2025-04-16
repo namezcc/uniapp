@@ -4,9 +4,10 @@
 			<mycol mainAlign="center">
 				<view style="height: 50px;"></view>
 				<myrow mainAlign="center">
-					<uni-easyinput v-if="showTestInput" :primaryColor="colorTheme.primary" @input="onPhoneInput" :maxlength="11" type="number" placeholder="手机号"/>
+					<uni-easyinput v-if="showTestInput" :primaryColor="colorTheme.btn_primary" @input="onPhoneInput" :maxlength="11" type="number" placeholder="手机号"/>
 					<view class="logo" v-if="!showTestInput">
-						<text>帮  帮</text>
+						<!-- <text>帮  帮</text> -->
+						<image style="width: 100px;height: 100px;border-radius: 10px;" :src="srchost+'src/app_icon.png'"></image>
 					</view>
 				</myrow>
 				<view style="height: 30px;"></view>
@@ -18,8 +19,8 @@
 					<button @click="getPhoneCode" type="warn" :style="{backgroundColor:colorTheme.primary,marginLeft: '20px',width:'100px'}" size="mini" :disabled="codeDisabled">{{codeTip}}</button>
 				</myrow> -->
 				<expanded></expanded>
-					<button v-if="showTestInput" @click="login" type="warn" class="login-btn" :style="{backgroundColor:colorTheme.primary}" >一键登录</button>
-					<button v-if="!showTestInput" type="warn" class="login-btn" :style="{backgroundColor:colorTheme.primary}" 
+					<button v-if="showTestInput" @click="login" type="warn" class="login-btn" :style="{backgroundColor:colorTheme.btn_primary}" >一键登录</button>
+					<button v-if="!showTestInput" type="warn" class="login-btn" :style="{backgroundColor:colorTheme.btn_primary}" 
 					open-type="getPhoneNumber" @getphonenumber="getPhonenumber">手机号一键登录</button>
 				<!-- #ifndef MP-WEIXIN -->
 				<!-- #endif -->
@@ -49,7 +50,7 @@
 	import {color as theme} from "@/common/theme.js"
 	import api from "@/common/api_handle.js"
 	import store from "@/store/index.js"
-	import { ErrCode } from "../../common/define_const"
+	import { ErrCode, SrcHost } from "../../common/define_const"
 	// import {mapGetters} from "vuex"
 	
 	
@@ -66,6 +67,7 @@
 				showTestInput:false,
 				showOpenTest:false,
 				opencode:"",
+				srchost:SrcHost,
 			}
 		},
 		onLoad() {
@@ -217,7 +219,7 @@
 		width: 100px;
 		height: 100px;
 		color: #fff;
-		background-color: $my-color-primary-second;
+		// background-color: $my-color-primary-second;
 	}
 	
 	.logo-txt {

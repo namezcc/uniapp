@@ -20,8 +20,21 @@
 		</swiper>
 	</z-paging-swiper> -->
 	<view class="col-class">
-		<uv-tabs ref="tabs" :list="tabList" :current="current" @change="tabsChange" :scrollable="false"
-		:customStyle="{'background-color': theme.topNavBar}" :lineColor="theme.primary"/>
+		<!-- <uv-tabs ref="tabs" :list="tabList" :current="current" @change="tabsChange" :scrollable="false"
+		:customStyle="{'background-color': theme.topNavBar}" :lineColor="theme.warn_primary"/> -->
+		<view style="padding-top: 5px;padding-bottom: 17px;background-color: #fff;">			
+			<myrow>
+				<view style="margin-left: 14px;margin-right: 36px;" @click="tabsChange(0)">
+					<text-switch text="已报名" :open="current==0" bgheight="8px" :small="true"></text-switch>
+				</view>
+				<view style="margin-right: 36px;" @click="tabsChange(1)">
+					<text-switch text="我的" :open="current==1" bgheight="8px" :small="true"></text-switch>
+				</view>
+				<view @click="tabsChange(2)">
+					<text-switch text="兴趣" :open="current==2" bgheight="8px" :small="true"></text-switch>
+				</view>
+			</myrow>
+		</view>
 		<!-- <view class="expanded">
 			
 		</view> -->
@@ -65,7 +78,8 @@ import util_page from "../../common/util_page"
 		methods: {
 			tabsChange(index) {
 				// console.log("tabsChange ", index)
-				this.current = index.index;
+				// this.current = index.index;
+				this.current = index;
 			},
 			// swiper滑动中
 			swiperTransition(e) {
@@ -87,7 +101,14 @@ import util_page from "../../common/util_page"
 
 <style lang="scss">
 	@import "@/style/my.scss";
+	
+	page {
+		background-color: #F3F3F3;
+	}
+	
 	.swiper {
 		height: 100%;
 	}
+	
+	
 </style>

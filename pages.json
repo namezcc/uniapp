@@ -4,8 +4,8 @@
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "",
-				"disableScroll": true
-				// "navigationStyle": "custom"
+				"disableScroll": true,
+				"navigationStyle": "custom"
 				// "enablePullDownRefresh": true
 			}
 		},
@@ -13,7 +13,8 @@
 			"path" : "pages/message/task_join",
 			"style" : 
 			{
-				"navigationBarTitleText" : "",
+				"navigationBarTitleText" : "消息",
+				"navigationBarBackgroundColor": "#fff",
 				"enablePullDownRefresh" : false,
 				"disableScroll": true
 			}
@@ -23,6 +24,7 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "",
+				"navigationStyle": "custom",
 				"enablePullDownRefresh" : true
 				// "disableScroll": true
 			}
@@ -55,9 +57,13 @@
 			"path" : "pages/task/task_info",
 			"style" : 
 			{
-				"navigationBarTitleText" : "任务信息",
+				"navigationBarTitleText" : "详细信息",
 				"enablePullDownRefresh" : false,
-				"disableScroll": true
+				"disableScroll": true,
+				"navigationStyle": "custom",
+				// "navigationBarBackgroundColor": "#15FA8B",
+				// "navigationBarBackgroundColor":"#00000000",
+				"backgroundColor": "#fff"
 			}
 		},
 		{
@@ -94,7 +100,10 @@
 			{
 				"navigationBarTitleText" : "",
 				"enablePullDownRefresh" : false,
-				"onReachBottomDistance": 50
+				"onReachBottomDistance": 50,
+				// "navigationBarBackgroundColor": "#15FA8B",
+				// "navigationBarBackgroundColor": "#00000000",
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -158,7 +167,11 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "编辑资料",
-				"enablePullDownRefresh" : false
+				"enablePullDownRefresh" : false,
+				"disableScroll": true,
+				// "navigationBarBackgroundColor": "#15FA8B"
+				// "navigationBarBackgroundColor": "#00000000"
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -230,7 +243,16 @@
 			"path" : "pages/setting/help_page",
 			"style" : 
 			{
-				"navigationBarTitleText" : "使用帮助",
+				"navigationBarTitleText" : "",
+				"enablePullDownRefresh" : false,
+				"navigationBarBackgroundColor": "#15FA8B"
+			}
+		},
+		{
+			"path" : "pages/task/task_check",
+			"style" : 
+			{
+				"navigationBarTitleText" : "审核",
 				"enablePullDownRefresh" : false
 			}
 		}
@@ -248,20 +270,28 @@
 	},
 	"tabBar": {
 		"selectedColor": "#000000",
-		"fontSize": "16px",
+		// "fontSize": "16px",
 		"color": "#999",
+		"height": "60px",
+		// "iconWidth": "10px",
 		"list": [
 			{
 				"pagePath": "pages/index/index",
-				"text": "帮帮"
+				"text": "帮帮",
+				"iconPath": "static/icon_home.png",
+				"selectedIconPath": "static/icon_home_act.png"
 			},
 			{
 				"pagePath": "pages/message/task_join",
-				"text": "消息"
+				"text": "消息",
+				"iconPath": "static/icon_msg.png",
+				"selectedIconPath": "static/icon_msg_act.png"
 			},
 			{
 				"pagePath": "pages/user/user",
-				"text": "我的"
+				"text": "我的",
+				"iconPath": "static/icon_user.png",
+				"selectedIconPath": "static/icon_user_act.png"
 			}
 		]
 	}

@@ -11,7 +11,7 @@
 			</view> -->
 			<expanded></expanded>
 			<view>
-				<text :style="{'font-size': '14px',color: theme.primary_low}" @click="quitLogin">退出登录</text>
+				<text :style="{'font-size': '14px',color: theme.warn_primary}" @click="quitLogin">退出登录</text>
 			</view>
 			<view style="height: 50px;"></view>
 		</mycol>
@@ -52,7 +52,7 @@ import store from '../../store'
 							uni.navigateBack()
 						}
 					},
-					confirmColor:color.primary
+					confirmColor:color.warn_primary
 				})
 			}
 		}

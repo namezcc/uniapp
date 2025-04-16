@@ -36,7 +36,7 @@ function getNumString(task) {
 	
 	if (task.man_num < 0) {
 		// 不分性别
-		str = `报名 ${mann+woman}/${task.people_num}`;
+		str = `已报名 ${mann+woman}/${task.people_num}`;
 	} else {
 		if (task.man_num == 0) {
 			str = `限女生 ${woman}/${task.people_num}`;
@@ -77,20 +77,31 @@ function getMoneyString(task,infopage=false) {
 		if (infopage) {
 			return task.money_type == TaskMoneyType.Reward ? "无" : "免费"
 		} else{
-			return task.money_type == TaskMoneyType.Reward ? "" : "免费"
+			return task.money_type == TaskMoneyType.Reward ? "免费" : "免费"
 		}
 	}
 	if (task.money_type == TaskMoneyType.Reward) {
-		return ` ￥${task.money}`;
+		return `￥${task.money}`;
 	} else {
 		if (infopage) {
-			return `收费 男￥${task.money} 女￥${task.womanMoney}`;
+			let sex = getLimitSex(task)
+			if (sex == EnumSex.MAN) {
+				return task.money <= 0 ? "免费" : `￥${task.money}`
+			}else if(sex == EnumSex.WOMAN) {
+				return task.womanMoney <= 0 ? "免费" : `￥${task.womanMoney}`
+			}else{
+				if (task.womanMoney == task.money) {
+					return task.money <= 0 ? "免费" : `￥${task.money}`
+				}else{
+					return `男￥${task.money} 女￥${task.womanMoney}`;
+				}
+			}
 		}
 		let minv = Math.min(task.money,task.womanMoney)
 		if (task.money == task.womanMoney) {
-			return `收费 ￥${minv}`;
+			return `￥${minv}`;
 		} else{
-			return `收费 ￥${minv} 元起`;
+			return `￥${minv}元起`;
 		}
 	}
 }
@@ -160,6 +171,19 @@ function getJoinByCid(cid, task) {
 			}
 		}
 	}
+}
+
+function getJoinIcons(task,max = 5) {
+	let icons = []
+	if (task.join) {
+		for (let s of task.join.data) {
+			icons.push(s.icon)
+			if (icons.length >= max) {
+				break
+			}
+		}
+	}
+	return icons
 }
 
 function canJoin(t,sex) {
@@ -239,4 +263,5 @@ export default {
 	getTaskState,
 	getTaskJoinCidvec,
 	TaskServerState,
+	getJoinIcons,
 }

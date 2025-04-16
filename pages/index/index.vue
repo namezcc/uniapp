@@ -1,21 +1,26 @@
 <template>
 	<view class="col-class" style="height: 100%;">
-		<!-- <uni-nav-bar :fixed="true" @clickLeft="onAddTask" :border="false">
-			<template v-slot:left>
-				<text>使用帮助</text>
-			</template>
-		</uni-nav-bar> -->
-		<!-- <uv-navbar title="" :fixed="true">
-			<template #center>
-			</template>
-		</uv-navbar> -->
-		<view :style="{'background-color': theme.topNavBar,'paddingBottom':'10px'}">			
-			<myrow :customStyle="{padding: '10px 5px',backgroundColor:theme.topNavBar}">
-				<uv-search :disabled="true" placeholder="搜索" :showAction="false" @click="onToSearchPage"></uv-search>
-				<!-- <uni-icons type="plus" :color="navcolor" size="32" style="margin: 0px 10px;" @click="onAddTask"></uni-icons> -->
-				<button class="fill-btn-primary" style="width: 60px;height: 30px;font-size: 14px;margin: 0px 10px;" @click="onAddTask">发布</button>
+		<view class="top-box"></view>
+		<view class="top-part" :style="{'paddingBottom':'0px'}">			
+			<uv-status-bar></uv-status-bar>
+			<myrow :customStyle="{padding: '10px 18px'}">
+				<view @click="switchSelectType(0)">
+					<text-switch text="线下帮帮" :open="selectType==0" bgheight="8px"></text-switch>
+				</view>
+				<view style="width: 26px;"></view>
+				<view @click="switchSelectType(1)">
+					<text-switch text="线上帮帮" :open="selectType==1" bgheight="8px"></text-switch>
+				</view>
+				<view style="width: 26px;"></view>
+				<view @click="toHelpPage">
+					<text-switch text="使用帮助" :open="false" bgheight="8px" ></text-switch>
+				</view>
 			</myrow>
-			<myrow mainAlign="center">
+			<myrow :customStyle="{padding: '10px 18px'}">
+				<uv-search :disabled="true" placeholder="搜索" bgColor="#fff" :showAction="false" @click="onToSearchPage"></uv-search>
+				<!-- <button class="fill-btn-primary" style="width: 60px;height: 30px;font-size: 14px;margin-left:10px;" @click="onAddTask">发布</button> -->
+			</myrow>
+			<!-- <myrow mainAlign="center">
 				<view class="select-box" :class="{'select-color': selectType==0}" @click="switchSelectType(0)">
 					线下帮帮
 				</view>
@@ -27,50 +32,119 @@
 				<view class="select-box" @click="toHelpPage">
 					使用帮助
 				</view>
-			</myrow>
-			<view style="margin: 5px 10px 2px 10px;">				
-				<myrow>
-					<view class="cond-box" :class="{'cond-open': haveMoney}" @click="switchCond(1)">
-						有奖励
-					</view>
-				</myrow>
-			</view>
+			</myrow> -->
 		</view>
+		<uni-popup ref="actionPop" type="center" >
+			<view class="help-main">
+				<view class="help-box" @click="onSelectPubType(1)">
+					<myrow mainAlign="center">
+						<image style="max-width: 18px;max-height: 18px;" src="@/static/icon_help.png"></image>
+						<view style="margin-left: 14px;">
+							寻求帮助
+						</view>
+					</myrow>
+				</view>
+				<view class="help-box" @click="onSelectPubType(0)">
+					<myrow mainAlign="center">
+						<image style="max-width: 18px;max-height: 18px;" src="@/static/icon_active.png"></image>
+						<view style="margin-left: 14px;">
+							活动组局
+						</view>
+					</myrow>
+				</view>
+				<view class="help-box" style="margin-bottom: 0px;" @click="onSelectPubType(2)">
+					<myrow mainAlign="center">
+						<image style="max-width: 18px;max-height: 18px;" src="@/static/icon_service.png"></image>
+						<view style="margin-left: 14px;">
+							提供服务
+						</view>
+					</myrow>
+				</view>
+			</view>
+		</uni-popup>
+		<uv-action-sheet ref="actionShare" :actions="taskTypeList" title="选择类型" cancelText="取消"
+		round="10" @select="onSelectShare"></uv-action-sheet>
 		<!-- <view style="flex: 1;">
 		</view> -->
 			<scroll-view v-show="selectType == 0" scroll-y="true" :refresherEnabled="true" @refresherrefresh="onPullDownRefresh" :refresherTriggered="refreshFinish" 
-			style="height: 0;flex: 1;" @scrolltolower="onLoadMore">
-				<uv-list :customStyle="{backgroundColor: 'transparent'}">
-					<template v-for="(task,index) in genTaskList" :key="index">
-						<uv-list-item @click="toTaskInfo(task)" :clickable="true" :customStyle="{backgroundColor: 'transparent'}">
-							<task-item :task="task"></task-item>
-						</uv-list-item>
-					</template>
-					<uv-list-item :customStyle="{backgroundColor: 'transparent'}">
-						<uni-load-more :status="loadState"></uni-load-more>
-					</uv-list-item>
-				</uv-list>
+			style="height: 0;flex: 1;" class="scroll-view" @scrolltolower="onLoadMore">
+				<view class="">
+					<myrow mainAlign="center" :customStyle="{margin: '10px'}">
+						<image style="width: 153px;height: 90px;" :src="srchost+'src/index_bg.png'"></image>
+					</myrow>
+					<view class="option-box" style="margin: 5px 0px 0px 0px;padding: 10px 0px 10px 0px;">				
+						<myrow>
+							<view class="" style="margin: 0px 21px;" @click="switchCond(0)">
+								<text-switch text="全部" :open="condIndex==0" :small="true"/>
+							</view>
+							<view class="" @click="switchCond(1)">
+								<text-switch text="有奖励" :open="condIndex==1" :small="true"/>
+							</view>
+							<!-- <view class="cond-box" :class="{'cond-open': haveMoney}" @click="switchCond(1)">
+								有奖励
+							</view> -->
+						</myrow>
+					</view>
+					<view class="view-main">					
+						<uv-list :customStyle="{backgroundColor: 'transparent'}">
+							<template v-for="(task,index) in genTaskList" :key="index">
+								<uv-list-item @click="toTaskInfo(task)" :clickable="true" :customStyle="{backgroundColor: 'transparent'}">
+									<task-item :task="task"></task-item>
+								</uv-list-item>
+							</template>
+							<uv-list-item :customStyle="{backgroundColor: 'transparent'}">
+								<uni-load-more :status="loadState"></uni-load-more>
+							</uv-list-item>
+						</uv-list>
+					</view>
+				</view>
 			</scroll-view>
 			<scroll-view v-show="selectType == 1" scroll-y="true" :refresherEnabled="true" @refresherrefresh="onPullDownRefresh" :refresherTriggered="onlineRefreshFinish"
-			style="height: 0;flex: 1;" @scrolltolower="onLoadMore">
-				<uv-list :customStyle="{backgroundColor: 'transparent'}">
-					<template v-for="(task,index) in genOnlineTaskList" :key="index">
-						<uv-list-item @click="toTaskInfo(task)" :clickable="true" :customStyle="{backgroundColor: 'transparent'}">
-							<task-item :task="task"></task-item>
-						</uv-list-item>
-					</template>
-					<uv-list-item :customStyle="{backgroundColor: 'transparent'}">
-						<uni-load-more :status="onlineLoadState"></uni-load-more>
-					</uv-list-item>
-				</uv-list>
+			style="height: 0;flex: 1;" class="scroll-view" @scrolltolower="onLoadMore">
+				<view class="">
+					<myrow mainAlign="center" :customStyle="{margin: '10px'}">
+						<image style="width: 153px;height: 90px;" :src="srchost+'src/index_bg.png'"></image>
+					</myrow>
+					<view class="option-box" style="margin: 5px 0px 0px 0px;padding: 10px 0px 10px 0px;">
+						<myrow>
+							<view class="" style="margin: 0px 21px;" @click="switchCond(0)">
+								<text-switch text="全部" :open="condIndexOnline==0" :small="true"/>
+							</view>
+							<view class="" @click="switchCond(1)">
+								<text-switch text="有奖励" :open="condIndexOnline==1" :small="true"/>
+							</view>
+							<!-- <view class="cond-box" :class="{'cond-open': haveMoney}" @click="switchCond(1)">
+								有奖励
+							</view> -->
+						</myrow>
+					</view>
+					<view class="view-main">	
+						<uv-list :customStyle="{backgroundColor: 'transparent'}">
+							<template v-for="(task,index) in genOnlineTaskList" :key="index">
+								<uv-list-item @click="toTaskInfo(task)" :clickable="true" :customStyle="{backgroundColor: 'transparent'}">
+									<task-item :task="task"></task-item>
+								</uv-list-item>
+							</template>
+							<uv-list-item :customStyle="{backgroundColor: 'transparent'}">
+								<uni-load-more :status="onlineLoadState"></uni-load-more>
+							</uv-list-item>
+						</uv-list>
+					</view>
+				</view>
 			</scroll-view>
+			<button class=" fixed-button" @click="onAddTask">
+				<myrow mainAlign="center">
+					<uni-icons type="paperplane-filled" :color="theme.primary" size="22"></uni-icons>
+					<text class="button-text" style="margin-left: 6px;">我要发布</text>
+				</myrow>
+			</button>
 	</view>
 </template>
 
 <script>
 	import {color as mycolor} from "@/common/theme.js"
 	import httputil from "@/common/http_util.js"
-	import { EnumLoadState, ErrCode, LoadState,ServerConfig, UpdateEventType } from "@/common/define_const.js"
+	import { EnumLoadState, ErrCode, LoadState,ServerConfig, SrcHost, UpdateEventType } from "@/common/define_const.js"
 	import store from "@/store/index.js"
 	import api from "@/common/api_handle.js"
 	import util_task from "@/common/util_task"
@@ -96,9 +170,17 @@ import util_page from "../../common/util_page"
 				loadState: EnumLoadState.More,
 				onlineLoadState: EnumLoadState.More,
 				selectType:taskSelectType.OffLine,
+				condIndex:0,
+				condIndexOnline:0,
 				onlineloaded:false,
 				condMoney:false,
 				condMoneyOnline:false,
+				srchost:SrcHost,
+				taskTypeList:[
+					{name:"活动组局",value:0},
+					{name:"寻求帮助",value:1},
+					{name:"提供服务",value:2},
+				]
 			}
 		},
 		onLoad() {
@@ -193,11 +275,13 @@ import util_page from "../../common/util_page"
 				// let b = aa.key
 				
 				if (store.getters.isLogin) {
-					uni.navigateTo({
-						url:"/pages/task/task_add"
-						// url:"/pages/message/test_chat_page"
-						// url:"/pages/web/web_xy_nrfb"
-					})
+					// uni.navigateTo({
+					// 	url:"/pages/task/task_add"
+					// 	// url:"/pages/message/test_chat_page"
+					// 	// url:"/pages/web/web_xy_nrfb"
+					// })
+					// this.$refs.actionShare.open()
+					this.$refs.actionPop.open('center')
 					
 				}else{					
 					uni.navigateTo({
@@ -233,6 +317,20 @@ import util_page from "../../common/util_page"
 					// 	}
 					// })
 				}
+			},
+			onSelectShare(e) {
+				console.log("select share:",e.value)
+				uni.navigateTo({
+					url:"/pages/task/task_add?tasktype="+e.value
+					// url:"/pages/message/test_chat_page"
+					// url:"/pages/web/web_xy_nrfb"
+				})
+			},
+			onSelectPubType(val) {
+				this.$refs.actionPop.close()
+				uni.navigateTo({
+					url:"/pages/task/task_add?tasktype="+val
+				})
 			},
 			onToSearchPage() {
 				if (global_data.isLogin()) {					
@@ -313,10 +411,14 @@ import util_page from "../../common/util_page"
 					}
 				}else{
 					if (stype == taskSelectType.OffLine) {
-						this.taskList = []
+						if (ref) {
+							this.taskList = []
+						}
 						this.loadState = EnumLoadState.noMore						
 					}else{
-						this.onlineTaskList = []
+						if (ref) {
+							this.onlineTaskList = []
+						}
 						this.onlineLoadState = EnumLoadState.noMore						
 					}
 				}
@@ -343,12 +445,20 @@ import util_page from "../../common/util_page"
 				}
 			},
 			switchCond(stype) {
-				if (stype == 1) {
-					if (this.selectType == taskSelectType.OffLine) {
-						this.condMoney = !this.condMoney
-					}else{
-						this.condMoneyOnline = !this.condMoneyOnline
+				if (this.selectType == taskSelectType.OffLine) {
+					if (stype == this.condIndex) {
+						return
 					}
+					this.condIndex = stype
+					
+					this.condMoney = stype == 1
+				}else{
+					if (stype == this.condIndexOnline) {
+						return
+					}
+					this.condIndexOnline = stype
+					
+					this.condMoneyOnline = stype == 1
 				}
 				this.refreshTaskList()
 			},
@@ -379,6 +489,37 @@ import util_page from "../../common/util_page"
 <style lang="scss">
 	@import "@/style/my.scss";
 	
+	.top-box {
+		background: linear-gradient( 205deg, #56FAF2 0%, #BDF6FB 100%);
+		position: fixed;
+		top: 0px;
+		width: 100%;
+		height: 300px;
+		z-index: 1;
+	}
+	
+	.top-part {
+		background-color: transparent;
+		z-index: 2;
+	}
+	
+	.option-box {
+		background: linear-gradient( 180deg, #FFFFFF 0%, #F7F7F7 100%);
+		border-radius: 13px 13px 0px 0px;
+		position: sticky;
+		top: 0;
+		z-index: 4;
+	}
+	
+	.scroll-view {
+		z-index: 3;
+	}
+	
+	.view-main {
+		background-color: #f5f5f5;
+		min-height: 100px;
+	}
+	
 	.select-box {
 		border-radius: 20px;
 		padding: 5px 15px;
@@ -404,7 +545,7 @@ import util_page from "../../common/util_page"
 	}
 	
 	.cond-open {
-		background-color: $uni-success-light;
+		background-color: #d8fdff;
 		color: $uni-main-color;
 	}
 	
@@ -412,10 +553,64 @@ import util_page from "../../common/util_page"
 		color: $uni-main-color;
 	}
 	
+	// .help-box {
+	// 	border-radius: 20px;
+	// 	padding: 3px 8px;
+	// 	background-color: $uni-success-light;
+	// }
+	
+	.fixed-button {
+		position: fixed;
+		display: flex; /* 开启flex布局 */
+		justify-content: center; /* 水平居中对齐 */
+		align-items: center; /* 垂直居中对齐 */
+		left: 50%;
+		transform: translateX(-50%);
+		bottom: 36px;
+		border-radius: 23px;
+		background-color: $my-color-btn-primary;
+		color: $my-color-text-primary;
+		// height: 40px;
+		// padding: 1px 10px;
+		// width: 200px;
+		width: 172px;
+		height: 46px;
+		z-index: 100;
+	}
+	
+	.button-text {
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 500;
+		font-size: 14px;
+		line-height: 20px;
+		text-shadow: 0px 2px 4px rgba(0,0,0,0.1);
+		text-align: left;
+		font-style: normal;
+	}
+	
+	.help-main {
+		background-color: #fff;
+		border-radius: 18px;
+		padding: 20px 40px;
+	}
+	
 	.help-box {
-		border-radius: 20px;
-		padding: 3px 8px;
-		background-color: $uni-success-light;
+		width: 200px;
+		height: 45px;
+		border-radius: 9px;
+		background: #222222;
+		margin: 0px 0px 26px 0px;
+		display: flex; /* 开启flex布局 */
+		justify-content: center; /* 水平居中对齐 */
+		align-items: center; /* 垂直居中对齐 */
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 500;
+		font-size: 16px;
+		color: #1EFE8F;
+		line-height: 22px;
+		text-align: left;
+		font-style: normal;
+		// height: 80px;
 	}
 	
 </style>

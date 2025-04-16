@@ -2,6 +2,7 @@
 	import store from "@/store/index.js"
 import apihandle from "./common/api_handle"
 import util_emoji from "./common/util_emoji"
+import util_font from "./common/util_font"
 import wsconn from "./common/wsconn"
 
 	// uni.onError((res)=>{
@@ -16,6 +17,8 @@ import wsconn from "./common/wsconn"
 			store.commit("loadToken")
 			// wsconn
 			wsconn.init()
+			// font
+			util_font.loadFont()
 		},
 		onError:function(err){
 			try{

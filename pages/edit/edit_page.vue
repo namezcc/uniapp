@@ -1,30 +1,56 @@
 <template>
 	<view>
-		<view style="margin-top: 20px;"></view>
-		<view class="class-ceter">
-			<!-- #ifndef MP-WEIXIN -->
-				<view class="avator-box">
-					<button @click="onChooseIcon" class="button-avator">				
-						<avatar :src="user.icon" :radius="75"></avatar>
-					</button>
-					<uni-icons type="camera" class="camera-icon" :size="30"></uni-icons>
+		<view class="top-background-color top-bg" style="width: 100%;"></view>
+		<my-top-bar bgcolor="transparent" title="编辑资料"></my-top-bar>
+		<view style="position: absolute;z-index: 3;width: 100%;">			
+			<view style="height: 100px;"></view>
+			<view style="border-radius: 26px 26px 0px 0px;width: 100%;background-color: #F8F8F8;">
+				<view class="class-ceter">
+					<!-- #ifndef MP-WEIXIN -->
+						<view class="avator-box">
+							<button @click="onChooseIcon" class="button-avator">				
+								<avatar :src="user.icon" :radius="75" outline="3px"></avatar>
+							</button>
+							<view style="background-color: #000;padding: 3px 3px;border-radius: 50%;" class="camera-icon">
+								<uni-icons type="camera-filled"  color="#15FA8B" :size="17"></uni-icons>
+							</view>
+						</view>
+					<!-- #endif -->
+					<!-- #ifdef MP-WEIXIN -->
+						<view class="avator-box">					
+							<button @chooseavatar="onChooseAvatar" open-type="chooseAvatar" class="button-avator">
+								<avatar :src="user.icon" :radius="75" outline="3px"></avatar>
+							</button>
+							<view style="background-color: #000;padding: 3px 3px;border-radius: 50%;" class="camera-icon">
+								<uni-icons type="camera-filled"  color="#15FA8B" :size="17"></uni-icons>
+							</view>
+						</view>
+					<!-- #endif -->
 				</view>
-			<!-- #endif -->
-			<!-- #ifdef MP-WEIXIN -->
-				<view class="avator-box">					
-					<button @chooseavatar="onChooseAvatar" open-type="chooseAvatar" class="button-avator">
-						<avatar :src="user.icon" :radius="75"></avatar>
-					</button>
-					<uni-icons type="camera" class="camera-icon" :size="30"></uni-icons>
+				<myrow mainAlign="center">
+					<text class="text-name" style="margin: 8px 8px;">{{user.name}}</text>
+					<sex-icon :sex="sex" :size="16"></sex-icon>
+				</myrow>
+				<myrow>
+					<image src="@/static/icon_tip.png" style="width: 37px;height: 26px;margin-left: 16px;"></image>
+					<text class="tip-text" style="margin-left: 8px;">请完善资料</text>
+				</myrow>
+				<view class="card">			
+					<uv-cell-group :border="false">
+						<uv-cell title="昵称" :isLink="true" @click="toEditName" :value="user.name" :border="false">
+							<template v-slot:title>
+								<text class="cell-title">昵称</text>
+							</template>
+						</uv-cell>
+						<uv-cell title="实名验证" :isLink="true" @click="toEditIdCard" :value="idcard" :border="false">
+							<template v-slot:title>
+								<text class="cell-title">实名验证</text>
+							</template>
+						</uv-cell>
+					</uv-cell-group>
 				</view>
-			<!-- #endif -->
-		</view>
-		<view class="card">			
-			<uv-cell-group :border="false">
-				<uv-cell title="昵称" :isLink="true" @click="toEditName" :value="user.name"></uv-cell>
-				<!-- <uv-cell title="性别" :isLink="true" @click="toEditSex" :value="sex"></uv-cell> -->
-				<uv-cell title="实名验证" :isLink="true" @click="toEditIdCard" :value="idcard" :border="false"></uv-cell>
-			</uv-cell-group>
+				<view style="height: 200px;"></view>
+			</view>
 		</view>
 	</view>
 </template>
@@ -152,8 +178,30 @@ import store from "../../store"
 <style lang="scss">
 	@import "@/style/my.scss";
 	
+	page {
+		background-color: #F8F8F8;
+	}
+	
+	.top-bg {
+		position: fixed;
+		top: 0;
+		right: 0;
+		z-index: 0;
+		height: 300px;
+	}
+	
 	button::after{
 		border: none;
+	}
+	
+	.text-name {
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 600;
+		font-size: 18px;
+		color: #333333;
+		line-height: 25px;
+		text-align: left;
+		font-style: normal;
 	}
 	
 	.button-avator {
@@ -170,18 +218,45 @@ import store from "../../store"
 		position: relative;
 		height: 80px;
 		width: 80px;
+		margin-top: -50px;
+		background-color: transparent;
 	}
 	
 	.camera-icon {
 		position: absolute;
 		right: 0;
 		bottom: 0;
+		height: 20px;
+		width: 20px;
+		display: flex; /* 开启flex布局 */
+		justify-content: center; /* 水平居中对齐 */
+		align-items: center; /* 垂直居中对齐 */
 	}
 	
 	.card {
 		border-radius: 10px;
 		background-color: #fff;
 		margin: 20px 10px;
+	}
+	
+	.tip-text {
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 400;
+		font-size: 14px;
+		color: #737373;
+		line-height: 20px;
+		text-align: justify;
+		font-style: normal;
+	}
+	
+	.cell-title {
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 600;
+		font-size: 14px;
+		color: #000000;
+		line-height: 20px;
+		text-align: left;
+		font-style: normal;
 	}
 	
 </style>

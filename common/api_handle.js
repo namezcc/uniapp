@@ -86,7 +86,7 @@ var apihandle = {
 	},
 	async userloginWxCode(code,opencode) {
 		try{
-			var res = await http.request("userloginWxCode","POST",{code:opencode})
+			var res = await http.request("userloginWxCode","POST",{code,opencode})
 			if (this.checkData(res.data,res)) {
 				this.setToken(res.data.data.token)
 				return res.data
@@ -535,6 +535,39 @@ var apihandle = {
 			// this.catchError(e)
 			console.log("apiVerifyTextContent",e)
 		}
+	},
+	async apiRemoveTsak(taskid) {
+		try{
+			var res = await http.request("apiRemoveTsak","GET",{taskid,},{header:authorHeader})
+			if (this.checkData(res.data,res)) {
+				return true
+			}
+		}catch(e){
+			this.catchError(e)
+		}
+		return false
+	},
+	async apiTaskCheckOne(id,open) {
+		try{
+			var res = await http.request("apiTaskCheckOne","GET",{id,open},{header:authorHeader})
+			if (this.checkData(res.data,res)) {
+				return true
+			}
+		}catch(e){
+			this.catchError(e)
+		}
+		return false
+	},
+	async apiLoadCheckTask(skip) {
+		try{
+			var res = await http.request("apiLoadCheckTask","GET",{skip},{header:authorHeader})
+			if (this.checkData(res.data,res)) {
+				return res.data.data
+			}
+		}catch(e){
+			this.catchError(e,false)
+		}
+		return null
 	},
 }
 

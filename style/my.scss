@@ -1,12 +1,20 @@
-$my-color-primary:#D32F2F;
+$my-color-warn_primary:#D32F2F;
+// $my-color-primary-second:#ff7373;
+$my-color-primary:#15fa8b;
 $my-color-primary-second:#ff7373;
+$my-color-text-primary:#1ef68b;
+$my-color-text-second:#71e6ac;
+$my-color-btn-primary:#222222;
+$my-color-btn-unact:#c8c8c8;
+$my-color-money:#FA3232;
+$my-color-money2:#00C865;
 
 .fill-btn-primary {
 	width: 100%;
-	font-size: 15px;
+	// font-size: 15px;
+	color: $my-color-text-primary;
 	border-radius: 30px;
-	background-color: $my-color-primary;
-	color: white;	
+	background-color: $my-color-btn-primary;
 	height: 45px;
 	display: flex; /* 开启flex布局 */
 	justify-content: center; /* 水平居中对齐 */
@@ -15,10 +23,10 @@ $my-color-primary-second:#ff7373;
 
 .fill-btn-primary-disabled {
 	width: 100%;
-	font-size: 15px;
+	// font-size: 15px;
+	color: #FFFFFF;
 	border-radius: 30px;
-	background-color: $my-color-primary-second;
-	color: white;
+	background-color: $my-color-btn-unact;
 	height: 45px;
 	display: flex; /* 开启flex布局 */
 	justify-content: center; /* 水平居中对齐 */
@@ -86,13 +94,18 @@ $my-color-primary-second:#ff7373;
 
 .timeContent {
 		border: 1px solid $uni-border-4;
-		border-radius: 10px;
-		padding: 5px;
+		border-radius: 5px;
+		padding: 3px 10px;
 		color: $uni-base-color;
-		width: 240rpx;
-		font-size: 26rpx;
+		width: 250rpx;
+		font-size: 12px;
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
 		
 	}
+	
+.top-background-color {
+	// background: linear-gradient( 205deg, #56FAF2 0%, #BDF6FB 100%);
+	background-color: $my-color-primary;
+}

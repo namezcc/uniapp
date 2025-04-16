@@ -5,7 +5,9 @@
 				<slot></slot>
 			</view>
 			<view style="height: 10px;"></view>
-			<text>{{name}}</text>
+			<slot name="icontext">
+				<text>{{name}}</text>
+			</slot>
 		</view>
 	</view>
 </template>

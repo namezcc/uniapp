@@ -61,13 +61,7 @@ import util_task from "../../common/util_task"
 		},
 		onLoad(e) {
 			this.task = store.getters.getTaskById(e.taskid)
-			let cidvec = util_task.getTaskJoinCidvec(this.task)
-			store.dispatch("getOtherUserListOrCash",cidvec).then((res)=>{
-				if (res) {					
-					// console.log("get member",res)
-					this.member = res
-				}
-			})
+			this.refreshMember()
 		},
 		computed:{
 			...mapState({
@@ -142,6 +136,15 @@ import util_task from "../../common/util_task"
 			kickCancle() {
 				this.kickCid = null
 			},
+			refreshMember() {
+				let cidvec = util_task.getTaskJoinCidvec(this.task)
+				store.dispatch("getOtherUserListOrCash",cidvec).then((res)=>{
+					if (res) {					
+						// console.log("get member",res)
+						this.member = res
+					}
+				})
+			},
 			confirmKick() {
 				console.log("kick people confirm ",this.kickCid)
 				apihandle.apiKickTask(this.task.id,this.kickCid).then((res)=>{
@@ -150,6 +153,7 @@ import util_task from "../../common/util_task"
 						this.task.join = res.join
 						store.commit("updateTaskOne",this.task)
 						apihandle.toast("操作成功")
+						this.refreshMember()
 					}
 				})
 			},

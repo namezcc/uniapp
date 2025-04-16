@@ -1,5 +1,5 @@
 <template>
-	<view :class="['boxTag',bgclass]">
+	<view :class="['boxTag',bgclass]" :style="{color:color,backgroundColor:bgcolor,fontSize:size}">
 		{{text}}
 	</view>
 </template>
@@ -18,7 +18,19 @@
 			},
 			theme:{
 				type:String,
-				default:'success'
+				default:''
+			},
+			color:{
+				type:String,
+				default:''
+			},
+			bgcolor:{
+				type:String,
+				default:''
+			},
+			size:{
+				type:String,
+				default:'12px'
 			}
 		},
 		data() {
@@ -38,7 +50,7 @@
 					case 'grey':
 						return "boxGrey";
 					default:
-						return "boxSuccess";
+						return "";
 				}
 			}
 		}
@@ -47,7 +59,7 @@
 
 <style lang="scss">
 	.boxTag {
-		padding: 0rpx 10rpx;
+		padding: 0px 5px;
 		// background-color: #f9e6e4;
 		display: flex;
 		justify-content: center;
@@ -56,7 +68,10 @@
 		// color: #d54431;
 		// width: 44rpx;
 		// height: 44rpx;
-		border-radius: 6rpx;
+		border-radius: 3px;
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 400;
+		line-height: 17px;
 		
 	}
 	

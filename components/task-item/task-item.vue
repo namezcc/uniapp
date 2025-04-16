@@ -1,9 +1,9 @@
 <template>
 	<view class="" style="width: 100%;">
-		<uni-card margin="5px">
+		<uni-card margin="7px 14px 7px 14px" padding="10px 4px 10px 4px" :border="false" :is-shadow="false">
 			<template v-slot:title>
-				<view style="margin-top: 10px">
-					<myrow>
+				<view style="margin-top: 16px;padding: 0px 4px 0px 4px;">
+					<myrow :wrap="false">
 						<avatar :src="icon" />
 						<!-- <view class="" style="margin-left: 8rpx;">							
 							<mycol itemAlign="flex-start">
@@ -11,29 +11,33 @@
 								<text class="txt-credit" v-if="creditScore">信用分:{{creditScore}}</text>
 							</mycol>
 						</view> -->
+						<view style="margin: 5px;"></view>
+						<text class="txt-name">{{userName}}</text>
+						<view style="margin: 2.5px;"></view>
+						<sex-icon :sex="userSex" :size="12"></sex-icon>
+						<view style="margin-left: 5px;"></view>
+						<text-tag bgcolor="#dfffef" text="限女生" v-if="sexlimitType == 0"/>
+						<text-tag bgcolor="#dfffef" text="限男生" v-if="sexlimitType == 1"/>
 						<expanded/>
-						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 0">限女生</view>
-						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 1">限男生</view>
-						<view style="margin-left: 20rpx;">							
-							<text>报名 </text>
-							<text style="color: #f4d1b9;">{{numinfo[0]}}</text>
-							<text>/{{numinfo[1]}}</text>
-						</view>
+						<uni-icons v-if="taskDistance" type="location-filled" color="#666666" :size="18"></uni-icons>
+						<text class="text-dis" >{{taskDistance}}</text>
 					</myrow>
 				</view>
-				<view style="margin-top: 10px;">
+				<!-- <view style="margin-top: 10px;">
 					<uv-line></uv-line>
-				</view>
+				</view> -->
 			</template>
 			<myrow itemAlign="flex-start" :wrap="false">
 				<mycol itemAlign="flex-start">
-					<text class="task-title text-nothide">{{task.title}}</text>
+					<text class="text-title text-nothide">{{task.title}}</text>
 					<text class="txt-content">{{task.content}}</text>
+					<view style="margin-top: 10px;"></view>
 					<view v-if="haveTaskRangeTime">
 						<!-- <view class="round-dot" style="margin: 6rpx;"></view> -->
 						<myrow>							
-							<uv-icon name="calendar" color="#40c25f" size="20"></uv-icon>
-							<text style="font-size: 14px;">{{taskRangTime}}</text>
+							<!-- <uv-icon name="clock" size="20"></uv-icon> -->
+							<text-tag text="报名中" bgcolor="#1EFE8F" color="#333333"></text-tag>
+							<text style="font-size: 14px;margin-left: 9px;">时间: {{taskRangTime}}</text>
 						</myrow>
 					</view>
 					<!-- <view v-if="haveTaskRangeTime">
@@ -42,18 +46,35 @@
 					</view> -->
 				</mycol>
 				<!-- <uni-title :title="task.title" type="h3"></uni-title> -->
-				<expanded></expanded>
-				<view v-if="taskImage.length" style="width: 75px;height: 75px;margin: 10rpx;">
-					<image style="width: 75px;height: 75px;" :src="taskImage[0]" mode="aspectFill"></image>
-				</view>
+				<!-- <expanded></expanded> -->
 			</myrow>
+			<view v-if="taskImage.length" style="margin: 10px 0px;">
+				<myrow :mainAlign="taskImage.length == 3 ? 'space-between' : 'flex-start'">
+					<template v-for="(item,index) in taskImage" :key="index">
+						<image :class="item.class" style="width: 206rpx;height: 218rpx;" :style="{marginRight:taskImage.length == 3 ? '0rpx' : '8rpx'}" :src="item.url" mode="aspectFill"></image>
+					</template>
+				</myrow>
+			</view>			
 			<myrow>
 				<view v-if="haveReward" class="boxText">赏</view>
-				<text :style="{fontSize: '16px',color: moneyColor}" >{{taskMoney}}</text>
-				<expanded></expanded>
-				<uni-icons v-if="taskDistance" type="location-filled" color="#00aaff"></uni-icons>
-				<text :style="{fontSize: '12px'}" >{{taskDistance}}</text>
+				<text v-if="!haveReward" style="font-size: 14px;color: black;">费用:</text>
+				<!-- :style="{fontSize: '14px',color: moneyColor}"  -->
+				<text class="text-money">{{taskMoney}}</text>
 			</myrow>
+			<myrow :wrap="false">
+				<myrow :wrap="false">								
+					<uv-avatar-group :urls="icongroup" :size="30"></uv-avatar-group>
+					<!-- <text style="color: #f4d1b9;">{{numinfo[0]}}</text>
+					<text style="margin-right: 5px;">/{{numinfo[1]}}</text> -->
+					<view style="margin-left: 8px;" v-if="icongroup.length > 0"></view>
+					<text>{{joinString}}</text>
+				</myrow>
+				<expanded></expanded>
+				<view class="call-box">
+					<text class="call-text">{{optName}}</text>
+				</view>
+			</myrow>
+			
 		</uni-card>
 	</view>
 </template>
@@ -65,6 +86,8 @@
 	import store from "@/store/index.js"
 	import util_time from "../../common/util_time"
 import util_common from "../../common/util_common"
+import util_task from "@/common/util_task.js"
+import { EnumSex, TaskType } from "../../common/define_const"
 	
 	export default {
 		name:"task-item",
@@ -102,6 +125,15 @@ import util_common from "../../common/util_common"
 				let num = utiltask.getJoinNum(this.task)
 				return [num[0]+num[1],this.task.people_num]
 			},
+			joinString() {
+				let num = utiltask.getJoinNum(this.task)
+				let total = num[0]+num[1]
+				if (total == 0) {
+					return "报名中"
+				}else{
+					return `${total}人已报名`
+				}
+			},
 			sexlimitType() {
 				return utiltask.getLimitSex(this.task)
 			},
@@ -130,7 +162,22 @@ import util_common from "../../common/util_common"
 				return util_time.formatTaskWeekTime(this.task.task_end_time)+" 结束"
 			},
 			taskImage() {
-				return utiltask.getImageUrls(this.task)
+				let vec = utiltask.getImageUrls(this.task)
+				let res = []
+				for (var i = 0; i < vec.length && i < 3; i++) {
+					res.push({
+						url:vec[i],
+						class:"",
+					})
+				}
+				if (res.length == 1) {
+					res[0].class = "image-one"
+				}else if(res.length > 1){
+					res[0].class = "image-left"
+					res[res.length-1].class = "image-right"
+					// console.log(res)
+				}
+				return res
 			},
 			taskMoney() {
 				return utiltask.getMoneyString(this.task)
@@ -152,6 +199,20 @@ import util_common from "../../common/util_common"
 			},
 			icon() {
 				return this.taskuser?.icon || ""
+			},
+			userName() {
+				return this.taskuser?.name || ""
+			},
+			userSex() {
+				// return EnumSex.WOMAN
+				// console.log("usersex",this.taskuser?.sex)
+				return this.taskuser?.sex
+			},
+			icongroup() {
+				return util_task.getJoinIcons(this.task)
+			},
+			optName() {
+				return this.task.taskType == TaskType.Help ? "帮助TA" : "呼TA"
 			}
 		},
 		methods:{
@@ -178,8 +239,12 @@ import util_common from "../../common/util_common"
 <style lang="scss">
 	@import "@/style/my.scss";
 	
+	page {
+		background-color: #F7F7F7;
+	}
+	
 	.uni-card {
-		border-radius: 10px;
+		border-radius: 12px;
 	}
 	
 	.txt-credit {
@@ -190,6 +255,23 @@ import util_common from "../../common/util_common"
 	.txt-name {
 		font-size: 14px;
 		color: $uni-base-color;
+		font-weight: 600;
+		text-align: left;
+		white-space: nowrap;
+		line-height: 20px;
+		font-family: PingFangSC-Semibold;
+	}
+	
+	.image-left {
+		border-radius: 10px 0px 0px 10px;
+	}
+	
+	.image-one {
+		border-radius: 10px 10px 10px 10px;
+	}
+	
+	.image-right {
+		border-radius: 0px 10px 10px 0px;
 	}
 	
 	.text-hide {
@@ -197,6 +279,18 @@ import util_common from "../../common/util_common"
 	    -webkit-box-orient: vertical; /*排列方式*/ 
 	    -webkit-line-clamp: 1; /*显示文本行数(这里控制多少行隐藏)*/
 	    overflow: hidden; /*溢出隐藏*/
+	}
+	
+	.text-title {
+		overflow-wrap: break-word;
+		color: #000000;
+		font-size: 16px;
+		// font-family: PingFangSC-Semibold;
+		font-weight: 600;
+		text-align: left;
+		white-space: nowrap;
+		line-height: 22px;
+		margin-bottom: 5px;
 	}
 	
 	.text-nothide {
@@ -216,6 +310,48 @@ import util_common from "../../common/util_common"
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
+		line-height: 20px;
+	}
+	
+	.call-box {
+		background-color: #222222;
+		border-radius: 16px;
+		display: flex; /* 开启flex布局 */
+		justify-content: center; /* 水平居中对齐 */
+		align-items: center; /* 垂直居中对齐 */
+		padding: 7px 21px;
+	}
+	
+	.call-text {
+		overflow-wrap: break-word;
+		color: $my-color-text-primary;
+		font-size: 14px;
+		// font-family: AlibabaPuHuiTi_2_85_Bold;
+		font-weight: bold;
+		text-align: left;
+		white-space: nowrap;
+		line-height: 17px;
+	}
+	
+	.text-money {
+		overflow-wrap: break-word;
+		color: $my-color-money;
+		font-size: 14px;
+		font-family: PingFangSC-Semibold;
+		font-weight: 600;
+		text-align: left;
+		white-space: nowrap;
+		line-height: 20px;
+	}
+	
+	.text-dis {
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 400;
+		font-size: 14px;
+		color: #999999;
+		line-height: 20px;
+		text-align: left;
+		font-style: normal;
 	}
 	
 </style>

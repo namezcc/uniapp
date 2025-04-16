@@ -8,10 +8,14 @@
 var HostBase = "http://192.168.0.77:8999"
 var WsHost = "ws://192.168.0.77:10002/"
 var WebHost = "http://192.168.0.77:443"
+var SrcHost = "http://192.168.0.77:8999/static/"
+var FontHost = "http://192.168.0.77:8999/static/font/"
 if (process.env.NODE_ENV != "development") {
 	HostBase = "https://bangbangweituo.com:18999"
 	WsHost = "wss://bangbangweituo.com:10002/"
 	WebHost = "https://bangbangweituo.com"
+	SrcHost = "https://bangbang1-1326763244.cos.ap-shanghai.myqcloud.com/"
+	FontHost = "https://bangbangweituo.com:18999/static/"
 }
 
 var ErrCode = {
@@ -137,6 +141,12 @@ var AgeType = {
 	Max:66,
 }
 
+var TaskType = {
+	Active:0,
+	Help:1,
+	Service:2,
+}
+
 export {
 	ErrCode,
 	EnumSex,
@@ -158,4 +168,7 @@ export {
 	TaskShowState,
 	CreditType,
 	AgeType,
+	TaskType,
+	SrcHost,
+	FontHost,
 }

@@ -1,6 +1,8 @@
 <template>
 	<view :style="[avatorBox]">
-		<uv-avatar :src="src" :size="radius" @click="toUserPage"></uv-avatar>
+		<view class="avatar-circle" :style="{padding:outline,backgroundColor:'#fff'}">
+			<uv-avatar :src="src" :size="radius" @click="toUserPage"></uv-avatar>
+		</view>
 		<view class="sex-icon">
 			<uv-icon v-if="sex!=null" :name="iconname" :color="sexcolor" :bold="true"></uv-icon>
 		</view>
@@ -33,6 +35,9 @@ import global_data from '../../common/global_data';
 			},
 			usercid:{
 				default:0,
+			},
+			outline:{
+				default:'0px',
 			}
 		},
 		// watch:{
@@ -69,6 +74,9 @@ import global_data from '../../common/global_data';
 					height: (this.radius+5)+'px',
 					width: (this.radius+5)+'px',
 				} : {}
+			},
+			bgsize() {
+				return this.radius+5
 			}
 		},
 		methods:{
@@ -103,5 +111,6 @@ import global_data from '../../common/global_data';
 	
 	.avatar-circle {
 		border-radius: 50%;
+		
 	}
 </style>

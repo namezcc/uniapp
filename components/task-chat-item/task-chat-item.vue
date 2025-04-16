@@ -1,18 +1,23 @@
 <template>
 	<view class="" style="width: 100%;">
-		<uni-card margin="5px">
+		<uni-card margin="14px 14px" padding="10px 4px 10px 4px" :is-shadow="false" :border="false">
 			<template v-slot:title>
-				<view style="margin-top: 10px">
+				<view style="margin-top: 16px;padding: 0px 4px 0px 4px;">
 					<myrow>
 						<avatar :src="icon" :usercid="task.cid"/>
-						<!-- <text>{{task.creator_name}}</text> -->
+						<view style="margin: 5px;"></view>
+						<text class="txt-name">{{taskUserName}}</text>
+						<view style="margin: 2.5px;"></view>
+						<sex-icon :sex="userSex" :size="10"></sex-icon>
+						<view style="margin-left: 5px;"></view>
+						<text-tag bgcolor="#dfffef" text="限女生" v-if="sexlimitType == 0"/>
+						<text-tag bgcolor="#dfffef" text="限男生" v-if="sexlimitType == 1"/>
 						<expanded/>
-						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 0">限女生</view>
-						<view class="boxText" style="font-size: 26rpx;" v-if="sexlimitType == 1">限男生</view>
 						<view style="margin-left: 20rpx;">
-							<text>报名 </text>
+							<!-- <text>报名 </text>
 							<text style="color: #f4d1b9;">{{numinfo[0]}}</text>
-							<text>/{{numinfo[1]}}</text>
+							<text>/{{numinfo[1]}}</text> -->
+							<text-tag :text="taskStateString" :theme="taskStateTheme" bgcolor="#fff" :color="taskStateColor" ></text-tag>
 						</view>
 						<view v-if="myTask" style="margin-left: 10px;"  @click.stop="showMoreAction">
 							<uni-icons type="more-filled"></uni-icons>
@@ -22,16 +27,13 @@
 						</mycol> -->
 					</myrow>
 				</view>
-				<view style="margin-top: 10px;">
+				<!-- <view style="margin-top: 10px;">
 					<uv-line></uv-line>
-				</view>
+				</view> -->
 			</template>
 			<myrow itemAlign="flex-start" :wrap="false">
-				<text style="white-space: pre-wrap;" class="task-title">{{task.title}}</text>
-				<expanded></expanded>
-				<view style="margin-left: 5px;"></view>
-				<view v-if="haveReward" class="boxText">赏</view>
-				<text :style="{fontSize: '16px',color: theme.primary,whiteSpace: 'nowrap'}" >{{taskMoney}}</text>
+				<text style="white-space: pre-wrap;" class="text-title">{{task.title}}</text>
+				<!-- <expanded></expanded> -->
 			</myrow>
 			<view class="text-chat" v-if="taskChat">
 				<myrow>
@@ -41,9 +43,23 @@
 					<uni-badge :text="taskUnReadNum" type="error"></uni-badge>
 				</myrow>
 			</view>
-			<view class="" style="margin-top: 6rpx;">
-				<myrow>
-					<text-tag :text="taskStateString" :theme="taskStateTheme"></text-tag>
+			<myrow v-if="!nomoney">
+				<!-- <view style="margin-left: 5px;"></view> -->
+				<view v-if="haveReward" style="font-size: 14px;color: black;">奖励:</view>
+				<text v-if="!haveReward" style="font-size: 14px;color: black;">费用:</text>
+				<text class="text-money" >{{taskMoney}}</text>
+			</myrow>
+			<view class="" style="margin-top: 6px;">
+				<myrow :wrap="false">
+					<myrow :wrap="false">
+						<uv-avatar-group :urls="icongroup" :size="22"></uv-avatar-group>
+						<!-- <text style="color: #f4d1b9;">{{numinfo[0]}}</text>
+						<text style="margin-right: 5px;">/{{numinfo[1]}}</text> -->
+						<view style="margin-left: 8px;" v-if="icongroup.length > 0"></view>
+						<text>报名</text>
+						<text style="color: #00D26A;">{{numinfo[0]}}</text>
+						<text >/{{numinfo[1]}}</text>
+					</myrow>
 					<expanded></expanded>
 					<view class="" @click.stop="deleteJoin" v-if="showDelete">
 						<uni-icons type="closeempty" ></uni-icons>
@@ -62,12 +78,12 @@ import util_chat from "../../common/util_chat";
 import util_time from '@/common/util_time';
 import util_task from "@/common/util_task.js";
 import global_data from "../../common/global_data";
-import { TaskShowState } from "../../common/define_const";
+import { EnumSex, TaskShowState } from "../../common/define_const";
 import apihandle from "../../common/api_handle";
 	
 	export default {
 		name:"task-chat-item",
-		emits: ['clickClose'],
+		emits:['clickClose'],
 		props: {
 			task: {
 				type: Object,
@@ -78,15 +94,13 @@ import apihandle from "../../common/api_handle";
 			return {
 				theme:theme,
 				icon:"",
+				taskuser:null,
+				taskUserName:"",
+				userSex:EnumSex.MAN,
 			};
 		},
 		mounted() {
-			store.dispatch("getOtherUser",this.task.cid).then((res)=>{
-				if (res) {
-					this.icon = res.icon
-					// console.log("user icon ",res.icon)
-				}
-			})
+			this.setUser()
 		},
 		watch:{
 			task:{
@@ -94,18 +108,26 @@ import apihandle from "../../common/api_handle";
 					if (newv.cid == oldv?.cid) {
 						return
 					}
+					this.setUser()
 					// console.log("taskchange",newv.title,oldv.title)
-					store.dispatch("getOtherUser",newv.cid).then((res)=>{
-						if (res) {
-							this.icon = res.icon
-							// console.log("user icon ",res.icon)
-						}
-					})
 				},
 				immediate:false
 			}
 		},
 		computed:{
+			// icon() {
+			// 	return this.taskuser?.icon || ""
+			// },
+			// taskUserName() {
+			// 	// console.log("getusername",this.taskuser.name)
+			// 	return this.taskuser.name || ""
+			// },
+			// userSex() {
+			// 	return this.taskuser.sex || EnumSex.MAN
+			// },
+			icongroup() {
+				return util_task.getJoinIcons(this.task)
+			},
 			numinfo() {
 				let num = utiltask.getJoinNum(this.task)
 				return [num[0]+num[1],this.task.people_num]
@@ -118,6 +140,9 @@ import apihandle from "../../common/api_handle";
 			},
 			haveReward() {
 				return utiltask.haveRewardMoney(this.task)
+			},
+			nomoney() {
+				return this.task.money == 0 && this.task.womanMoney == 0
 			},
 			taskDistance() {
 				if (this.task.address == null) {
@@ -195,6 +220,15 @@ import apihandle from "../../common/api_handle";
 				}
 				return "grey"
 			},
+			taskStateColor() {
+				let state = util_task.getTaskState(this.task,global_data.cid)
+				switch (state){
+					case TaskShowState.Open:
+						return theme.primary_low;
+					default:
+						return "";
+				}
+			},
 			showDelete() {
 				let state = util_task.getTaskState(this.task,global_data.cid)
 				if (state == TaskShowState.Kicked || state == TaskShowState.TaskDelete || state == TaskShowState.Illegal) {
@@ -266,6 +300,18 @@ import apihandle from "../../common/api_handle";
 					fail() {
 					}
 				})
+			},
+			setUser() {
+				store.dispatch("getOtherUser",this.task.cid).then((res)=>{
+					if (res) {
+						this.icon = res.icon
+						this.taskUserName = res.name
+						this.userSex = res.sex
+						// this.taskuser = res
+						// this.$forceUpdate();
+						// console.log("user name",res.name)
+					}
+				})
 			}
 		},
 		options: {
@@ -287,5 +333,27 @@ import apihandle from "../../common/api_handle";
 	.text-chat {
 		font-size: 14px;
 		color: #999;
+	}
+	
+	.text-title {
+		overflow-wrap: break-word;
+		  color: rgba(0, 0, 0, 1);
+		  font-size: 16px;
+		  font-family: PingFangSC-Semibold;
+		  font-weight: 600;
+		  text-align: left;
+		  white-space: nowrap;
+		  line-height: 22px;
+	}
+	
+	.text-money {
+		overflow-wrap: break-word;
+		color: rgba(250, 50, 50, 1);
+		font-size: 14px;
+		font-family: PingFangSC-Semibold;
+		font-weight: 600;
+		text-align: left;
+		white-space: nowrap;
+		line-height: 20px;
 	}
 </style>

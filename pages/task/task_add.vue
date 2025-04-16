@@ -1,11 +1,17 @@
 <template>
-	<view  class="mainCol">
+	<view  class="mainCol main-text">
 		<mycol>			
 			<view class="titleStyle colItem">
-				<uv-input v-model="txtTitle" placeholder="标题" maxlength="30" inputAlign="center" shape="circle" />
+				<uv-input v-model="txtTitle" border="none" placeholder="标题" maxlength="30" fontSize="16" inputAlign="start" />
 			</view>
 			<view class="contentStyle colItem">
-				<uv-textarea v-model="txtContent" placeholder="详细内容..." count maxlength="500" height="100" ></uv-textarea>
+				<myrow>
+					<image src="@/static/icon_tip.png" style="width: 37px;height: 26px;margin-left: 9px;"></image>
+					<text class="tip-text" style="margin-left: 8px;">{{taskTypeString}}</text>
+				</myrow>
+					<uv-textarea v-model="txtContent" border="none" placeholder="详细内容..." count maxlength="1000" height="100" ></uv-textarea>
+				<!-- <view class="">
+				</view> -->
 			</view>
 			<view class="colItem itemContent">
 				<view class="contentPadding">
@@ -17,7 +23,14 @@
 			</view>
 			<view class="colItem itemContent">
 				<view class="contentPadding">
-					<uni-data-checkbox v-model="currentNum" :localdata="sexNum" mode="tag" selectedColor="#87d694"></uni-data-checkbox>
+					<!-- <uni-data-checkbox v-model="currentNum" :localdata="sexNum" mode="tag" selectedColor="#87d694"></uni-data-checkbox> -->
+					<myrow>
+						<template v-for="(item,index) in sexNum" :key="index">
+							<view :class="currentNum == index ? 'num-select':'num-unselect'" @click="onClickNumItem(index)">
+								<text>{{item.text}}</text>
+							</view>
+						</template>
+					</myrow>
 					<view class="lineMargin"></view>
 					<myrow>
 						<view>
@@ -31,27 +44,27 @@
 							人数
 						</view>
 						<expanded></expanded>
-						<view style="font-size: 14px;">
+						<view>
 							<view v-show="currentNum !== 1">
 								<myrow>
-									<view :style="{width: inputWidth+'px'}">
-										<uv-input v-model="txtManNum" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
-									</view>
+									<!-- <view :style="{width: inputWidth+'px'}">
+									</view> -->
+									<uv-input v-model="txtManNum" type="number" maxlength="3" inputAlign="center" shape="circle" border="none" :customStyle="inputStyle"></uv-input>
 									<text>人</text>
 								</myrow>
 							</view>
 							<view v-show="currentNum === 1">
 								<myrow>
 									男
-									<view :style="{width: inputWidth+'px'}">
-										<uv-input v-model="txtManNum" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
-									</view>
+									<!-- <view :style="{width: inputWidth+'px'}">
+									</view> -->
+									<uv-input v-model="txtManNum" type="number" maxlength="3" inputAlign="center" shape="circle" border="none" :customStyle="inputStyle"></uv-input>
 									<text>人</text>
 									<view style="width: 20px;"></view>
 									女
-									<view :style="{width: inputWidth+'px'}">
-										<uv-input v-model="txtWomanNum" type="number" maxlength="3" inputAlign="center" shape="circle"></uv-input>
-									</view>
+									<!-- <view :style="{width: inputWidth+'px'}">
+									</view> -->
+									<uv-input v-model="txtWomanNum" type="number" maxlength="3" inputAlign="center" shape="circle" border="none" :customStyle="inputStyle"></uv-input>
 									<text>人</text>
 								</myrow>
 							</view>
@@ -71,45 +84,45 @@
 							</picker>
 						</view>
 						<expanded></expanded>
-						<view style="font-size: 14px;">
+						<view>
 							<view v-show="currentMoney === 0">
 								<myrow>
-									<view :style="{width: inputWidth+'px'}">
-										<uv-input v-model="txtManMoney" type="number" maxlength="10" inputAlign="center" shape="circle"></uv-input>
-									</view>
+									<!-- <view :style="{width: inputWidth+'px'}">
+									</view> -->
+									<uv-input v-model="txtManMoney" type="number" maxlength="10" inputAlign="center" shape="circle" border="none" :customStyle="inputStyle"></uv-input>
 									<text>元</text>
 								</myrow>
 							</view>
 							<view v-show="currentMoney === 1">
 								<myrow>
 									男
-									<view :style="{width: inputWidth+'px'}">
-										<uv-input v-model="txtManMoney" type="number" maxlength="10" inputAlign="center" shape="circle"></uv-input>
-									</view>
+									<!-- <view :style="{width: inputWidth+'px'}">
+									</view> -->
+									<uv-input v-model="txtManMoney" type="number" maxlength="10" inputAlign="center" shape="circle" border="none" :customStyle="inputStyle"></uv-input>
 									<text>元</text>
 									<view style="width: 20px;"></view>
 									女
-									<view :style="{width: inputWidth+'px'}">
-										<uv-input v-model="txtWomanMoney" type="number" maxlength="10" inputAlign="center" shape="circle"></uv-input>
-									</view>
+									<!-- <view :style="{width: inputWidth+'px'}">
+									</view> -->
+									<uv-input v-model="txtWomanMoney" type="number" maxlength="10" inputAlign="center" shape="circle" border="none" :customStyle="inputStyle"></uv-input>
 									<text>元</text>
 								</myrow>
 							</view>
 						</view>
 					</myrow>
-					<view :style="{fontSize: '12px',color: theme.secondary}">
+					<view class="sub-text">
 						<text v-show="currentMoney === 0">
-							*你支付给别人的报酬
+							你支付给别人的报酬
 						</text>
 						<text v-show="currentMoney === 1">
-							*别人支付给你的费用
+							别人支付给你的费用
 						</text>
 					</view>
 					<view class="lineMargin"></view>
 					<myrow>
 						<text>联系方式</text>
 						<expanded></expanded>
-						<input v-model="contact_way" placeholder="填写联系你的方式" class="contact-input" maxlength="30" />
+						<input v-model="contact_way" placeholder-class="sub-text" placeholder="填写联系你的方式" class="contact-input" maxlength="30" />
 					</myrow>
 				</view>
 			</view>
@@ -118,21 +131,23 @@
 					<myrow>
 						<text>报名截止时间</text>
 						<expanded></expanded>
-						<text @click="openPicker(1)">{{taskJoinEndTime}}</text>
+						<text :class="timeClass" @click="openPicker(1)">{{taskJoinEndTime}}</text>
 						<uv-picker ref="picker" :columns="pickerColums" @confirm="onPicker" ></uv-picker>
 					</myrow>
-					<view class="lineMargin"></view>
-					<myrow>
-						<!-- <checkbox-group @change="onSetTaskTime">
-							<label>
-								<text>开始结束时间</text>
-								<checkbox value="1" :color="theme.primary" :border-color="theme.primary" />
-							</label>
-						</checkbox-group> -->
-						<text>开始结束时间</text>
-						<expanded></expanded>
-						<switch :checked="haveTaskTime" :color="theme.primary_low" @change="onSetTaskTime"></switch>
-					</myrow>
+					<view v-if="tasktype != 1">						
+						<view class="lineMargin"></view>
+						<myrow>
+							<!-- <checkbox-group @change="onSetTaskTime">
+								<label>
+									<text>开始结束时间</text>
+									<checkbox value="1" :color="theme.primary" :border-color="theme.primary" />
+								</label>
+							</checkbox-group> -->
+							<text>开始结束时间</text>
+							<expanded></expanded>
+							<switch style="transform:scale(0.7)" :checked="haveTaskTime" :color="theme.primary_low" @change="onSetTaskTime"></switch>
+						</myrow>
+					</view>
 					<view class="lineMargin"></view>
 					<myrow v-if="haveTaskTime" mainAlign="center" >
 						<view class="timeContent" @click="openPicker(2)">
@@ -147,7 +162,7 @@
 					<myrow>
 						<text>地点</text>
 						<expanded></expanded>
-						<text @click="openMap" style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;max-width: 200px;">{{locationString}}</text>
+						<text @click="openMap" :class="locationClass" style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;max-width: 200px;">{{locationStr}}</text>
 						<uni-icons type="location-filled"></uni-icons>
 					</myrow>
 					<view class="lineMargin"></view>
@@ -162,25 +177,33 @@
 					<myrow>
 						<text>信用分</text>
 						<expanded></expanded>
+						<view style="width: 200px;">
+							<uv-slider v-model="credit_score" min="50" max="150" activeColor="#000" block-color="#000"></uv-slider>
+						</view>
 						<text class="text-score">{{creditScore}}</text>
 					</myrow>
-					<uv-slider v-model="credit_score" min="50" max="150" :activeColor="theme.primary_low" :block-color="theme.primary_low"></uv-slider>
 					<view class="lineMargin"></view>
 					<myrow>
 						<text>是否公开</text>
 						<expanded></expanded>
-						<switch :checked="taskOpen" :color="theme.primary_low" @change="onTaskOpen"></switch>
+						<switch style="transform:scale(0.7)" :checked="taskOpen" :color="theme.primary_low" @change="onTaskOpen"></switch>
 					</myrow>
 				</view>
 			</view>
-			<myrow>
+			<myrow mainAlign="center">
 				<label>
-					<checkbox value="1" :checked="agree" @click="setAgree" /><text class="agree-txt" @click.stop="toPageNrfb">《帮帮内容发布规范》</text>
+					<checkbox style="transform:scale(0.7)" activeBackgroundColor="#000" :iconColor="theme.primary" value="1" :checked="agree" @click="setAgree" />
+					<text class="agree-txt" @click.stop="toPageNrfb">《帮帮内容发布规范》</text>
 				</label>
-				<expanded></expanded>
+				<!-- <expanded></expanded> -->
 			</myrow>
 			<view class="colItem" style="margin-top: 20px;">
-				<button @click="submitTask" class="fill-btn-primary" >{{optName}}</button>
+				<button @click="submitTask" class="fill-btn-primary" style="font-size: 16px;width: 172px" >
+					<myrow mainAlign="center">
+						<uni-icons type="paperplane-filled" :color="theme.primary" size="22"></uni-icons>
+						<text style="margin-left: 6px;">{{optName}}</text>
+					</myrow>
+				</button>
 			</view>
 			<uv-safe-bottom></uv-safe-bottom>
 		</mycol>
@@ -197,7 +220,7 @@
 	import util_time from "../../common/util_time"
 import util_page from "../../common/util_page"
 import util_common from "../../common/util_common"
-import { AgeType } from "../../common/define_const"
+import { AgeType, TaskType } from "../../common/define_const"
 	
 	let useDateArray = [];
 	
@@ -272,6 +295,13 @@ import { AgeType } from "../../common/define_const"
 					height: '70px',
 					backgroundColor: 'white',
 				},
+				inputStyle:{
+					width: '65px',
+					height: '28px',
+					background: '#F8F8F8',
+					borderRadius: '14px',
+					border: '1px solid #D4D4D4',
+				},
 				currentNum:0,
 				currentMoney:0,
 				theme:theme,
@@ -280,7 +310,7 @@ import { AgeType } from "../../common/define_const"
 				],
 				dateSelect:[],
 				// dateString: "请选择日期",
-				locationString: "线下委托请选择",
+				locationString: "",
 				location: null,
 				joinEndTime:0,
 				numtype:["男女不限","自定义","限女生","限男生"],
@@ -302,6 +332,7 @@ import { AgeType } from "../../common/define_const"
 				agemin:18,
 				agemax:AgeType.Max,
 				pickerAgeDefault:[0,AgeType.Max-18],
+				tasktype:TaskType.Active,
 			}
 		},
 		onLoad(e) {
@@ -309,6 +340,10 @@ import { AgeType } from "../../common/define_const"
 			// 	backgroundColor:theme.primary,
 			// 	frontColor:"#ffffff",
 			// })
+			
+			if (e.tasktype != null) {
+				this.tasktype = parseInt(e.tasktype)
+			}
 			
 			if (e?.taskid) {				
 				var t = store.getters.getTaskById(e.taskid)
@@ -339,6 +374,7 @@ import { AgeType } from "../../common/define_const"
 				this.contact_way = t.contact_way || ""
 				this.agemin = t.agemin || 18
 				this.agemax = t.agemax || 65
+				this.tasktype = t.tasktype || TaskType.Active
 				
 				if (t.address) {
 					this.locationString = t.address.name || t.address.address
@@ -358,14 +394,47 @@ import { AgeType } from "../../common/define_const"
 					this.imageValue = img
 				}
 			}
+			
+			switch (this.tasktype){
+				case TaskType.Active:
+					this.currentMoney = 1
+					break;
+				case TaskType.Help:
+					break;
+				case TaskType.Service:
+					this.currentMoney = 1
+					break;
+				default:
+					break;
+			}
 		},
 		computed:{
 			...mapState({
 				user: state => state.user_data.user,
 				userlocation: state => state.user_data.location,
 			}),
+			taskTypeString(){
+				switch (this.tasktype){
+					case TaskType.Active:
+						return "活动组局"
+					case TaskType.Help:
+						return "寻求帮助"
+					case TaskType.Service:
+						return "提供服务"
+					default:
+						break;
+				}
+				return ""
+			},
 			optName() {
-				return this.editTask == null ? "发布" : "确认修改"
+				return this.editTask == null ? "立即发布" : "确认修改"
+			},
+			timeClass() {
+				if (this.joinEndTime == 0) {
+					return "sub-text"
+				}else{
+					return ""
+				}
 			},
 			taskJoinEndTime() {
 				if (this.joinEndTime == 0) {
@@ -395,7 +464,13 @@ import { AgeType } from "../../common/define_const"
 				let min = this.agemin >= AgeType.Max ? AgeType.Min : this.agemin
 				let max = this.agemax >= AgeType.Max ? "不限" : `${this.agemax}岁`
 				return `${min} - ${max}`
-			}
+			},
+			locationStr() {
+				return this.locationString == "" ? "线下请选择地点" :this.locationString
+			},
+			locationClass() {
+				return this.locationString == "" ? "sub-text" : ""
+			},
 		},
 		methods: {
 			...mapMutations(["setLocation"]),
@@ -429,9 +504,9 @@ import { AgeType } from "../../common/define_const"
 			onDeleteImage(e) {
 				console.log("delete image ",e)
 			},
-			onClickNumItem(e) {
-				console.log("moneyitem ",e)
-				let index = e.detail.value
+			onClickNumItem(index) {
+				// console.log("moneyitem ",e)
+				// let index = e.detail.value
 				if (this.currentNum !== index) {
 					this.currentNum = index
 				}
@@ -612,6 +687,7 @@ import { AgeType } from "../../common/define_const"
 					contact_way:this.contact_way,
 					agemin: this.agemin,
 					agemax: this.agemax,
+					tasktype: this.tasktype,
 				}
 				if (this.location) {
 					task.address = this.location
@@ -740,16 +816,71 @@ import { AgeType } from "../../common/define_const"
 <style lang="scss">
 	@import "@/style/my.scss";
 	
+	.main-text {
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 20px;
+		text-align: justify;
+		font-style: normal;
+	}
+	
+	.tip-text {
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 600;
+		// font-size: 14px;
+		color: #1E221E;
+		line-height: 20px;
+		text-align: justify;
+		font-style: normal;
+		margin: 5px 10px;
+	}
+	
+	.num-select, .num-unselect {
+		border-radius: 13px;
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 400;
+		// font-size: 14px;
+		line-height: 20px;
+		text-align: justify;
+		font-style: normal;
+		margin-right: 5px;
+		padding: 3px 5px;
+	}
+	
+	.num-select {
+		color: #124778;
+		background: #F4F8FB;
+	}
+	
+	.num-unselect {
+		color: #6F6F6F;
+		background: #F6F6F6;
+	}
+	
+	.num-input {
+		width: 65px;
+		height: 28px;
+		background: #F8F8F8;
+		// border-radius: 14px;
+		border: 1px solid #D4D4D4;
+	}
+	
 	.mainCol {
 		margin: 10px;
 		color: $uni-main-color;
 	}
 	
 	.titleStyle {
-		border-radius: 20px;
+		border-radius: 8px;
+		height: 45px;
 		/* margin: 10px; */
 		background-color: white;
 		width: 100%;
+		
+		display: flex; /* 开启flex布局 */
+		justify-content: center; /* 水平居中对齐 */
+		align-items: center; /* 垂直居中对齐 */
 	}
 	
 	.colItem {
@@ -761,8 +892,21 @@ import { AgeType } from "../../common/define_const"
 	.itemContent {
 		border-radius: 10px;
 		background-color: white;
+		
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 400;
+		// font-size: 14px;
+		color: #333333;
+		line-height: 20px;
+		text-align: justify;
+		font-style: normal;
 		// margin: 10rpx;
 		// padding: 10rpx;
+	}
+	
+	.sub-text {
+		color: #C3C3C3;
+		// font-size: 14px;
 	}
 	
 	.contentPadding {
@@ -772,6 +916,8 @@ import { AgeType } from "../../common/define_const"
 	.contentStyle {
 		width: 100%;
 		/* margin: 10px; */
+		background-color: $my-color-primary;
+		border-radius: 11px 11px 0px 0px;
 	}
 	
 	.lineMargin {
@@ -787,17 +933,24 @@ import { AgeType } from "../../common/define_const"
 	}
 	
 	.text-score {
-		color: $my-color-primary-second;
-		font-size: 14px;
+		// color: $my-color-primary-second;
+		// font-size: 14px;
 	}
 	
 	.agree-txt {
-		color: $uni-error;
+		color: $my-color-warn_primary;
 		font-size: 14px;
 	}
 	
 	.contact-input {
 		text-align: right;
+		font-family: PingFangSC, PingFang SC;
+		font-weight: 400;
+		// font-size: 14px;
+		color: #333333;
+		line-height: 20px;
+		// text-align: justify;
+		font-style: normal;
 		// font-size: 14px;
 	}
 	// .fill-btn-primary {
